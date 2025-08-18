@@ -1,1 +1,21 @@
-
+{
+  "name": "quiz-app-vercel",
+  "version": "1.0.0",
+  "description": "A self-practice quiz app",
+  "main": "api/generate-quiz.js",
+  "dependencies": {
+    "node-fetch": "^2.6.1"
+  },
+  "scripts": {
+    "start": "vercel dev"
+  },
+  "keywords": [
+    "quiz",
+    "gemini",
+    "ai",
+    "vercel",
+    "serverless"
+  ],
+  "author": "Your Name (Optional)",
+  "license": "MIT"
+}
