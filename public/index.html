@@ -285,7 +285,7 @@
 </head>
 <body>
     <div class="container">
-        <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">📝 Objective Question Generator</h1>
+        <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">📝 Obj. Question AI</h1>
 
         <div id="quizContainer" class="mt-5">
             <!-- Questions will be loaded here -->
@@ -375,7 +375,7 @@
         const resumeBtn = document.getElementById('resumeBtn');
         const quizOverlay = document.getElementById('quizOverlay');
         const mainContainer = document.querySelector('.container');
-        const notificationElement = document.getElementById('notification'); // Get the notification element
+        const notificationElement = document.getElementById('notification');
 
         let generatedQuestions = [];
         let startTime;
@@ -400,7 +400,7 @@
             resultsContainer.style.display = 'none';
             controls.style.display = 'none';
             quizContainer.innerHTML = '';
-            stopTimer(); // Ensure timer is stopped if user starts new quiz while old one was active
+            stopTimer();
         });
 
         cancelBtn.addEventListener('click', () => {
@@ -421,9 +421,9 @@
             floatingTimerControls.style.display = 'flex';
             pauseBtn.style.display = 'block';
             resumeBtn.style.display = 'none';
-            document.body.style.overflow = ''; // Enable scrolling for the body
-            quizOverlay.style.display = 'none'; // Hide quiz overlay
-            mainContainer.style.pointerEvents = 'auto'; // Enable interaction on main container
+            document.body.style.overflow = '';
+            quizOverlay.style.display = 'none';
+            mainContainer.style.pointerEvents = 'auto';
 
             timerInterval = setInterval(updateTimerDisplay, 1000);
         }
@@ -448,9 +448,9 @@
             isPaused = true;
             pauseBtn.style.display = 'none';
             resumeBtn.style.display = 'block';
-            document.body.style.overflow = 'hidden'; // Disable body scrolling
-            quizOverlay.style.display = 'flex'; // Show quiz overlay
-            mainContainer.style.pointerEvents = 'none'; // Disable interaction on main container below overlay
+            document.body.style.overflow = 'hidden';
+            quizOverlay.style.display = 'flex';
+            mainContainer.style.pointerEvents = 'none';
         }
 
         function resumeTimer() {
@@ -459,9 +459,9 @@
             startTime = Date.now();
             pauseBtn.style.display = 'block';
             resumeBtn.style.display = 'none';
-            document.body.style.overflow = ''; // Enable body scrolling
-            quizOverlay.style.display = 'none'; // Hide quiz overlay
-            mainContainer.style.pointerEvents = 'auto'; // Enable interaction on main container
+            document.body.style.overflow = '';
+            quizOverlay.style.display = 'none';
+            mainContainer.style.pointerEvents = 'auto';
             timerInterval = setInterval(updateTimerDisplay, 1000);
         }
 
@@ -511,7 +511,7 @@
             showError('');
             loadingSpinner.style.display = 'block';
             fab.disabled = true;
-            stopTimer(); // Ensure timer is stopped before new generation
+            stopTimer();
 
             const proxyUrl = '/api/generate-quiz';
 
@@ -530,9 +530,9 @@
                         questionAnswerTimes = new Array(generatedQuestions.length).fill(null);
                         displayQuestions(generatedQuestions);
                         controls.style.display = 'flex';
-                        startTimer(); // Start the timer when questions are displayed
+                        startTimer();
                         window.scrollTo({ top: 0, behavior: 'smooth' });
-                        submitBtn.disabled = false; // Enable submit button for new quiz
+                        submitBtn.disabled = false;
                     } else {
                         throw new Error(result.error || 'Proxy returned an empty or invalid array of questions.');
                     }
@@ -565,7 +565,7 @@
                             </div>
                         `).join('')}
                     </div>
-                    <div class="explanation-text" style="display: none;"> <!-- Initially hidden -->
+                    <div class="explanation-text" style="display: none;">
                         <strong>Explanation:</strong> <span class="explanation-content">${q.explanation}</span>
                     </div>
                     <p class="answer-time" style="display: none;"></p>
@@ -652,16 +652,14 @@
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF('p', 'mm', 'a4');
 
-            // Create a temporary container for rendering PDF content
             const elementsToPrint = document.createElement('div');
-            elementsToPrint.style.width = '760px'; // Match the main container's content width
+            elementsToPrint.style.width = '760px';
             elementsToPrint.style.padding = '20px';
             elementsToPrint.style.backgroundColor = '#ffffff';
             elementsToPrint.style.position = 'absolute';
-            elementsToPrint.style.top = '-9999px'; // Position off-screen to avoid flicker
-            elementsToPrint.style.left = '-9999px'; // Ensure it's truly off-screen
+            elementsToPrint.style.top = '-9999px';
+            elementsToPrint.style.left = '-9999px';
 
-            // Add a title to the PDF content
             const pdfTitle = document.createElement('h1');
             pdfTitle.textContent = `Quiz on: ${modalTopicInput.value}`;
             pdfTitle.style.fontSize = '24px';
@@ -670,58 +668,52 @@
             pdfTitle.style.textAlign = 'center';
             elementsToPrint.appendChild(pdfTitle);
 
-            // Clone the quiz content and append it
             const clonedQuiz = quizContainer.cloneNode(true);
-            // Remove the timer display from the cloned quiz as it's a floating element, not part of the quiz questions themselves
             const clonedTimer = clonedQuiz.querySelector('.timer-display');
             if (clonedTimer) clonedTimer.remove();
             elementsToPrint.appendChild(clonedQuiz);
 
-            // Clone and append results if they are visible
             if (resultsContainer.style.display !== 'none') {
                 const clonedResults = resultsContainer.cloneNode(true);
                 clonedResults.style.marginTop = '20px';
                 elementsToPrint.appendChild(clonedResults);
             }
 
-            // Temporarily add the container to the DOM for html2canvas to render it
             document.body.appendChild(elementsToPrint);
 
             try {
-                // Generate canvas from the temporary container
                 const canvas = await html2canvas(elementsToPrint, {
-                    scale: 2, // Increase scale for better resolution
+                    scale: 1.0, // Adjusted scale for smaller file size
                     logging: true,
                     useCORS: true,
                 });
 
-                const imgData = canvas.toDataURL('image/png');
-                const imgWidth = 210; // A4 width in mm
-                const pageHeight = 297; // A4 height in mm
+                const imgData = canvas.toDataURL('image/jpeg', 0.8); // Use JPEG for better compression, quality 0.8
+                const imgWidth = 210;
+                const pageHeight = 297;
                 const imgHeight = canvas.height * imgWidth / canvas.width;
                 let heightLeft = imgHeight;
 
                 let position = 0;
 
-                doc.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                doc.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight); // Use JPEG here too
                 heightLeft -= pageHeight;
 
                 while (heightLeft >= 0) {
                     position = heightLeft - imgHeight;
                     doc.addPage();
-                    doc.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                    doc.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
                     heightLeft -= pageHeight;
                 }
                 
                 doc.save(`Quiz_on_${modalTopicInput.value.replace(/\s+/g, '_')}.pdf`);
-                showNotification('PDF downloaded successfully! 🎉'); // Show success notification
+                showNotification('PDF downloaded successfully! 🎉');
 
             } catch (error) {
                 console.error("Error generating PDF:", error);
                 showError("Failed to generate PDF. Please try again.");
-                showNotification('PDF download failed! 😢', 5000); // Show error notification
+                showNotification('PDF download failed! 😢', 5000);
             } finally {
-                // Clean up: remove the temporary container from the DOM
                 if (document.body.contains(elementsToPrint)) {
                     document.body.removeChild(elementsToPrint);
                 }
@@ -743,7 +735,7 @@
             quizContainer.innerHTML = '';
             controls.style.display = 'none';
             resultsContainer.style.display = 'none';
-            floatingTimerControls.style.display = 'none'; // Hide timer on initial load
+            floatingTimerControls.style.display = 'none';
             showError('');
         };
     </script>
