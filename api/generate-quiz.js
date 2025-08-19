@@ -28,12 +28,14 @@ module.exports = async (req, res) => {
         }
 
         // Construct the prompt string that will be sent to the Gemini API
-        const prompt = `Generate ${numQuestions} objective questions about "${topic}". Each question should have exactly 4 options (A, B, C, D) and one correct answer. Provide the output as a JSON array of objects. Each object should have 'questionText', 'options' (an array of strings), and 'correctAnswer' (the string of the correct option). Ensure the options are clearly distinct and the question is clear. For example:
+        // Added instruction for explanation.
+        const prompt = `Generate ${numQuestions} objective questions about "${topic}". Each question should have exactly 4 options (A, B, C, D), one correct answer, and a short, concise explanation for why the correct answer is correct. Provide the output as a JSON array of objects. Each object should have 'questionText', 'options' (an array of strings), 'correctAnswer' (the string of the correct option), and 'explanation' (a string explaining the correct answer). Ensure the options are clearly distinct and the question is clear. For example:
 [
   {
     "questionText": "What is the capital of France?",
     "options": ["Berlin", "Madrid", "Paris", "Rome"],
-    "correctAnswer": "Paris"
+    "correctAnswer": "Paris",
+    "explanation": "Paris is the largest city and capital of France, known for its art, fashion, and culture."
   }
 ]`;
 
@@ -49,9 +51,10 @@ module.exports = async (req, res) => {
                         properties: {
                             "questionText": { "type": "STRING" },
                             "options": { "type": "ARRAY", "items": { "type": "STRING" } },
-                            "correctAnswer": { "type": "STRING" }
+                            "correctAnswer": { "type": "STRING" },
+                            "explanation": { "type": "STRING" } // Added explanation to the schema
                         },
-                        required: ["questionText", "options", "correctAnswer"]
+                        required: ["questionText", "options", "correctAnswer", "explanation"] // Mark explanation as required
                     }
                 }
             }
