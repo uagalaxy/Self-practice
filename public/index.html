@@ -8,7 +8,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <script src="https://cdnjs.com/libraries/jspdf"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         body {
@@ -195,10 +194,10 @@
             display: none;
             font-weight: 500;
         }
-        /* Floating Timer Styles */
+        /* Floating Timer Styles - Adjusted z-index and top */
         #floatingTimerControls {
             position: fixed;
-            top: 20px;
+            top: 10px; /* Moved slightly higher */
             right: 20px;
             background-color: #6366f1;
             color: white;
@@ -209,7 +208,7 @@
             align-items: center;
             gap: 10px;
             font-weight: 600;
-            z-index: 1000;
+            z-index: 2001; /* Higher than quiz-overlay (1500) and modal (2000) */
             display: none;
         }
         #floatingTimerControls button {
@@ -232,7 +231,7 @@
             width: 100%;
             height: 100%;
             background-color: rgba(255, 255, 255, 0.8);
-            z-index: 1500;
+            z-index: 1500; /* Lower than floatingTimerControls, higher than quiz content */
             display: none;
             justify-content: center;
             align-items: center;
@@ -248,7 +247,7 @@
             margin-top: 15px;
             font-size: 0.95rem;
             color: #0c4a6e;
-            display: none;
+            /* No longer display: none; by default. Controlled by JS. */
         }
         .answer-time {
             font-size: 0.85rem;
@@ -263,7 +262,8 @@
         <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">📝 Objective Question Generator</h1>
 
         <div id="quizContainer" class="mt-5">
-            </div>
+            <!-- Questions will be loaded here -->
+        </div>
 
         <div id="controls" class="flex flex-col md:flex-row justify-center gap-4 mt-4" style="display: none;">
             <button id="submitBtn" class="btn btn-primary flex-1">Submit Answers</button>
@@ -280,20 +280,24 @@
         </div>
     </div>
 
+    <!-- Floating action button -->
     <button id="fab" class="fab">
         <i class="fas fa-plus"></i>
     </button>
 
+    <!-- Floating Timer and Controls -->
     <div id="floatingTimerControls">
         <span id="timer">Time: 00:00</span>
         <button id="pauseBtn"><i class="fas fa-pause"></i></button>
         <button id="resumeBtn" style="display: none;"><i class="fas fa-play"></i></button>
     </div>
 
+    <!-- Quiz Overlay for Pause -->
     <div id="quizOverlay" class="quiz-overlay">
         Quiz Paused
     </div>
 
+    <!-- Modal for question inputs -->
     <div id="inputModal" class="modal">
         <div class="modal-content">
             <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Generate New Quiz</h2>
@@ -349,13 +353,14 @@
         let isPaused = false;
         let questionAnswerTimes = [];
 
+        // Event listeners for modal
         fab.addEventListener('click', () => {
             inputModal.style.display = 'flex';
             floatingTimerControls.style.display = 'none';
             resultsContainer.style.display = 'none';
             controls.style.display = 'none';
             quizContainer.innerHTML = '';
-            stopTimer();
+            stopTimer(); // Ensure timer is stopped if user starts new quiz while old one was active
         });
 
         cancelBtn.addEventListener('click', () => {
@@ -368,6 +373,7 @@
             }
         });
 
+        // Stopwatch functions
         function startTimer() {
             pausedTime = 0;
             isPaused = false;
@@ -375,9 +381,9 @@
             floatingTimerControls.style.display = 'flex';
             pauseBtn.style.display = 'block';
             resumeBtn.style.display = 'none';
-            document.body.style.overflow = '';
+            document.body.style.overflow = ''; // Enable scrolling
             quizOverlay.style.display = 'none';
-            quizContainer.style.pointerEvents = 'auto';
+            quizContainer.style.pointerEvents = 'auto'; // Enable quiz interaction
 
             timerInterval = setInterval(updateTimerDisplay, 1000);
         }
@@ -396,32 +402,33 @@
         }
 
         function pauseTimer() {
-            if (isPaused) return; // Prevent multiple pauses
+            if (isPaused) return;
             clearInterval(timerInterval);
             pausedTime += Date.now() - startTime;
             isPaused = true;
             pauseBtn.style.display = 'none';
             resumeBtn.style.display = 'block';
-            document.body.style.overflow = 'hidden';
-            quizOverlay.style.display = 'flex';
-            quizContainer.style.pointerEvents = 'none';
+            document.body.style.overflow = 'hidden'; // Disable scrolling
+            quizOverlay.style.display = 'flex'; // Show overlay
+            quizContainer.style.pointerEvents = 'none'; // Disable quiz interaction (only quiz area)
         }
 
         function resumeTimer() {
-            if (!isPaused) return; // Prevent multiple resumes
+            if (!isPaused) return;
             isPaused = false;
             startTime = Date.now();
             pauseBtn.style.display = 'block';
             resumeBtn.style.display = 'none';
-            document.body.style.overflow = '';
-            quizOverlay.style.display = 'none';
-            quizContainer.style.pointerEvents = 'auto';
+            document.body.style.overflow = ''; // Enable scrolling
+            quizOverlay.style.display = 'none'; // Hide overlay
+            quizContainer.style.pointerEvents = 'auto'; // Enable quiz interaction
             timerInterval = setInterval(updateTimerDisplay, 1000);
         }
 
         pauseBtn.addEventListener('click', pauseTimer);
         resumeBtn.addEventListener('click', resumeTimer);
 
+        // Utility function for exponential backoff
         async function fetchWithExponentialBackoff(url, options, retries = 5, delay = 1000) {
             for (let i = 0; i < retries; i++) {
                 try {
@@ -464,7 +471,7 @@
             showError('');
             loadingSpinner.style.display = 'block';
             fab.disabled = true;
-            stopTimer();
+            stopTimer(); // Ensure timer is stopped before new generation
 
             const proxyUrl = '/api/generate-quiz';
 
@@ -483,8 +490,9 @@
                         questionAnswerTimes = new Array(generatedQuestions.length).fill(null);
                         displayQuestions(generatedQuestions);
                         controls.style.display = 'flex';
-                        startTimer();
+                        startTimer(); // Start the timer when questions are displayed
                         window.scrollTo({ top: 0, behavior: 'smooth' });
+                        submitBtn.disabled = false; // Enable submit button for new quiz
                     } else {
                         throw new Error(result.error || 'Proxy returned an empty or invalid array of questions.');
                     }
@@ -517,7 +525,7 @@
                             </div>
                         `).join('')}
                     </div>
-                    <div class="explanation-text" style="display: none;">
+                    <div class="explanation-text">
                         <strong>Explanation:</strong> <span class="explanation-content">${q.explanation}</span>
                     </div>
                     <p class="answer-time" style="display: none;"></p>
@@ -562,20 +570,20 @@
                         questionCard.classList.add('border-green-500');
                         feedbackText.textContent = 'Correct! 🎉';
                         feedbackText.style.color = '#10B981';
-                        explanationDiv.style.display = 'none';
                     } else {
                         questionCard.classList.add('border-red-500');
                         feedbackText.textContent = `Incorrect. The correct answer was: ${q.correctAnswer}`;
                         feedbackText.style.color = '#EF4444';
-                        explanationDiv.style.display = 'block';
                     }
                 } else {
                     questionCard.classList.add('border-yellow-500');
                     feedbackText.textContent = `You did not select an answer. Correct: ${q.correctAnswer}`;
                     feedbackText.style.color = '#F59E0B';
-                    explanationDiv.style.display = 'block';
                 }
                 questionCard.appendChild(feedbackText);
+                
+                // Always display explanation after submission
+                explanationDiv.style.display = 'block';
 
                 if (questionAnswerTimes[index] !== null) {
                     const ansTime = questionAnswerTimes[index];
@@ -596,6 +604,7 @@
             resultsContainer.style.display = 'block';
             window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
             submitBtn.disabled = true;
+            // Disable all radio buttons after submission
             document.querySelectorAll('input[type="radio"]').forEach(radio => radio.disabled = true);
         }
 
@@ -603,13 +612,15 @@
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF('p', 'mm', 'a4');
 
+            // Create a temporary container for rendering PDF content
             const elementsToPrint = document.createElement('div');
-            elementsToPrint.style.width = '760px';
+            elementsToPrint.style.width = '760px'; // Match the main container's content width
             elementsToPrint.style.padding = '20px';
             elementsToPrint.style.backgroundColor = '#ffffff';
             elementsToPrint.style.position = 'absolute';
-            elementsToPrint.style.top = '-9999px'; // Position off-screen
+            elementsToPrint.style.top = '-9999px'; // Position off-screen to avoid flicker
 
+            // Add a title to the PDF content
             const pdfTitle = document.createElement('h1');
             pdfTitle.textContent = `Quiz on: ${modalTopicInput.value}`;
             pdfTitle.style.fontSize = '24px';
@@ -618,29 +629,37 @@
             pdfTitle.style.textAlign = 'center';
             elementsToPrint.appendChild(pdfTitle);
 
+            // Clone the quiz content and append it
             const clonedQuiz = quizContainer.cloneNode(true);
+            // Remove the timer display from the cloned quiz as it's a floating element, not part of the quiz questions themselves
+            const clonedTimer = clonedQuiz.querySelector('.timer-display');
+            if (clonedTimer) clonedTimer.remove();
             elementsToPrint.appendChild(clonedQuiz);
 
+            // Clone and append results if they are visible
             if (resultsContainer.style.display !== 'none') {
                 const clonedResults = resultsContainer.cloneNode(true);
                 clonedResults.style.marginTop = '20px';
                 elementsToPrint.appendChild(clonedResults);
             }
 
+            // Temporarily add the container to the DOM for html2canvas to render it
             document.body.appendChild(elementsToPrint);
 
             try {
+                // Generate canvas from the temporary container
                 const canvas = await html2canvas(elementsToPrint, {
-                    scale: 2,
+                    scale: 2, // Increase scale for better resolution
                     logging: true,
                     useCORS: true,
-                    scrollX: -window.scrollX,
-                    scrollY: -window.scrollY
+                    // These options might not be needed with off-screen rendering:
+                    // scrollX: -window.scrollX,
+                    // scrollY: -window.scrollY
                 });
 
                 const imgData = canvas.toDataURL('image/png');
-                const imgWidth = 210;
-                const pageHeight = 297;
+                const imgWidth = 210; // A4 width in mm
+                const pageHeight = 297; // A4 height in mm
                 const imgHeight = canvas.height * imgWidth / canvas.width;
                 let heightLeft = imgHeight;
 
@@ -662,6 +681,7 @@
                 console.error("Error generating PDF:", error);
                 showError("Failed to generate PDF. Please try again.");
             } finally {
+                // Clean up: remove the temporary container from the DOM
                 if (document.body.contains(elementsToPrint)) {
                     document.body.removeChild(elementsToPrint);
                 }
@@ -683,7 +703,7 @@
             quizContainer.innerHTML = '';
             controls.style.display = 'none';
             resultsContainer.style.display = 'none';
-            floatingTimerControls.style.display = 'none';
+            floatingTimerControls.style.display = 'none'; // Hide timer on initial load
             showError('');
         };
     </script>
