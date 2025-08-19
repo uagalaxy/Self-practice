@@ -1,529 +1,668 @@
-<!DOCTYPE html>
+​<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Objective Question Self-Practice</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f3f4f6;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            min-height: 100vh;
-            padding: 20px;
-            box-sizing: border-box;
-        }
-        .container {
-            background-color: #ffffff;
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-            max-width: 800px;
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-        .btn {
-            padding: 12px 25px;
-            border-radius: 10px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background-color 0.2s ease, transform 0.1s ease;
-            text-align: center;
-        }
-        .btn-primary {
-            background-color: #6366f1;
-            color: #ffffff;
-            box-shadow: 0 4px 10px rgba(99, 102, 241, 0.3);
-        }
-        .btn-primary:hover {
-            background-color: #4f46e5;
-            transform: translateY(-2px);
-        }
-        .btn-primary:active {
-            transform: translateY(0);
-        }
-        .fab {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            width: 60px;
-            height: 60px;
-            background-color: #6366f1;
-            color: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            box-shadow: 0 4px 10px rgba(99, 102, 241, 0.4);
-            cursor: pointer;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-            z-index: 1000;
-        }
-        .fab:hover {
-            transform: scale(1.05);
-            box-shadow: 0 6px 15px rgba(99, 102, 241, 0.5);
-        }
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 2000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.4);
-            justify-content: center;
-            align-items: center;
-        }
-        .modal-content {
-            background-color: #fff;
-            padding: 2rem;
-            border-radius: 1rem;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-            width: 90%;
-            max-width: 500px;
-            animation: fadeIn 0.3s ease-out;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .input-group label {
-            font-weight: 600;
-            color: #374151;
-            margin-bottom: 8px;
-            display: block;
-        }
-        .input-group input, .input-group select {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #d1d5db;
-            border-radius: 8px;
-            font-size: 1rem;
-            color: #4b5563;
-            transition: border-color 0.2s ease;
-        }
-        .input-group input:focus, .input-group select:focus {
-            outline: none;
-            border-color: #6366f1;
-            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
-        }
-        .question-card {
-            background-color: #f9fafb;
-            padding: 20px;
-            border-radius: 10px;
-            border: 1px solid #e5e7eb;
-            margin-bottom: 15px;
-        }
-        .question-card p.question-text {
-            font-size: 1.15rem;
-            font-weight: 500;
-            color: #1f2937;
-            margin-bottom: 15px;
-        }
-        .question-card .option label {
-            display: flex;
-            align-items: center;
-            padding: 10px 12px;
-            background-color: #ffffff;
-            border: 1px solid #e5e7eb;
-            border-radius: 8px;
-            margin-bottom: 10px;
-            cursor: pointer;
-            transition: background-color 0.2s ease, border-color 0.2s ease;
-        }
-        .question-card .option label:hover {
-            background-color: #eff6ff;
-            border-color: #a7b4f5;
-        }
-        .question-card .option input[type="radio"] {
-            margin-right: 12px;
-            accent-color: #6366f1;
-            transform: scale(1.2);
-        }
-        .loading-spinner {
-            border: 4px solid rgba(0, 0, 0, 0.1);
-            border-left-color: #6366f1;
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            animation: spin 1s linear infinite;
-            margin: 20px auto;
-            display: none;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        .results-section {
-            background-color: #ecfdf5;
-            padding: 25px;
-            border-radius: 15px;
-            border: 1px solid #a7f3d0;
-            text-align: center;
-            display: none;
-        }
-        .results-section h2 {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: #065f46;
-            margin-bottom: 10px;
-        }
-        .results-section p {
-            font-size: 1.1rem;
-            color: #065f46;
-        }
-        .error-message {
-            color: #ef4444;
-            background-color: #fee2e2;
-            padding: 15px;
-            border-radius: 10px;
-            border: 1px solid #fca5a5;
-            margin-top: 15px;
-            display: none;
-            font-weight: 500;
-        }
-        .timer-display {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: #4b5563;
-            text-align: right;
-            margin-bottom: 10px;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Objective Question Self-Practice</title>
+<script src="[https://cdn.tailwindcss.com](https://cdn.tailwindcss.com)"></script>
+<link href="[https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap](https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap)" rel="stylesheet">
+<link rel="stylesheet" href="[https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css](https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css)">
+<script src="[https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js](https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js)"></script>
+<script src="[https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js](https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js)"></script>
+<style>
+body {
+font-family: 'Inter', sans-serif;
+background-color: #f3f4f6;
+display: flex;
+justify-content: center;
+align-items: flex-start;
+min-height: 100vh;
+padding: 20px;
+box-sizing: border-box;
+overflow-y: auto; /* Ensure scrolling is possible by default /
+}
+.container {
+background-color: #ffffff;
+padding: 30px;
+border-radius: 15px;
+box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+max-width: 800px;
+width: 100%;
+display: flex;
+flex-direction: column;
+gap: 20px;
+}
+.btn {
+padding: 12px 25px;
+border-radius: 10px;
+font-weight: 600;
+cursor: pointer;
+transition: background-color 0.2s ease, transform 0.1s ease;
+text-align: center;
+}
+.btn-primary {
+background-color: #6366f1;
+color: #ffffff;
+box-shadow: 0 4px 10px rgba(99, 102, 241, 0.3);
+}
+.btn-primary:hover {
+background-color: #4f46e5;
+transform: translateY(-2px);
+}
+.btn-primary:active {
+transform: translateY(0);
+}
+.fab {
+position: fixed;
+bottom: 30px;
+right: 30px;
+width: 60px;
+height: 60px;
+background-color: #6366f1;
+color: white;
+border-radius: 50%;
+display: flex;
+align-items: center;
+justify-content: center;
+font-size: 24px;
+box-shadow: 0 4px 10px rgba(99, 102, 241, 0.4);
+cursor: pointer;
+transition: transform 0.2s ease, box-shadow 0.2s ease;
+z-index: 1000;
+}
+.fab:hover {
+transform: scale(1.05);
+box-shadow: 0 6px 15px rgba(99, 102, 241, 0.5);
+}
+.modal {
+display: none;
+position: fixed;
+z-index: 2000;
+left: 0;
+top: 0;
+width: 100%;
+height: 100%;
+background-color: rgba(0, 0, 0, 0.4);
+justify-content: center;
+align-items: center;
+}
+.modal-content {
+background-color: #fff;
+padding: 2rem;
+border-radius: 1rem;
+box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+width: 90%;
+max-width: 500px;
+animation: fadeIn 0.3s ease-out;
+}
+@keyframes fadeIn {
+from { opacity: 0; transform: translateY(-20px); }
+to { opacity: 1; transform: translateY(0); }
+}
+.input-group label {
+font-weight: 600;
+color: #374151;
+margin-bottom: 8px;
+display: block;
+}
+.input-group input, .input-group select {
+width: 100%;
+padding: 12px;
+border: 1px solid #d1d5db;
+border-radius: 8px;
+font-size: 1rem;
+color: #4b5563;
+transition: border-color 0.2s ease;
+}
+.input-group input:focus, .input-group select:focus {
+outline: none;
+border-color: #6366f1;
+box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+}
+.question-card {
+background-color: #f9fafb;
+padding: 20px;
+border-radius: 10px;
+border: 1px solid #e5e7eb;
+margin-bottom: 15px;
+}
+.question-card p.question-text {
+font-size: 1.15rem;
+font-weight: 500;
+color: #1f2937;
+margin-bottom: 15px;
+}
+.question-card .option label {
+display: flex;
+align-items: center;
+padding: 10px 12px;
+background-color: #ffffff;
+border: 1px solid #e5e7eb;
+border-radius: 8px;
+margin-bottom: 10px;
+cursor: pointer;
+transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+.question-card .option label:hover {
+background-color: #eff6ff;
+border-color: #a7b4f5;
+}
+.question-card .option input[type="radio"] {
+margin-right: 12px;
+accent-color: #6366f1;
+transform: scale(1.2);
+}
+.loading-spinner {
+border: 4px solid rgba(0, 0, 0, 0.1);
+border-left-color: #6366f1;
+border-radius: 50%;
+width: 30px;
+height: 30px;
+animation: spin 1s linear infinite;
+margin: 20px auto;
+display: none;
+}
+@keyframes spin {
+0% { transform: rotate(0deg); }
+100% { transform: rotate(360deg); }
+}
+.results-section {
+background-color: #ecfdf5;
+padding: 25px;
+border-radius: 15px;
+border: 1px solid #a7f3d0;
+text-align: center;
+display: none;
+}
+.results-section h2 {
+font-size: 1.8rem;
+font-weight: 700;
+color: #065f46;
+margin-bottom: 10px;
+}
+.results-section p {
+font-size: 1.1rem;
+color: #065f46;
+}
+.error-message {
+color: #ef4444;
+background-color: #fee2e2;
+padding: 15px;
+border-radius: 10px;
+border: 1px solid #fca5a5;
+margin-top: 15px;
+display: none;
+font-weight: 500;
+}
+/ Floating Timer Styles /
+#floatingTimerControls {
+position: fixed;
+top: 20px;
+right: 20px;
+background-color: #6366f1;
+color: white;
+padding: 10px 15px;
+border-radius: 10px;
+box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+display: flex;
+align-items: center;
+gap: 10px;
+font-weight: 600;
+z-index: 1000;
+display: none; / Hidden by default /
+}
+#floatingTimerControls button {
+background-color: rgba(255, 255, 255, 0.2);
+border: none;
+padding: 5px 10px;
+border-radius: 5px;
+cursor: pointer;
+color: white;
+transition: background-color 0.2s ease;
+}
+#floatingTimerControls button:hover {
+background-color: rgba(255, 255, 255, 0.4);
+}
+/ Overlay for pause /
+.quiz-overlay {
+position: fixed;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+background-color: rgba(255, 255, 255, 0.8); / Semi-transparent white overlay /
+z-index: 1500; / Higher than quiz content but lower than modal /
+display: none; / Hidden by default /
+justify-content: center;
+align-items: center;
+font-size: 2rem;
+color: #374151;
+font-weight: 700;
+}
+.explanation-text {
+background-color: #e0f2fe; / Light blue for explanation /
+padding: 10px;
+border-left: 4px solid #38bdf8; / Blue border /
+border-radius: 5px;
+margin-top: 15px;
+font-size: 0.95rem;
+color: #0c4a6e;
+display: none; / Hidden by default */
+}
+.answer-time {
+font-size: 0.85rem;
+color: #6b7280;
+margin-top: 5px;
+font-style: italic;
+}
+</style>
 </head>
 <body>
-    <div class="container">
-        <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">📝 Objective Question Generator</h1>
-
-        <div id="quizContainer" class="mt-5">
-            </div>
-
-        <div id="controls" class="flex flex-col md:flex-row justify-center gap-4 mt-4" style="display: none;">
-            <button id="submitBtn" class="btn btn-primary flex-1">Submit Answers</button>
-            <button id="downloadPdfBtn" class="btn btn-primary flex-1">Download PDF</button>
-        </div>
-
-        <div id="loadingSpinner" class="loading-spinner"></div>
-        <div id="errorMessage" class="error-message"></div>
-
-        <div id="resultsContainer" class="results-section mt-5">
-            <h2>Quiz Results</h2>
-            <p id="scoreText" class="text-lg"></p>
-            <p id="timeText" class="text-lg"></p>
-        </div>
-    </div>
-
-    <button id="fab" class="fab">
-        <i class="fas fa-plus"></i>
-    </button>
-
-    <div id="inputModal" class="modal">
-        <div class="modal-content">
-            <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Generate New Quiz</h2>
-            <div class="input-group mb-4">
-                <label for="modalTopicInput">Topic:</label>
-                <input type="text" id="modalTopicInput" placeholder="e.g., Physics, Indian History, Human Anatomy" class="focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500">
-            </div>
-            <div class="input-group mb-6">
-                <label for="modalNumQuestionsSelect">Number of Questions:</label>
-                <select id="modalNumQuestionsSelect" class="focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500">
-                    <option value="5">5</option>
-                    <option value="10">10</option>
-                    <option value="20">20</option>
-                    <option value="30">30</option>
-                    <option value="40">40</option>
-                    <option value="50">50</option>
-                    <option value="100">100</option>
-                </select>
-            </div>
-            <div class="flex gap-4">
-                <button id="generateBtn" class="btn btn-primary w-full">Generate Questions</button>
-                <button id="cancelBtn" class="btn btn-secondary w-full" style="background-color: #d1d5db; color: #374151;">Cancel</button>
-            </div>
-        </div>
-    </div>
-    
-    <script>
-        const fab = document.getElementById('fab');
-        const inputModal = document.getElementById('inputModal');
-        const modalTopicInput = document.getElementById('modalTopicInput');
-        const modalNumQuestionsSelect = document.getElementById('modalNumQuestionsSelect');
-        const generateBtn = document.getElementById('generateBtn');
-        const cancelBtn = document.getElementById('cancelBtn');
-        const quizContainer = document.getElementById('quizContainer');
-        const controls = document.getElementById('controls');
-        const loadingSpinner = document.getElementById('loadingSpinner');
-        const errorMessage = document.getElementById('errorMessage');
-        const submitBtn = document.getElementById('submitBtn');
-        const downloadPdfBtn = document.getElementById('downloadPdfBtn');
-        const resultsContainer = document.getElementById('resultsContainer');
-        const scoreText = document.getElementById('scoreText');
-        const timeText = document.getElementById('timeText');
-
-        let generatedQuestions = [];
-        let startTime;
-        let timerInterval;
-
-        // Event listeners for modal
-        fab.addEventListener('click', () => {
-            inputModal.style.display = 'flex';
-        });
-
-        cancelBtn.addEventListener('click', () => {
-            inputModal.style.display = 'none';
-        });
-
-        window.addEventListener('click', (event) => {
-            if (event.target === inputModal) {
-                inputModal.style.display = 'none';
-            }
-        });
-
-        // Stopwatch functions
-        function startTimer() {
-            startTime = Date.now();
-            timerInterval = setInterval(() => {
-                const elapsed = Date.now() - startTime;
-                const minutes = Math.floor(elapsed / 60000);
-                const seconds = Math.floor((elapsed % 60000) / 1000);
-                document.getElementById('timer').textContent = `Time: ${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-            }, 1000);
-        }
-
-        function stopTimer() {
-            clearInterval(timerInterval);
-        }
-
-        // Utility function for exponential backoff
-        async function fetchWithExponentialBackoff(url, options, retries = 5, delay = 1000) {
-            for (let i = 0; i < retries; i++) {
-                try {
-                    const response = await fetch(url, options);
-                    if (response.ok) {
-                        return response;
-                    } else if (response.status === 429 || response.status >= 500) {
-                        console.warn(`Attempt ${i + 1} failed with status ${response.status}. Retrying in ${delay / 1000}s...`);
-                        await new Promise(res => setTimeout(res, delay));
-                        delay *= 2;
-                    } else {
-                        const errorData = await response.json();
-                        throw new Error(errorData.error.message || `HTTP error! status: ${response.status}`);
-                    }
-                } catch (error) {
-                    if (i === retries - 1) {
-                        throw error;
-                    }
-                    console.error(`Fetch error on attempt ${i + 1}:`, error.message);
-                    await new Promise(res => setTimeout(res, delay));
-                    delay *= 2;
-                }
-            }
-            throw new Error('Max retries exceeded');
-        }
-
-        async function generateQuestions() {
-            const topic = modalTopicInput.value.trim();
-            const numQuestions = parseInt(modalNumQuestionsSelect.value);
-
-            if (!topic) {
-                showError('Please enter a topic.');
-                return;
-            }
-
-            inputModal.style.display = 'none';
-            quizContainer.innerHTML = '';
-            controls.style.display = 'none';
-            resultsContainer.style.display = 'none';
-            showError('');
-            loadingSpinner.style.display = 'block';
-            fab.disabled = true;
-
-            const proxyUrl = '/api/generate-quiz';
-
-            try {
-                const response = await fetchWithExponentialBackoff(proxyUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        topic: topic,
-                        numQuestions: numQuestions
-                    })
-                });
-
-                const result = await response.json();
-
-                if (response.ok) {
-                    if (Array.isArray(result) && result.length > 0) {
-                        generatedQuestions = result;
-                        displayQuestions(generatedQuestions);
-                        controls.style.display = 'flex';
-                        startTimer();
-                        window.scrollTo({ top: 0, behavior: 'smooth' });
-                    } else {
-                        throw new Error(result.error || 'Proxy returned an empty or invalid array of questions.');
-                    }
-                } else {
-                    throw new Error(result.error || `Proxy server error: ${response.status}`);
-                }
-            } catch (error) {
-                console.error('Error generating questions via proxy:', error);
-                showError(`Failed to generate questions: ${error.message}. Please try again.`);
-            } finally {
-                loadingSpinner.style.display = 'none';
-                fab.disabled = false;
-            }
-        }
-
-        function displayQuestions(questions) {
-            quizContainer.innerHTML = '';
-            // Add timer display at the top of the quiz
-            const timerDiv = document.createElement('div');
-            timerDiv.id = 'timer';
-            timerDiv.className = 'timer-display';
-            timerDiv.textContent = 'Time: 00:00';
-            quizContainer.appendChild(timerDiv);
-
-            questions.forEach((q, index) => {
-                const questionCard = document.createElement('div');
-                questionCard.className = 'bg-gray-50 p-5 rounded-lg border border-gray-200 mb-4';
-                questionCard.innerHTML = `
-                    <p class="text-lg font-medium text-gray-900 mb-4">${index + 1}. ${q.questionText}</p>
-                    <div class="options-group">
-                        ${q.options.map((option, optIndex) => `
-                            <div class="mb-3 option">
-                                <label class="flex items-center p-3 bg-white border border-gray-300 rounded-md cursor-pointer hover:bg-blue-50 hover:border-blue-400 transition-all duration-200">
-                                    <input type="radio" name="question${index}" value="${option}" class="mr-3 accent-indigo-600 transform scale-125">
-                                    <span class="option-text">${String.fromCharCode(65 + optIndex)}. ${option}</span>
-                                </label>
-                            </div>
-                        `).join('')}
-                    </div>
-                `;
-                quizContainer.appendChild(questionCard);
-            });
-        }
-
-        function submitAnswers() {
-            stopTimer();
-            let score = 0;
-            const elapsedTime = Date.now() - startTime;
-            const minutes = Math.floor(elapsedTime / 60000);
-            const seconds = Math.floor((elapsedTime % 60000) / 1000);
-
-            generatedQuestions.forEach((q, index) => {
-                const selectedOption = document.querySelector(`input[name="question${index}"]:checked`);
-                const questionCard = quizContainer.children[index + 1]; // +1 to skip the timer div
-
-                questionCard.classList.remove('border-green-500', 'border-red-500', 'border-yellow-500');
-                const prevFeedback = questionCard.querySelector('.feedback-text');
-                if (prevFeedback) prevFeedback.remove();
-
-                const feedbackText = document.createElement('p');
-                feedbackText.className = 'feedback-text mt-3 font-medium';
-
-                if (selectedOption) {
-                    if (selectedOption.value === q.correctAnswer) {
-                        score++;
-                        questionCard.classList.add('border-green-500');
-                        feedbackText.textContent = 'Correct! 🎉';
-                        feedbackText.style.color = '#10B981';
-                    } else {
-                        questionCard.classList.add('border-red-500');
-                        feedbackText.textContent = `Incorrect. The correct answer was: ${q.correctAnswer}`;
-                        feedbackText.style.color = '#EF4444';
-                    }
-                } else {
-                    questionCard.classList.add('border-yellow-500');
-                    feedbackText.textContent = `You did not select an answer. Correct: ${q.correctAnswer}`;
-                    feedbackText.style.color = '#F59E0B';
-                }
-                questionCard.appendChild(feedbackText);
-            });
-
-            scoreText.textContent = `You scored ${score} out of ${generatedQuestions.length}!`;
-            timeText.textContent = `Time taken: ${String(minutes).padStart(2, '0')}m ${String(seconds).padStart(2, '0')}s`;
-            resultsContainer.style.display = 'block';
-            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-            submitBtn.disabled = true;
-        }
-
-        async function downloadPdf() {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-            
-            // Wait for the DOM to be ready
-            await new Promise(resolve => setTimeout(resolve, 500));
-
-            const quizElement = document.getElementById('quizContainer');
-            const questionCards = quizElement.querySelectorAll('.question-card');
-            
-            doc.text(`Quiz on: ${modalTopicInput.value}`, 10, 10);
-            let y = 20;
-
-            for (let i = 0; i < questionCards.length; i++) {
-                const card = questionCards[i];
-                const questionText = card.querySelector('.question-text').textContent;
-                const options = Array.from(card.querySelectorAll('.option-text')).map(el => el.textContent);
-                const feedback = card.querySelector('.feedback-text') ? card.querySelector('.feedback-text').textContent : '';
-
-                const questionLines = doc.splitTextToSize(questionText, 180);
-                doc.setFontSize(12);
-                doc.text(questionLines, 10, y);
-                y += (questionLines.length * 5) + 5;
-                
-                options.forEach((option, index) => {
-                    const optionLines = doc.splitTextToSize(option, 180);
-                    doc.setFontSize(10);
-                    doc.text(optionLines, 15, y);
-                    y += (optionLines.length * 4) + 2;
-                });
-                
-                if (feedback) {
-                    doc.setFontSize(10);
-                    doc.setTextColor('#10B981');
-                    doc.text(feedback, 10, y);
-                    doc.setTextColor('#000000');
-                    y += 5;
-                }
-
-                y += 5;
-                if (y > 280) { // New page
-                    doc.addPage();
-                    y = 10;
-                }
-            }
-
-            doc.save('quiz.pdf');
-        }
-
-        function showError(message) {
-            errorMessage.textContent = message;
-            errorMessage.style.display = message ? 'block' : 'none';
-        }
-
-        generateBtn.addEventListener('click', generateQuestions);
-        submitBtn.addEventListener('click', submitAnswers);
-        downloadPdfBtn.addEventListener('click', downloadPdf);
-
-        window.onload = () => {
-            modalTopicInput.value = '';
-            modalNumQuestionsSelect.value = '5';
-            quizContainer.innerHTML = '';
-            controls.style.display = 'none';
-            resultsContainer.style.display = 'none';
-            showError('');
-        };
-    </script>
+<div class="container">
+<h1 class="text-3xl font-bold text-center text-gray-800 mb-6">📝 Objective Question Generator</h1>
+​<div id="quizContainer" class="mt-5">
+<!-- Questions will be loaded here -->
+</div>
+​<div id="controls" class="flex flex-col md:flex-row justify-center gap-4 mt-4" style="display: none;">
+<button id="submitBtn" class="btn btn-primary flex-1">Submit Answers</button>
+<button id="downloadPdfBtn" class="btn btn-primary flex-1">Download PDF</button>
+</div>
+​<div id="loadingSpinner" class="loading-spinner"></div>
+<div id="errorMessage" class="error-message"></div>
+​<div id="resultsContainer" class="results-section mt-5">
+<h2>Quiz Results</h2>
+<p id="scoreText" class="text-lg"></p>
+<p id="timeText" class="text-lg"></p>
+</div>
+</div>
+​<!-- Floating action button -->
+<button id="fab" class="fab">
+<i class="fas fa-plus"></i>
+</button>
+​<!-- Floating Timer and Controls -->
+<div id="floatingTimerControls">
+<span id="timer">Time: 00:00</span>
+<button id="pauseBtn"><i class="fas fa-pause"></i></button>
+<button id="resumeBtn" style="display: none;"><i class="fas fa-play"></i></button>
+</div>
+​<!-- Quiz Overlay for Pause -->
+<div id="quizOverlay" class="quiz-overlay">
+Quiz Paused
+</div>
+​<!-- Modal for question inputs -->
+<div id="inputModal" class="modal">
+<div class="modal-content">
+<h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Generate New Quiz</h2>
+<div class="input-group mb-4">
+<label for="modalTopicInput">Topic:</label>
+<input type="text" id="modalTopicInput" placeholder="e.g., Physics, Indian History, Human Anatomy" class="focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500">
+</div>
+<div class="input-group mb-6">
+<label for="modalNumQuestionsSelect">Number of Questions:</label>
+<select id="modalNumQuestionsSelect" class="focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500">
+<option value="5">5</option>
+<option value="10">10</option>
+<option value="20">20</option>
+<option value="30">30</option>
+<option value="40">40</option>
+<option value="50">50</option>
+<option value="100">100</option>
+</select>
+</div>
+<div class="flex gap-4">
+<button id="generateBtn" class="btn btn-primary w-full">Generate Questions</button>
+<button id="cancelBtn" class="btn btn-secondary w-full" style="background-color: #d1d5db; color: #374151;">Cancel</button>
+</div>
+</div>
+</div>
+​<script>
+const fab = document.getElementById('fab');
+const inputModal = document.getElementById('inputModal');
+const modalTopicInput = document.getElementById('modalTopicInput');
+const modalNumQuestionsSelect = document.getElementById('modalNumQuestionsSelect');
+const generateBtn = document.getElementById('generateBtn');
+const cancelBtn = document.getElementById('cancelBtn');
+const quizContainer = document.getElementById('quizContainer');
+const controls = document.getElementById('controls');
+const loadingSpinner = document.getElementById('loadingSpinner');
+const errorMessage = document.getElementById('errorMessage');
+const submitBtn = document.getElementById('submitBtn');
+const downloadPdfBtn = document.getElementById('downloadPdfBtn');
+const resultsContainer = document.getElementById('resultsContainer');
+const scoreText = document.getElementById('scoreText');
+const timeText = document.getElementById('timeText');
+const floatingTimerControls = document.getElementById('floatingTimerControls');
+const timerDisplay = document.getElementById('timer');
+const pauseBtn = document.getElementById('pauseBtn');
+const resumeBtn = document.getElementById('resumeBtn');
+const quizOverlay = document.getElementById('quizOverlay');
+​let generatedQuestions = [];
+let startTime;
+let timerInterval;
+let pausedTime = 0; // Stores the time elapsed when paused
+let isPaused = false;
+let questionAnswerTimes = []; // To store time when each question was answered
+​// Event listeners for modal
+fab.addEventListener('click', () => {
+inputModal.style.display = 'flex';
+// Hide timer and results when opening modal
+floatingTimerControls.style.display = 'none';
+resultsContainer.style.display = 'none';
+controls.style.display = 'none';
+quizContainer.innerHTML = '';
+// Clear any previous timer
+stopTimer();
+});
+​cancelBtn.addEventListener('click', () => {
+inputModal.style.display = 'none';
+});
+​window.addEventListener('click', (event) => {
+if (event.target === inputModal) {
+inputModal.style.display = 'none';
+}
+});
+​// Stopwatch functions
+function startTimer() {
+// Reset for a new quiz
+pausedTime = 0;
+isPaused = false;
+startTime = Date.now();
+floatingTimerControls.style.display = 'flex'; // Show the timer
+pauseBtn.style.display = 'block';
+resumeBtn.style.display = 'none';
+document.body.style.overflow = ''; // Ensure scrolling is enabled
+quizOverlay.style.display = 'none';
+quizContainer.style.pointerEvents = 'auto'; // Enable quiz interaction
+​timerInterval = setInterval(updateTimerDisplay, 1000);
+}
+​function updateTimerDisplay() {
+const elapsed = (Date.now() - startTime) + pausedTime;
+const minutes = Math.floor(elapsed / 60000);
+const seconds = Math.floor((elapsed % 60000) / 1000);
+timerDisplay.textContent = Time: ${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')};
+}
+​function stopTimer() {
+clearInterval(timerInterval);
+pausedTime = 0; // Reset for next quiz
+floatingTimerControls.style.display = 'none'; // Hide timer when quiz ends or new one starts
+}
+​function pauseTimer() {
+clearInterval(timerInterval);
+pausedTime += Date.now() - startTime; // Accumulate elapsed time
+isPaused = true;
+pauseBtn.style.display = 'none';
+resumeBtn.style.display = 'block';
+document.body.style.overflow = 'hidden'; // Disable scrolling
+quizOverlay.style.display = 'flex'; // Show overlay
+quizContainer.style.pointerEvents = 'none'; // Disable quiz interaction
+}
+​function resumeTimer() {
+isPaused = false;
+startTime = Date.now(); // Restart timer from current moment
+pauseBtn.style.display = 'block';
+resumeBtn.style.display = 'none';
+document.body.style.overflow = ''; // Enable scrolling
+quizOverlay.style.display = 'none'; // Hide overlay
+quizContainer.style.pointerEvents = 'auto'; // Enable quiz interaction
+timerInterval = setInterval(updateTimerDisplay, 1000);
+}
+​pauseBtn.addEventListener('click', pauseTimer);
+resumeBtn.addEventListener('click', resumeTimer);
+​// Utility function for exponential backoff
+async function fetchWithExponentialBackoff(url, options, retries = 5, delay = 1000) {
+for (let i = 0; i < retries; i++) {
+try {
+const response = await fetch(url, options);
+if (response.ok) {
+return response;
+} else if (response.status === 429 || response.status >= 500) {
+console.warn(Attempt ${i + 1} failed with status ${response.status}. Retrying in ${delay / 1000}s...);
+await new Promise(res => setTimeout(res, delay));
+delay *= 2;
+} else {
+const errorData = await response.json();
+throw new Error(errorData.error.message || HTTP error! status: ${response.status});
+}
+} catch (error) {
+if (i === retries - 1) {
+throw error;
+}
+console.error(Fetch error on attempt ${i + 1}:, error.message);
+await new Promise(res => setTimeout(res, delay));
+delay *= 2;
+}
+}
+throw new Error('Max retries exceeded');
+}
+​async function generateQuestions() {
+const topic = modalTopicInput.value.trim();
+const numQuestions = parseInt(modalNumQuestionsSelect.value);
+​if (!topic) {
+showError('Please enter a topic.');
+return;
+}
+​inputModal.style.display = 'none';
+quizContainer.innerHTML = '';
+controls.style.display = 'none';
+resultsContainer.style.display = 'none';
+showError('');
+loadingSpinner.style.display = 'block';
+fab.disabled = true;
+stopTimer(); // Ensure timer is stopped before new generation
+​const proxyUrl = '/api/generate-quiz';
+​try {
+const response = await fetchWithExponentialBackoff(proxyUrl, {
+method: 'POST',
+headers: { 'Content-Type': 'application/json' },
+body: JSON.stringify({
+topic: topic,
+numQuestions: numQuestions
+})
+});
+​const result = await response.json();
+​if (response.ok) {
+if (Array.isArray(result) && result.length > 0) {
+generatedQuestions = result;
+// Initialize answer times array for each question
+questionAnswerTimes = new Array(generatedQuestions.length).fill(null);
+displayQuestions(generatedQuestions);
+controls.style.display = 'flex';
+startTimer(); // Start the timer when questions are displayed
+window.scrollTo({ top: 0, behavior: 'smooth' });
+} else {
+throw new Error(result.error || 'Proxy returned an empty or invalid array of questions.');
+}
+} else {
+throw new Error(result.error || Proxy server error: ${response.status});
+}
+} catch (error) {
+console.error('Error generating questions via proxy:', error);
+showError(Failed to generate questions: ${error.message}. Please try again.);
+} finally {
+loadingSpinner.style.display = 'none';
+fab.disabled = false;
+}
+}
+​function displayQuestions(questions) {
+quizContainer.innerHTML = '';
+// No need to add timer div here as it's now a fixed element
+​questions.forEach((q, index) => {
+const questionCard = document.createElement('div');
+questionCard.className = 'bg-gray-50 p-5 rounded-lg border border-gray-200 mb-4';
+questionCard.innerHTML = <p class="text-lg font-medium text-gray-900 mb-4">${index + 1}. ${q.questionText}</p> <div class="options-group"> ${q.options.map((option, optIndex) =>
+<div class="mb-3 option">
+<label class="flex items-center p-3 bg-white border border-gray-300 rounded-md cursor-pointer hover:bg-blue-50 hover:border-blue-400 transition-all duration-200">
+<input type="radio" name="question${index}" value="${option}" class="mr-3 accent-indigo-600 transform scale-125">
+<span class="option-text">${String.fromCharCode(65 + optIndex)}. ${option}</span>
+</label>
+</div>
+).join('')} </div> <div class="explanation-text" style="display: none;"> <strong>Explanation:</strong> <span class="explanation-content">${q.explanation}</span> </div> <p class="answer-time" style="display: none;"></p> ;
+quizContainer.appendChild(questionCard);
+​// Add event listener to each radio button to record answer time
+const radios = questionCard.querySelectorAll(input[name="question${index}"]);
+radios.forEach(radio => {
+radio.addEventListener('change', () => {
+if (questionAnswerTimes[index] === null) { // Record only the first time answered
+// Calculate time relative to quiz start, considering pauses
+const currentTime = Date.now();
+const elapsedDuringSession = currentTime - startTime;
+const totalElapsedTime = elapsedDuringSession + pausedTime;
+questionAnswerTimes[index] = totalElapsedTime;
+}
+});
+});
+});
+}
+​function submitAnswers() {
+stopTimer(); // Stop the timer when answers are submitted
+let score = 0;
+const finalElapsedTime = (Date.now() - startTime) + pausedTime; // Total time taken
+​generatedQuestions.forEach((q, index) => {
+const selectedOption = document.querySelector(input[name="question${index}"]:checked);
+const questionCard = quizContainer.children[index]; // Get the correct question card
+​questionCard.classList.remove('border-green-500', 'border-red-500', 'border-yellow-500');
+const prevFeedback = questionCard.querySelector('.feedback-text');
+if (prevFeedback) prevFeedback.remove();
+​const feedbackText = document.createElement('p');
+feedbackText.className = 'feedback-text mt-3 font-medium';
+const explanationDiv = questionCard.querySelector('.explanation-text');
+const answerTimeDisplay = questionCard.querySelector('.answer-time');
+​if (selectedOption) {
+if (selectedOption.value === q.correctAnswer) {
+score++;
+questionCard.classList.add('border-green-500');
+feedbackText.textContent = 'Correct! 🎉';
+feedbackText.style.color = '#10B981';
+explanationDiv.style.display = 'none'; // Hide explanation for correct answers
+} else {
+questionCard.classList.add('border-red-500');
+feedbackText.textContent = Incorrect. The correct answer was: ${q.correctAnswer};
+feedbackText.style.color = '#EF4444';
+explanationDiv.style.display = 'block'; // Show explanation for incorrect answers
+}
+} else {
+questionCard.classList.add('border-yellow-500');
+feedbackText.textContent = You did not select an answer. Correct: ${q.correctAnswer};
+feedbackText.style.color = '#F59E0B';
+explanationDiv.style.display = 'block'; // Show explanation for unanswered questions
+}
+questionCard.appendChild(feedbackText);
+​// Display individual answer time if recorded
+if (questionAnswerTimes[index] !== null) {
+const ansTime = questionAnswerTimes[index];
+const minutes = Math.floor(ansTime / 60000);
+const seconds = Math.floor((ansTime % 60000) / 1000);
+answerTimeDisplay.textContent = Answered at: ${String(minutes).padStart(2, '0')}m ${String(seconds).padStart(2, '0')}s;
+answerTimeDisplay.style.display = 'block';
+} else {
+answerTimeDisplay.textContent = 'Not answered.';
+answerTimeDisplay.style.display = 'block';
+}
+});
+​scoreText.textContent = You scored ${score} out of ${generatedQuestions.length}!;
+const finalMinutes = Math.floor(finalElapsedTime / 60000);
+const finalSeconds = Math.floor((finalElapsedTime % 60000) / 1000);
+timeText.textContent = Total time taken: ${String(finalMinutes).padStart(2, '0')}m ${String(finalSeconds).padStart(2, '0')}s;
+resultsContainer.style.display = 'block';
+window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+submitBtn.disabled = true; // Prevent resubmission
+// Disable all radio buttons after submission
+document.querySelectorAll('input[type="radio"]').forEach(radio => radio.disabled = true);
+}
+​async function downloadPdf() {
+const { jsPDF } = window.jspdf;
+const doc = new jsPDF('p', 'mm', 'a4'); // 'p' for portrait, 'mm' for millimeters, 'a4' size
+​// Temporarily hide FAB and timer controls for cleaner screenshot
+fab.style.display = 'none';
+floatingTimerControls.style.display = 'none';
+​// Use html2canvas to capture the entire quizContainer content
+// Ensure the container has a defined width, max-width for accurate capture
+const quizContent = document.getElementById('quizContainer');
+const resultsContent = document.getElementById('resultsContainer');
+const controlsContent = document.getElementById('controls');
+​// Set a specific width for html2canvas to render consistently
+quizContent.style.width = '760px'; // Matching max-width of .container - 40px padding
+​try {
+// Combine contents for PDF
+const elementsToPrint = document.createElement('div');
+elementsToPrint.style.width = '760px'; // Match the content width
+elementsToPrint.style.padding = '20px'; // Add some padding
+elementsToPrint.style.backgroundColor = '#ffffff';
+​// Append a title
+const pdfTitle = document.createElement('h1');
+pdfTitle.textContent = Quiz on: ${modalTopicInput.value};
+pdfTitle.style.fontSize = '24px';
+pdfTitle.style.fontWeight = 'bold';
+pdfTitle.style.marginBottom = '20px';
+pdfTitle.style.textAlign = 'center';
+elementsToPrint.appendChild(pdfTitle);
+​// Clone quiz content and append
+const clonedQuiz = quizContent.cloneNode(true);
+// Remove timer display from cloned quiz if it's there
+const clonedTimer = clonedQuiz.querySelector('.timer-display');
+if (clonedTimer) clonedTimer.remove();
+​elementsToPrint.appendChild(clonedQuiz);
+​// Clone results and append if visible
+if (resultsContent.style.display !== 'none') {
+const clonedResults = resultsContent.cloneNode(true);
+clonedResults.style.marginTop = '20px';
+elementsToPrint.appendChild(clonedResults);
+}
+​document.body.appendChild(elementsToPrint); // Temporarily add to DOM for capture
+​const canvas = await html2canvas(elementsToPrint, {
+scale: 2, // Increase scale for better resolution
+logging: true,
+useCORS: true,
+// width: elementsToPrint.offsetWidth, // Ensure width is respected
+// height: elementsToPrint.offsetHeight,
+});
+​const imgData = canvas.toDataURL('image/png');
+const imgWidth = 210; // A4 width in mm
+const pageHeight = 297; // A4 height in mm
+const imgHeight = canvas.height * imgWidth / canvas.width;
+let heightLeft = imgHeight;
+​let position = 0;
+​doc.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+heightLeft -= pageHeight;
+​while (heightLeft >= 0) {
+position = heightLeft - imgHeight;
+doc.addPage();
+doc.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+heightLeft -= pageHeight;
+}
+​doc.save(Quiz_on_${modalTopicInput.value.replace(/\s+/g, '_')}.pdf);
+​} catch (error) {
+console.error("Error generating PDF:", error);
+showError("Failed to generate PDF. Please try again.");
+} finally {
+// Restore original styles and remove temporary element
+quizContent.style.width = '';
+if (document.body.contains(elementsToPrint)) {
+document.body.removeChild(elementsToPrint);
+}
+fab.style.display = 'flex';
+// Only show timer controls if quiz is active
+if (controls.style.display === 'flex' || resultsContainer.style.display === 'block') {
+floatingTimerControls.style.display = 'flex';
+}
+}
+}
+​function showError(message) {
+errorMessage.textContent = message;
+errorMessage.style.display = message ? 'block' : 'none';
+}
+​generateBtn.addEventListener('click', generateQuestions);
+submitBtn.addEventListener('click', submitAnswers);
+downloadPdfBtn.addEventListener('click', downloadPdf);
+​window.onload = () => {
+modalTopicInput.value = '';
+modalNumQuestionsSelect.value = '5';
+quizContainer.innerHTML = '';
+controls.style.display = 'none';
+resultsContainer.style.display = 'none';
+floatingTimerControls.style.display = 'none'; // Hide timer on initial load
+showError('');
+};
+</script>
 </body>
 </html>
