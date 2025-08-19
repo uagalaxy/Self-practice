@@ -260,6 +260,27 @@
             margin-top: 5px;
             font-style: italic;
         }
+        /* Notification styles */
+        #notification {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #10b981; /* Green background */
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            z-index: 2500; /* Above all other elements */
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+            font-weight: 500;
+        }
+        #notification.show {
+            opacity: 1;
+            visibility: visible;
+        }
     </style>
 </head>
 <body>
@@ -328,6 +349,9 @@
             </div>
         </div>
     </div>
+
+    <!-- Notification element -->
+    <div id="notification"></div>
     
     <script>
         const fab = document.getElementById('fab');
@@ -349,8 +373,9 @@
         const timerDisplay = document.getElementById('timer');
         const pauseBtn = document.getElementById('pauseBtn');
         const resumeBtn = document.getElementById('resumeBtn');
-        const quizOverlay = document.getElementById('quizOverlay'); // Get the overlay element
-        const mainContainer = document.querySelector('.container'); // Get the main quiz container
+        const quizOverlay = document.getElementById('quizOverlay');
+        const mainContainer = document.querySelector('.container');
+        const notificationElement = document.getElementById('notification'); // Get the notification element
 
         let generatedQuestions = [];
         let startTime;
@@ -358,6 +383,15 @@
         let pausedTime = 0;
         let isPaused = false;
         let questionAnswerTimes = [];
+
+        // Function to show a notification
+        function showNotification(message, duration = 3000) {
+            notificationElement.textContent = message;
+            notificationElement.classList.add('show');
+            setTimeout(() => {
+                notificationElement.classList.remove('show');
+            }, duration);
+        }
 
         // Event listeners for modal
         fab.addEventListener('click', () => {
@@ -680,10 +714,12 @@
                 }
                 
                 doc.save(`Quiz_on_${modalTopicInput.value.replace(/\s+/g, '_')}.pdf`);
+                showNotification('PDF downloaded successfully! 🎉'); // Show success notification
 
             } catch (error) {
                 console.error("Error generating PDF:", error);
                 showError("Failed to generate PDF. Please try again.");
+                showNotification('PDF download failed! 😢', 5000); // Show error notification
             } finally {
                 // Clean up: remove the temporary container from the DOM
                 if (document.body.contains(elementsToPrint)) {
