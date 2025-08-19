@@ -19,7 +19,7 @@
             min-height: 100vh;
             padding: 20px;
             box-sizing: border-box;
-            overflow-y: auto;
+            overflow-y: auto; /* Ensure scrolling is possible by default */
         }
         .container {
             background-color: #ffffff;
@@ -31,6 +31,8 @@
             display: flex;
             flex-direction: column;
             gap: 20px;
+            position: relative; /* Needed for z-index context */
+            z-index: 1; /* Ensure container is below overlay */
         }
         .btn {
             padding: 12px 25px;
@@ -77,7 +79,7 @@
         .modal {
             display: none;
             position: fixed;
-            z-index: 2000;
+            z-index: 2000; /* Highest for modal dialogs */
             left: 0;
             top: 0;
             width: 100%;
@@ -208,7 +210,7 @@
             align-items: center;
             gap: 10px;
             font-weight: 600;
-            z-index: 2001; /* Higher than quiz-overlay (1500) and modal (2000) */
+            z-index: 1600; /* Higher than quiz-overlay (1500), but lower than modal (2000) */
             display: none;
         }
         #floatingTimerControls button {
@@ -223,9 +225,9 @@
         #floatingTimerControls button:hover {
             background-color: rgba(255, 255, 255, 0.4);
         }
-        /* Overlay for pause */
+        /* Overlay for pause - Positioned relative to the container */
         .quiz-overlay {
-            position: fixed;
+            position: absolute; /* Changed to absolute to cover only the container */
             top: 0;
             left: 0;
             width: 100%;
@@ -238,6 +240,9 @@
             font-size: 2rem;
             color: #374151;
             font-weight: 700;
+            text-align: center;
+            padding: 20px;
+            box-sizing: border-box;
         }
         .explanation-text {
             background-color: #e0f2fe;
@@ -247,7 +252,7 @@
             margin-top: 15px;
             font-size: 0.95rem;
             color: #0c4a6e;
-            /* No longer display: none; by default. Controlled by JS. */
+            display: none; /* Hidden by default, shown by JS after submission */
         }
         .answer-time {
             font-size: 0.85rem;
@@ -278,6 +283,11 @@
             <p id="scoreText" class="text-lg"></p>
             <p id="timeText" class="text-lg"></p>
         </div>
+
+        <!-- Quiz Overlay for Pause - Inside the container for absolute positioning context -->
+        <div id="quizOverlay" class="quiz-overlay">
+            Quiz Paused
+        </div>
     </div>
 
     <!-- Floating action button -->
@@ -290,11 +300,6 @@
         <span id="timer">Time: 00:00</span>
         <button id="pauseBtn"><i class="fas fa-pause"></i></button>
         <button id="resumeBtn" style="display: none;"><i class="fas fa-play"></i></button>
-    </div>
-
-    <!-- Quiz Overlay for Pause -->
-    <div id="quizOverlay" class="quiz-overlay">
-        Quiz Paused
     </div>
 
     <!-- Modal for question inputs -->
@@ -344,7 +349,8 @@
         const timerDisplay = document.getElementById('timer');
         const pauseBtn = document.getElementById('pauseBtn');
         const resumeBtn = document.getElementById('resumeBtn');
-        const quizOverlay = document.getElementById('quizOverlay');
+        const quizOverlay = document.getElementById('quizOverlay'); // Get the overlay element
+        const mainContainer = document.querySelector('.container'); // Get the main quiz container
 
         let generatedQuestions = [];
         let startTime;
@@ -381,9 +387,9 @@
             floatingTimerControls.style.display = 'flex';
             pauseBtn.style.display = 'block';
             resumeBtn.style.display = 'none';
-            document.body.style.overflow = ''; // Enable scrolling
-            quizOverlay.style.display = 'none';
-            quizContainer.style.pointerEvents = 'auto'; // Enable quiz interaction
+            document.body.style.overflow = ''; // Enable scrolling for the body
+            quizOverlay.style.display = 'none'; // Hide quiz overlay
+            mainContainer.style.pointerEvents = 'auto'; // Enable interaction on main container
 
             timerInterval = setInterval(updateTimerDisplay, 1000);
         }
@@ -408,9 +414,9 @@
             isPaused = true;
             pauseBtn.style.display = 'none';
             resumeBtn.style.display = 'block';
-            document.body.style.overflow = 'hidden'; // Disable scrolling
-            quizOverlay.style.display = 'flex'; // Show overlay
-            quizContainer.style.pointerEvents = 'none'; // Disable quiz interaction (only quiz area)
+            document.body.style.overflow = 'hidden'; // Disable body scrolling
+            quizOverlay.style.display = 'flex'; // Show quiz overlay
+            mainContainer.style.pointerEvents = 'none'; // Disable interaction on main container below overlay
         }
 
         function resumeTimer() {
@@ -419,9 +425,9 @@
             startTime = Date.now();
             pauseBtn.style.display = 'block';
             resumeBtn.style.display = 'none';
-            document.body.style.overflow = ''; // Enable scrolling
-            quizOverlay.style.display = 'none'; // Hide overlay
-            quizContainer.style.pointerEvents = 'auto'; // Enable quiz interaction
+            document.body.style.overflow = ''; // Enable body scrolling
+            quizOverlay.style.display = 'none'; // Hide quiz overlay
+            mainContainer.style.pointerEvents = 'auto'; // Enable interaction on main container
             timerInterval = setInterval(updateTimerDisplay, 1000);
         }
 
@@ -525,7 +531,7 @@
                             </div>
                         `).join('')}
                     </div>
-                    <div class="explanation-text">
+                    <div class="explanation-text" style="display: none;"> <!-- Initially hidden -->
                         <strong>Explanation:</strong> <span class="explanation-content">${q.explanation}</span>
                     </div>
                     <p class="answer-time" style="display: none;"></p>
@@ -619,6 +625,7 @@
             elementsToPrint.style.backgroundColor = '#ffffff';
             elementsToPrint.style.position = 'absolute';
             elementsToPrint.style.top = '-9999px'; // Position off-screen to avoid flicker
+            elementsToPrint.style.left = '-9999px'; // Ensure it's truly off-screen
 
             // Add a title to the PDF content
             const pdfTitle = document.createElement('h1');
@@ -652,9 +659,6 @@
                     scale: 2, // Increase scale for better resolution
                     logging: true,
                     useCORS: true,
-                    // These options might not be needed with off-screen rendering:
-                    // scrollX: -window.scrollX,
-                    // scrollY: -window.scrollY
                 });
 
                 const imgData = canvas.toDataURL('image/png');
