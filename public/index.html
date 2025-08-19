@@ -288,6 +288,13 @@
             font-size: 1.5rem;
             font-weight: 700;
         }
+        .question-card .option .time-taken {
+            font-size: 0.85rem;
+            color: #6b7280;
+            margin-left: auto; /* Push to the right */
+            font-weight: 500;
+        }
+
 
         /* Styling for correct/incorrect/unanswered question cards */
         .question-card.correct {
@@ -336,10 +343,10 @@
     <div class="container" id="main-content-for-pdf">
         <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">📝 Objective Question Generator</h1>
 
-        <!-- Timer and Score Display - Hidden by default, shown when quiz starts -->
+        <!-- Stopwatch and Score Display - Hidden by default, shown when quiz starts -->
         <div id="timer-score-display" class="timer-score-box hidden hide-on-pdf">
             <div class="label">
-                Time Left: <span id="time-left" class="value text-blue-800">00:00</span>
+                Elapsed Time: <span id="elapsed-time" class="value text-blue-800">00:00</span>
             </div>
             <div id="quiz-score-summary" class="label hidden">
                 Your Score: <span id="score-value" class="value text-purple-800">0 / 0</span>
@@ -370,12 +377,13 @@
             <!-- Questions will be loaded here -->
         </div>
 
-        <!-- Submit Quiz Button - Hidden by default, shown when quiz questions are loaded -->
-        <div id="submit-quiz-button-container" class="flex justify-center mt-4 hidden hide-on-pdf">
-            <button id="submit-quiz-btn" class="btn btn-primary w-full max-w-xs">Submit Answers</button>
+        <!-- Quiz Action Buttons (Pre-Submission) -->
+        <div id="quiz-actions-pre-submit" class="flex flex-col sm:flex-row justify-center mt-4 space-y-4 sm:space-y-0 sm:space-x-4 hidden hide-on-pdf">
+            <button id="submit-quiz-btn" class="btn btn-primary w-full sm:w-auto">Submit Answers</button>
+            <button id="download-blank-quiz-btn" class="btn btn-primary bg-gray-600 hover:bg-gray-700 w-full sm:w-auto">Download Blank Quiz (PDF)</button>
         </div>
 
-        <!-- Quiz Result and Action Buttons - Hidden by default, shown after quiz submission -->
+        <!-- Quiz Result and Action Buttons (Post-Submission) -->
         <div id="quiz-result-actions" class="results-section mt-5 hidden">
             <h2 class="text-3xl font-bold text-gray-900">Quiz Completed!</h2>
             <p id="final-score-text" class="text-xl font-bold text-green-600 mb-4"></p>
@@ -383,8 +391,8 @@
                 <button id="create-new-quiz-btn" class="btn btn-primary bg-blue-600 hover:bg-blue-700 w-full sm:w-auto">
                     Create New Quiz
                 </button>
-                <button id="download-quiz-btn" class="btn btn-primary bg-gray-700 hover:bg-gray-800 w-full sm:w-auto">
-                    Download Quiz (PDF)
+                <button id="download-answered-quiz-btn" class="btn btn-primary bg-gray-700 hover:bg-gray-800 w-full sm:w-auto">
+                    Download Answered Quiz (PDF)
                 </button>
             </div>
         </div>
@@ -453,8 +461,10 @@
         const errorTextSpan = document.getElementById('error-text');
         // Elements for quiz display and interaction
         const quizQuestionsArea = document.getElementById('quiz-questions-area');
-        const submitQuizBtnContainer = document.getElementById('submit-quiz-button-container');
+        // Renamed from submitQuizBtnContainer to be more general for pre-submission actions
+        const quizActionsPreSubmit = document.getElementById('quiz-actions-pre-submit');
         const submitQuizBtn = document.getElementById('submit-quiz-btn');
+        const downloadBlankQuizBtn = document.getElementById('download-blank-quiz-btn'); // New button
         const quizResultActions = document.getElementById('quiz-result-actions');
         const finalScoreText = document.getElementById('final-score-text');
         // Floating button and modal elements
@@ -464,23 +474,25 @@
         const modalNumQuestionsSelect = document.getElementById('modal-num-questions-select');
         const cancelQuizBtn = document.getElementById('cancel-quiz-btn');
         const generateQuizModalBtn = document.getElementById('generate-quiz-modal-btn');
-        // Timer and score display elements
+        // Stopwatch and score display elements (renamed for clarity)
         const timerScoreDisplay = document.getElementById('timer-score-display');
-        const timeLeftSpan = document.getElementById('time-left');
+        const elapsedTimeSpan = document.getElementById('elapsed-time'); // Renamed from timeLeftSpan
         const quizScoreSummary = document.getElementById('quiz-score-summary');
         const scoreValueSpan = document.getElementById('score-value');
         // Post-quiz action buttons
         const createNewQuizBtn = document.getElementById('create-new-quiz-btn');
-        const downloadQuizBtn = document.getElementById('download-quiz-btn');
+        const downloadAnsweredQuizBtn = document.getElementById('download-answered-quiz-btn'); // Renamed for clarity
 
         // --- Global Quiz State Variables ---
         let quizData = [];              // Stores the fetched quiz questions and correct answers
-        let selectedAnswers = {};       // Stores user's selected answers {questionIndex: "Selected Option Text"}
+        // Stores user's selected answers, including the time taken for each.
+        // Format: {questionIndex: {option: "Selected Option Text", time: "MM:SS"}}
+        let selectedAnswers = {};
         let quizSubmitted = false;      // True if the quiz has been submitted
         let score = 0;                  // User's current score
-        let timeLeft = 0;               // Time remaining in seconds
-        let quizActive = false;         // True if the quiz is currently running (timer active, inputs enabled)
-        let timerIntervalId = null;     // ID for the timer interval (used to clear it)
+        let elapsedTime = 0;            // Stopwatch: time elapsed in seconds
+        let quizActive = false;         // True if the quiz is currently running (stopwatch active, inputs enabled)
+        let stopwatchIntervalId = null; // ID for the stopwatch interval (used to clear it)
         let currentQuizTopic = '';      // Stores the quiz topic for naming the PDF file
 
         // --- Utility Functions ---
@@ -520,10 +532,10 @@
             loadingSpinner.style.display = 'block';
             initialMessage.classList.add('hidden');
             quizQuestionsArea.innerHTML = ''; // Clear any previously loaded questions
-            submitQuizBtnContainer.classList.add('hidden');
-            quizResultActions.classList.add('hidden');
-            timerScoreDisplay.classList.add('hidden');
-            quizScoreSummary.classList.add('hidden');
+            quizActionsPreSubmit.classList.add('hidden'); // Hide submit/blank PDF buttons
+            quizResultActions.classList.add('hidden');    // Hide results section
+            timerScoreDisplay.classList.add('hidden');    // Hide timer/score display
+            quizScoreSummary.classList.add('hidden');     // Hide quiz score summary
         }
 
         /**
@@ -540,7 +552,6 @@
          */
         function showCreateQuizModal() {
             quizModal.classList.remove('hidden');
-            quizModal.style.display = 'flex'; // Explicitly set display to flex for modal overlay
             modalTopicInput.value = '';
             modalNumQuestionsSelect.value = '10';
             modalTopicInput.focus();
@@ -551,7 +562,6 @@
          */
         function hideCreateQuizModal() {
             quizModal.classList.add('hidden');
-            quizModal.style.display = ''; // Remove inline display style to allow CSS rules to take over
         }
 
         /**
@@ -563,11 +573,11 @@
             selectedAnswers = {};
             quizSubmitted = false;
             score = 0;
-            timeLeft = 0;
+            elapsedTime = 0;        // Reset elapsed time for stopwatch
             quizActive = false;
-            if (timerIntervalId) {
-                clearInterval(timerIntervalId);
-                timerIntervalId = null;
+            if (stopwatchIntervalId) { // Clear existing stopwatch if any
+                clearInterval(stopwatchIntervalId);
+                stopwatchIntervalId = null;
             }
             currentQuizTopic = '';
 
@@ -575,36 +585,29 @@
             hideLoading();
             quizQuestionsArea.innerHTML = '';
             initialMessage.classList.remove('hidden'); // Show the "Click to create quiz" message
-            submitQuizBtnContainer.classList.add('hidden');
-            quizResultActions.classList.add('hidden');
-            timerScoreDisplay.classList.add('hidden');
-            quizScoreSummary.classList.add('hidden');
-            timeLeftSpan.textContent = '00:00'; // Reset timer display
+            quizActionsPreSubmit.classList.add('hidden'); // Hide pre-submit buttons
+            quizResultActions.classList.add('hidden');    // Hide results section
+            timerScoreDisplay.classList.add('hidden');    // Hide timer/score display
+            quizScoreSummary.classList.add('hidden');     // Hide quiz score summary
+            elapsedTimeSpan.textContent = '00:00'; // Reset stopwatch display
             scoreValueSpan.textContent = '0 / 0'; // Reset score display
             finalScoreText.textContent = ''; // Clear final score text
         }
 
-        // --- Timer Logic ---
+        // --- Stopwatch Logic ---
 
         /**
-         * Starts the quiz countdown timer.
-         * The timer stops automatically when `timeLeft` reaches 0 or `handleSubmitQuiz` is called.
+         * Starts the quiz stopwatch.
+         * The stopwatch runs until `handleSubmitQuiz` is called.
          */
-        function startTimer() {
-            if (timerIntervalId) clearInterval(timerIntervalId); // Clear any existing timer to prevent multiple timers running
+        function startStopwatch() {
+            if (stopwatchIntervalId) clearInterval(stopwatchIntervalId); // Clear any existing stopwatch to prevent multiple timers running
             timerScoreDisplay.classList.remove('hidden'); // Show the timer display area
-            timeLeftSpan.textContent = formatTime(timeLeft); // Update with initial time
+            elapsedTimeSpan.textContent = formatTime(elapsedTime); // Update with initial time (00:00)
 
-            timerIntervalId = setInterval(() => {
-                timeLeft--;
-                timeLeftSpan.textContent = formatTime(timeLeft); // Update timer text every second
-                if (timeLeft <= 0) {
-                    clearInterval(timerIntervalId); // Stop the timer
-                    timerIntervalId = null;
-                    if (quizActive) { // If quiz was active when timer ran out, submit answers
-                        handleSubmitQuiz();
-                    }
-                }
+            stopwatchIntervalId = setInterval(() => {
+                elapsedTime++; // Increment elapsed time every second
+                elapsedTimeSpan.textContent = formatTime(elapsedTime); // Update stopwatch text
             }, 1000); // Interval of 1 second (1000 milliseconds)
         }
 
@@ -612,21 +615,25 @@
 
         /**
          * Handles a user's selection of an option for a specific question.
-         * Updates the `selectedAnswers` state and re-renders the questions for visual feedback.
+         * Updates the `selectedAnswers` state with the selected option and the current elapsed time.
          * @param {number} questionIndex - The zero-based index of the question.
          * @param {string} option - The text of the option selected by the user.
          */
         function handleOptionSelect(questionIndex, option) {
             // Allow selection only if the quiz is active and not yet submitted
             if (quizActive && !quizSubmitted) {
-                selectedAnswers[questionIndex] = option; // Store the user's choice
+                // Store the user's choice along with the elapsed time at the moment of selection
+                selectedAnswers[questionIndex] = {
+                    option: option,
+                    time: formatTime(elapsedTime)
+                };
                 renderQuizQuestions(); // Re-render to highlight the selected option
             }
         }
 
         /**
          * Dynamically renders the quiz questions and their options based on the `quizData`.
-         * Applies visual styling for selected answers and correctness after quiz submission.
+         * Applies visual styling for selected answers, correctness, and displays time taken after quiz submission.
          */
         function renderQuizQuestions() {
             quizQuestionsArea.innerHTML = ''; // Clear any existing questions to prevent duplicates
@@ -658,16 +665,17 @@
                     labelElement.className = 'flex items-center p-3 bg-white border border-gray-300 rounded-md cursor-pointer transition-all duration-200';
                     labelElement.innerHTML = `${String.fromCharCode(65 + optIndex)}. ${option}`; // Display option letter (A, B, C...)
 
+                    // Check if this option was selected by the user
+                    const userAnswer = selectedAnswers[index] ? selectedAnswers[index].option : undefined;
+                    if (userAnswer === option) {
+                        inputElement.checked = true;
+                    }
+
                     // Add event listener to the label to ensure clicking the whole label selects the radio
                     labelElement.addEventListener('click', () => {
                         inputElement.checked = true; // Manually check the radio button
                         handleOptionSelect(index, option); // Call our option selection handler
                     });
-
-                    // Set radio button as checked if it matches the user's previously selected answer
-                    if (selectedAnswers[index] === option) {
-                        inputElement.checked = true;
-                    }
 
                     // Disable radio buttons if the quiz is not active or has been submitted
                     if (!quizActive || quizSubmitted) {
@@ -677,14 +685,26 @@
                          labelElement.classList.remove('opacity-70', 'cursor-not-allowed');
                     }
 
-                    // Post-submission feedback: Apply specific classes for correct/incorrect visual cues
+                    // Post-submission feedback: Apply specific classes for correct/incorrect visual cues and show time taken
                     if (quizSubmitted) {
+                        const selectedAnswerObj = selectedAnswers[index];
+                        const timeTakenForQuestion = selectedAnswerObj ? selectedAnswerObj.time : 'N/A';
+
                         if (option === q.correctAnswer) { // Check against the correct answer from quizData
                             labelElement.classList.add('correct-option');
-                            labelElement.innerHTML += ' <span class="ml-auto text-green-600">✓ Correct</span>';
-                        } else if (selectedAnswers[index] === option && selectedAnswers[index] !== q.correctAnswer) {
+                            labelElement.innerHTML += `<span class="ml-auto text-green-600">✓ Correct</span>`;
+                        } else if (userAnswer === option && userAnswer !== q.correctAnswer) {
                             labelElement.classList.add('selected-incorrect-option');
-                            labelElement.innerHTML += ' <span class="ml-auto text-red-600">✗ Your Answer</span>';
+                            labelElement.innerHTML += `<span class="ml-auto text-red-600">✗ Your Answer</span>`;
+                        }
+                        // Always show correct answer if quiz submitted, even if not selected
+                        if (userAnswer !== q.correctAnswer && option === q.correctAnswer) {
+                            labelElement.innerHTML += `<span class="ml-auto text-green-600">Correct Answer</span>`;
+                        }
+
+                        // Display time taken for the question if it was answered
+                        if (selectedAnswerObj && selectedAnswerObj.option === option) { // Only show time on the selected option's label
+                            labelElement.innerHTML += `<span class="time-taken ml-2">(Time: ${timeTakenForQuestion})</span>`;
                         }
                     }
 
@@ -696,7 +716,7 @@
                 // Add overall question card border feedback after submission
                 if (quizSubmitted) {
                     const hasAnswered = selectedAnswers[index] !== undefined;
-                    const isCorrectOverall = selectedAnswers[index] === q.correctAnswer;
+                    const isCorrectOverall = selectedAnswers[index]?.option === q.correctAnswer;
 
                     if (hasAnswered) {
                         if (isCorrectOverall) {
@@ -712,29 +732,29 @@
                 quizQuestionsArea.appendChild(questionCard);
             });
 
-            // Show submit button if quiz is active and there are questions
+            // Show action buttons if quiz is active and there are questions
             if (quizActive && !quizSubmitted && quizData.length > 0) {
-                submitQuizBtnContainer.classList.remove('hidden');
+                quizActionsPreSubmit.classList.remove('hidden'); // Show submit and blank PDF buttons
             } else {
-                submitQuizBtnContainer.classList.add('hidden');
+                quizActionsPreSubmit.classList.add('hidden'); // Hide them
             }
         }
 
         /**
-         * Calculates the final quiz score, stops the timer, and displays the results section.
+         * Calculates the final quiz score, stops the stopwatch, and displays the results section.
          */
         function handleSubmitQuiz() {
             if (quizSubmitted) return; // Prevent multiple submissions
             quizActive = false; // Deactivate the quiz
             quizSubmitted = true; // Mark as submitted
-            if (timerIntervalId) {
-                clearInterval(timerIntervalId); // Stop the timer
-                timerIntervalId = null;
+            if (stopwatchIntervalId) {
+                clearInterval(stopwatchIntervalId); // Stop the stopwatch
+                stopwatchIntervalId = null;
             }
 
             let newScore = 0;
             quizData.forEach((q, index) => {
-                if (selectedAnswers[index] === q.correctAnswer) { // Check against correct answer
+                if (selectedAnswers[index]?.option === q.correctAnswer) { // Check against correct answer
                     newScore += 1;
                 }
             });
@@ -758,7 +778,7 @@
 
         /**
          * Calls the Vercel proxy to generate quiz questions based on user input.
-         * Handles loading states, errors, and initiates timer/quiz display upon success.
+         * Handles loading states, errors, and initiates stopwatch/quiz display upon success.
          */
         async function generateQuestions() {
             const topic = modalTopicInput.value.trim();
@@ -778,7 +798,7 @@
             // IMPORTANT: Replace 'YOUR_VERCEL_API_ENDPOINT_URL_HERE' with the FULL URL to your Vercel serverless function.
             // Example: If your Vercel app is 'https://my-quiz-app.vercel.app/' and your API is in 'api/generate-quiz.js',
             // then proxyUrl should be 'https://my-quiz-app.vercel.app/api/generate-quiz'
-            const proxyUrl = 'YOUR_VERCEL_API_ENDPOINT_URL_HERE'; // <<<--- !!! IMPORTANT: REPLACE THIS URL !!!
+            const proxyUrl = 'https://my-quiz-app.vercel.app/api/generate-quiz'; // <<<--- !!! IMPORTANT: REPLACE THIS URL !!!
 
             try {
                 // Make the API call to your Vercel proxy
@@ -806,10 +826,10 @@
                         selectedAnswers = {}; // Reset user selections for the new quiz
                         quizSubmitted = false; // Reset submission status
                         score = 0;            // Reset score
-                        timeLeft = numQuestions * 30; // Set timer: 30 seconds per question (adjust as needed)
+                        elapsedTime = 0;      // Reset elapsed time for the stopwatch
                         quizActive = true;    // Activate the quiz
                         renderQuizQuestions(); // Display the questions on the UI
-                        startTimer();         // Start the countdown timer
+                        startStopwatch();     // Start the stopwatch
                         initialMessage.classList.add('hidden'); // Ensure initial message stays hidden
                     } else {
                         throw new Error(result.error || 'Proxy returned an empty or invalid array of questions. Check your proxy function and Gemini response format.');
@@ -821,7 +841,7 @@
             } catch (error) {
                 console.error('Error generating questions via proxy:', error);
                 displayError(`Failed to generate questions: ${error.message}. Please check your Vercel API endpoint URL and your proxy serverless function.`);
-                quizData = null; // Clear quiz data on error
+                quizData = []; // Clear quiz data on error to prevent partial quizzes
             } finally {
                 hideLoading(); // Always hide loading spinner
             }
@@ -867,7 +887,7 @@
         // --- PDF Download Function ---
 
         /**
-         * Downloads the currently displayed quiz content (questions and options) as a PDF document.
+         * Downloads the currently displayed quiz content as a PDF document.
          * It temporarily hides UI elements not relevant to the PDF before capturing the content.
          */
         function downloadQuizAsPdf() {
@@ -914,7 +934,13 @@
                     }
 
                     // Save the generated PDF file with a dynamic name
-                    pdf.save(`${currentQuizTopic || 'Generated'}_Quiz.pdf`);
+                    let fileName = currentQuizTopic ? `${currentQuizTopic.replace(/\s/g, '_')}_Quiz` : 'Generated_Quiz';
+                    if (quizSubmitted) {
+                        fileName += '_Answered.pdf';
+                    } else {
+                        fileName += '_Blank.pdf';
+                    }
+                    pdf.save(fileName);
 
                     // Restore original display styles and background color after PDF generation
                     originalDisplays.forEach(({ el, display }) => {
@@ -952,12 +978,14 @@
 
             // Event listeners for quiz interaction buttons (Submit, Create New, Download)
             submitQuizBtn.addEventListener('click', handleSubmitQuiz); // Submit quiz answers
+            downloadBlankQuizBtn.addEventListener('click', downloadQuizAsPdf); // Download blank quiz as PDF
+
             createNewQuizBtn.addEventListener('click', () => {
                 resetQuizApp();      // Reset app state
                 showCreateQuizModal(); // Open modal to create a new quiz
             });
-            downloadQuizBtn.addEventListener('click', downloadQuizAsPdf); // Download quiz as PDF
+            downloadAnsweredQuizBtn.addEventListener('click', downloadQuizAsPdf); // Download answered quiz as PDF
         };
     </script>
 </body>
-</html>
+    </html>
