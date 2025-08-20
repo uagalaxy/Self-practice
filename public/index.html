@@ -11,15 +11,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <!-- PWA: Link to manifest.json with relative path -->
     <link rel="manifest" href="manifest.json">
-<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
-<script>
-  window.OneSignalDeferred = window.OneSignalDeferred || [];
-  OneSignalDeferred.push(async function(OneSignal) {
-    await OneSignal.init({
-      appId: "9d1880ec-6ccc-4c16-9fce-54bfcf6d89fc",
-    });
-  });
-</script>
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -416,7 +407,7 @@
 
         let deferredPrompt;
         let startTime;
-        let timerInterval; // Declared globally
+        let timerInterval;
         let pausedTime = 0;
         let isPaused = false;
         let questionAnswerTimes = [];
@@ -476,7 +467,7 @@
             quizOverlay.style.display = 'none';
             mainContainer.style.pointerEvents = 'auto';
 
-            timerInterval = setInterval(updateTimerDisplay, 1000); // Assign value here
+            timerInterval = setInterval(updateTimerDisplay, 1000);
         }
 
         function updateTimerDisplay() {
@@ -487,7 +478,6 @@
         }
 
         function stopTimer() {
-            // Only clear interval if it has been assigned a value
             if (timerInterval) {
                 clearInterval(timerInterval);
             }
@@ -616,14 +606,18 @@
                 questionCard.innerHTML = `
                     <p class="text-lg font-medium text-gray-900 mb-4">${index + 1}. ${q.questionText}</p>
                     <div class="options-group">
-                        ${q.options.map((option, optIndex) => `
-                            <div class="mb-3 option">
-                                <label class="flex items-center p-3 bg-white border border-gray-300 rounded-md cursor-pointer hover:bg-blue-50 hover:border-blue-400 transition-all duration-200">
-                                    <input type="radio" name="question${index}" value="${option}" class="mr-3 accent-indigo-600 transform scale-125">
-                                    <span class="option-text">${String.fromCharCode(65 + optIndex)}. ${option}</span>
-                                </label>
-                            </div>
-                        `).join('')}
+                        ${q.options.map((option, optIndex) => {
+                            // Strip any leading "A. ", "B. ", "C. ", "D. " from the option string
+                            const cleanedOption = option.replace(/^[A-D][\.\)]\s*/, '');
+                            return `
+                                <div class="mb-3 option">
+                                    <label class="flex items-center p-3 bg-white border border-gray-300 rounded-md cursor-pointer hover:bg-blue-50 hover:border-blue-400 transition-all duration-200">
+                                        <input type="radio" name="question${index}" value="${option}" class="mr-3 accent-indigo-600 transform scale-125">
+                                        <span class="option-text">${String.fromCharCode(65 + optIndex)}) ${cleanedOption}</span>
+                                    </label>
+                                </div>
+                            `;
+                        }).join('')}
                     </div>
                     <div class="explanation-text" style="display: none;">
                         <strong>Explanation:</strong> <span class="explanation-content">${q.explanation}</span>
