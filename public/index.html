@@ -283,6 +283,26 @@
             opacity: 1;
             visibility: visible;
         }
+        /* Install button styles */
+        #installAppBtn {
+            background-color: #2563eb;
+            color: white;
+            padding: 12px 25px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+            text-align: center;
+            display: none;
+            margin-top: 10px;
+        }
+        #installAppBtn:hover {
+            background-color: #1d4ed8;
+            transform: translateY(-2px);
+        }
+        #installAppBtn:active {
+            transform: translateY(0);
+        }
     </style>
 </head>
 <body>
@@ -297,6 +317,11 @@
             <button id="submitBtn" class="btn btn-primary flex-1">Submit Answers</button>
             <button id="downloadPdfBtn" class="btn btn-primary flex-1">Download PDF</button>
         </div>
+        
+        <!-- New Install App Button -->
+        <button id="installAppBtn" class="w-full">
+            <i class="fas fa-download mr-2"></i> Install App
+        </button>
 
         <div id="loadingSpinner" class="loading-spinner"></div>
         <div id="errorMessage" class="error-message"></div>
@@ -378,15 +403,27 @@
         const quizOverlay = document.getElementById('quizOverlay');
         const mainContainer = document.querySelector('.container');
         const notificationElement = document.getElementById('notification');
+        const installAppBtn = document.getElementById('installAppBtn');
 
-        let generatedQuestions = [];
-        let startTime;
-        let timerInterval;
-        let pausedTime = 0;
-        let isPaused = false;
-        let questionAnswerTimes = [];
+        let deferredPrompt;
 
-        // Function to show a notification
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            installAppBtn.style.display = 'block';
+            console.log('beforeinstallprompt fired!');
+        });
+
+        installAppBtn.addEventListener('click', async () => {
+            installAppBtn.style.display = 'none';
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                console.log(`User response to the A2HS prompt: ${outcome}`);
+                deferredPrompt = null;
+            }
+        });
+
         function showNotification(message, duration = 3000) {
             notificationElement.textContent = message;
             notificationElement.classList.add('show');
@@ -395,14 +432,13 @@
             }, duration);
         }
 
-        // Event listeners for modal
         fab.addEventListener('click', () => {
             inputModal.style.display = 'flex';
             floatingTimerControls.style.display = 'none';
             resultsContainer.style.display = 'none';
             controls.style.display = 'none';
             quizContainer.innerHTML = '';
-            stopTimer(); // Ensure timer is stopped if user starts new quiz while old one was active
+            stopTimer();
         });
 
         cancelBtn.addEventListener('click', () => {
@@ -415,7 +451,6 @@
             }
         });
 
-        // Stopwatch functions
         function startTimer() {
             pausedTime = 0;
             isPaused = false;
@@ -423,9 +458,9 @@
             floatingTimerControls.style.display = 'flex';
             pauseBtn.style.display = 'block';
             resumeBtn.style.display = 'none';
-            document.body.style.overflow = ''; // Enable scrolling for the body
-            quizOverlay.style.display = 'none'; // Hide quiz overlay
-            mainContainer.style.pointerEvents = 'auto'; // Enable interaction on main container
+            document.body.style.overflow = '';
+            quizOverlay.style.display = 'none';
+            mainContainer.style.pointerEvents = 'auto';
 
             timerInterval = setInterval(updateTimerDisplay, 1000);
         }
@@ -450,9 +485,9 @@
             isPaused = true;
             pauseBtn.style.display = 'none';
             resumeBtn.style.display = 'block';
-            document.body.style.overflow = 'hidden'; // Disable body scrolling
-            quizOverlay.style.display = 'flex'; // Show quiz overlay
-            mainContainer.style.pointerEvents = 'none'; // Disable interaction on main container below overlay
+            document.body.style.overflow = 'hidden';
+            quizOverlay.style.display = 'flex';
+            mainContainer.style.pointerEvents = 'none';
         }
 
         function resumeTimer() {
@@ -461,16 +496,15 @@
             startTime = Date.now();
             pauseBtn.style.display = 'block';
             resumeBtn.style.display = 'none';
-            document.body.style.overflow = ''; // Enable body scrolling
-            quizOverlay.style.display = 'none'; // Hide quiz overlay
-            mainContainer.style.pointerEvents = 'auto'; // Enable interaction on main container
+            document.body.style.overflow = '';
+            quizOverlay.style.display = 'none';
+            mainContainer.style.pointerEvents = 'auto';
             timerInterval = setInterval(updateTimerDisplay, 1000);
         }
 
         pauseBtn.addEventListener('click', pauseTimer);
         resumeBtn.addEventListener('click', resumeTimer);
 
-        // Utility function for exponential backoff
         async function fetchWithExponentialBackoff(url, options, retries = 5, delay = 1000) {
             for (let i = 0; i < retries; i++) {
                 try {
@@ -501,8 +535,11 @@
             const topic = modalTopicInput.value.trim();
             const numQuestions = parseInt(modalNumQuestionsSelect.value);
 
+            console.log(`Attempting to generate questions: Topic="${topic}", Count=${numQuestions}`);
+
             if (!topic) {
                 showError('Please enter a topic.');
+                console.error('Error: Topic not entered.');
                 return;
             }
 
@@ -515,16 +552,19 @@
             fab.disabled = true;
             stopTimer();
 
-            const proxyUrl = '/api/generate-quiz';
+            const proxyUrl = '/api/generate-quiz'; // This is relative to your root, which Vercel maps to /api/
 
             try {
+                console.log(`Fetching from proxyUrl: ${proxyUrl}`);
                 const response = await fetchWithExponentialBackoff(proxyUrl, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ topic, numQuestions })
                 });
 
+                console.log('Response status:', response.status);
                 const result = await response.json();
+                console.log('Parsed API result:', result);
 
                 if (response.ok) {
                     if (Array.isArray(result) && result.length > 0) {
@@ -535,8 +575,9 @@
                         startTimer();
                         window.scrollTo({ top: 0, behavior: 'smooth' });
                         submitBtn.disabled = false;
+                        console.log('Questions generated and displayed successfully.');
                     } else {
-                        throw new Error(result.error || 'Proxy returned an empty or invalid array of questions.');
+                        throw new new Error(result.error || 'Proxy returned an empty or invalid array of questions.');
                     }
                 } else {
                     throw new Error(result.error || `Proxy server error: ${response.status}`);
@@ -586,6 +627,7 @@
                     });
                 });
             });
+            console.log('Questions rendered to DOM.');
         }
 
         function submitAnswers() {
@@ -624,7 +666,7 @@
                 }
                 questionCard.appendChild(feedbackText);
                 
-                explanationDiv.style.display = 'block'; // Always display explanation after submission
+                explanationDiv.style.display = 'block';
 
                 if (questionAnswerTimes[index] !== null) {
                     const ansTime = questionAnswerTimes[index];
@@ -683,12 +725,12 @@
 
             try {
                 const canvas = await html2canvas(elementsToPrint, {
-                    scale: 1.0, // Keeping scale at 1.0 for smaller file size
+                    scale: 1.0,
                     logging: true,
                     useCORS: true,
                 });
 
-                const imgData = canvas.toDataURL('image/jpeg', 0.8); // Use JPEG for better compression, quality 0.8
+                const imgData = canvas.toDataURL('image/jpeg', 0.8);
                 const imgWidth = 210;
                 const pageHeight = 297;
                 const imgHeight = canvas.height * imgWidth / canvas.width;
@@ -735,13 +777,12 @@
             quizContainer.innerHTML = '';
             controls.style.display = 'none';
             resultsContainer.style.display = 'none';
-            floatingTimerControls.style.display = 'none'; // Hide timer on initial load
+            floatingTimerControls.style.display = 'none';
             showError('');
 
-            // PWA: Register Service Worker with relative path
             if ('serviceWorker' in navigator) {
                 window.addEventListener('load', () => {
-                    navigator.serviceWorker.register('sw.js') // Changed path to 'sw.js'
+                    navigator.serviceWorker.register('sw.js')
                         .then(registration => {
                             console.log('Service Worker registered with scope:', registration.scope);
                         })
