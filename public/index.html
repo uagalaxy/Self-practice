@@ -9,6 +9,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <!-- PWA: Link to manifest.json with relative path -->
+    <link rel="manifest" href="manifest.json">
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -19,7 +21,7 @@
             min-height: 100vh;
             padding: 20px;
             box-sizing: border-box;
-            overflow-y: auto; /* Ensure scrolling is possible by default */
+            overflow-y: auto;
         }
         .container {
             background-color: #ffffff;
@@ -31,8 +33,8 @@
             display: flex;
             flex-direction: column;
             gap: 20px;
-            position: relative; /* Needed for z-index context */
-            z-index: 1; /* Ensure container is below overlay */
+            position: relative;
+            z-index: 1;
         }
         .btn {
             padding: 12px 25px;
@@ -79,7 +81,7 @@
         .modal {
             display: none;
             position: fixed;
-            z-index: 2000; /* Highest for modal dialogs */
+            z-index: 2000;
             left: 0;
             top: 0;
             width: 100%;
@@ -196,10 +198,10 @@
             display: none;
             font-weight: 500;
         }
-        /* Floating Timer Styles - Adjusted z-index and top */
+        /* Floating Timer Styles */
         #floatingTimerControls {
             position: fixed;
-            top: 10px; /* Moved slightly higher */
+            top: 10px;
             right: 20px;
             background-color: #6366f1;
             color: white;
@@ -210,7 +212,7 @@
             align-items: center;
             gap: 10px;
             font-weight: 600;
-            z-index: 1600; /* Higher than quiz-overlay (1500), but lower than modal (2000) */
+            z-index: 1600;
             display: none;
         }
         #floatingTimerControls button {
@@ -225,15 +227,15 @@
         #floatingTimerControls button:hover {
             background-color: rgba(255, 255, 255, 0.4);
         }
-        /* Overlay for pause - Positioned relative to the container */
+        /* Overlay for pause */
         .quiz-overlay {
-            position: absolute; /* Changed to absolute to cover only the container */
+            position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             background-color: rgba(255, 255, 255, 0.8);
-            z-index: 1500; /* Lower than floatingTimerControls, higher than quiz content */
+            z-index: 1500;
             display: none;
             justify-content: center;
             align-items: center;
@@ -252,7 +254,7 @@
             margin-top: 15px;
             font-size: 0.95rem;
             color: #0c4a6e;
-            display: none; /* Hidden by default, shown by JS after submission */
+            display: none;
         }
         .answer-time {
             font-size: 0.85rem;
@@ -266,12 +268,12 @@
             bottom: 20px;
             left: 50%;
             transform: translateX(-50%);
-            background-color: #10b981; /* Green background */
+            background-color: #10b981;
             color: white;
             padding: 12px 20px;
             border-radius: 8px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-            z-index: 2500; /* Above all other elements */
+            z-index: 2500;
             opacity: 0;
             visibility: hidden;
             transition: opacity 0.3s ease, visibility 0.3s ease;
@@ -285,7 +287,7 @@
 </head>
 <body>
     <div class="container">
-        <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">📝 Obj. Question AI</h1>
+        <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">📝 Objective Question Generator</h1>
 
         <div id="quizContainer" class="mt-5">
             <!-- Questions will be loaded here -->
@@ -400,7 +402,7 @@
             resultsContainer.style.display = 'none';
             controls.style.display = 'none';
             quizContainer.innerHTML = '';
-            stopTimer();
+            stopTimer(); // Ensure timer is stopped if user starts new quiz while old one was active
         });
 
         cancelBtn.addEventListener('click', () => {
@@ -421,9 +423,9 @@
             floatingTimerControls.style.display = 'flex';
             pauseBtn.style.display = 'block';
             resumeBtn.style.display = 'none';
-            document.body.style.overflow = '';
-            quizOverlay.style.display = 'none';
-            mainContainer.style.pointerEvents = 'auto';
+            document.body.style.overflow = ''; // Enable scrolling for the body
+            quizOverlay.style.display = 'none'; // Hide quiz overlay
+            mainContainer.style.pointerEvents = 'auto'; // Enable interaction on main container
 
             timerInterval = setInterval(updateTimerDisplay, 1000);
         }
@@ -448,9 +450,9 @@
             isPaused = true;
             pauseBtn.style.display = 'none';
             resumeBtn.style.display = 'block';
-            document.body.style.overflow = 'hidden';
-            quizOverlay.style.display = 'flex';
-            mainContainer.style.pointerEvents = 'none';
+            document.body.style.overflow = 'hidden'; // Disable body scrolling
+            quizOverlay.style.display = 'flex'; // Show quiz overlay
+            mainContainer.style.pointerEvents = 'none'; // Disable interaction on main container below overlay
         }
 
         function resumeTimer() {
@@ -459,9 +461,9 @@
             startTime = Date.now();
             pauseBtn.style.display = 'block';
             resumeBtn.style.display = 'none';
-            document.body.style.overflow = '';
-            quizOverlay.style.display = 'none';
-            mainContainer.style.pointerEvents = 'auto';
+            document.body.style.overflow = ''; // Enable body scrolling
+            quizOverlay.style.display = 'none'; // Hide quiz overlay
+            mainContainer.style.pointerEvents = 'auto'; // Enable interaction on main container
             timerInterval = setInterval(updateTimerDisplay, 1000);
         }
 
@@ -622,8 +624,7 @@
                 }
                 questionCard.appendChild(feedbackText);
                 
-                // Always display explanation after submission
-                explanationDiv.style.display = 'block';
+                explanationDiv.style.display = 'block'; // Always display explanation after submission
 
                 if (questionAnswerTimes[index] !== null) {
                     const ansTime = questionAnswerTimes[index];
@@ -644,7 +645,6 @@
             resultsContainer.style.display = 'block';
             window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
             submitBtn.disabled = true;
-            // Disable all radio buttons after submission
             document.querySelectorAll('input[type="radio"]').forEach(radio => radio.disabled = true);
         }
 
@@ -683,7 +683,7 @@
 
             try {
                 const canvas = await html2canvas(elementsToPrint, {
-                    scale: 1.0, // Adjusted scale for smaller file size
+                    scale: 1.0, // Keeping scale at 1.0 for smaller file size
                     logging: true,
                     useCORS: true,
                 });
@@ -696,7 +696,7 @@
 
                 let position = 0;
 
-                doc.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight); // Use JPEG here too
+                doc.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
                 heightLeft -= pageHeight;
 
                 while (heightLeft >= 0) {
@@ -735,8 +735,21 @@
             quizContainer.innerHTML = '';
             controls.style.display = 'none';
             resultsContainer.style.display = 'none';
-            floatingTimerControls.style.display = 'none';
+            floatingTimerControls.style.display = 'none'; // Hide timer on initial load
             showError('');
+
+            // PWA: Register Service Worker with relative path
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', () => {
+                    navigator.serviceWorker.register('sw.js') // Changed path to 'sw.js'
+                        .then(registration => {
+                            console.log('Service Worker registered with scope:', registration.scope);
+                        })
+                        .catch(error => {
+                            console.error('Service Worker registration failed:', error);
+                        });
+                });
+            }
         };
     </script>
 </body>
