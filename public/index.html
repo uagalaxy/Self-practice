@@ -406,6 +406,11 @@
         const installAppBtn = document.getElementById('installAppBtn');
 
         let deferredPrompt;
+        let startTime;
+        let timerInterval; // Declared globally
+        let pausedTime = 0;
+        let isPaused = false;
+        let questionAnswerTimes = [];
 
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
@@ -462,7 +467,7 @@
             quizOverlay.style.display = 'none';
             mainContainer.style.pointerEvents = 'auto';
 
-            timerInterval = setInterval(updateTimerDisplay, 1000);
+            timerInterval = setInterval(updateTimerDisplay, 1000); // Assign value here
         }
 
         function updateTimerDisplay() {
@@ -473,7 +478,10 @@
         }
 
         function stopTimer() {
-            clearInterval(timerInterval);
+            // Only clear interval if it has been assigned a value
+            if (timerInterval) {
+                clearInterval(timerInterval);
+            }
             pausedTime = 0;
             floatingTimerControls.style.display = 'none';
         }
@@ -552,7 +560,7 @@
             fab.disabled = true;
             stopTimer();
 
-            const proxyUrl = '/api/generate-quiz'; // This is relative to your root, which Vercel maps to /api/
+            const proxyUrl = '/api/generate-quiz';
 
             try {
                 console.log(`Fetching from proxyUrl: ${proxyUrl}`);
@@ -577,7 +585,7 @@
                         submitBtn.disabled = false;
                         console.log('Questions generated and displayed successfully.');
                     } else {
-                        throw new new Error(result.error || 'Proxy returned an empty or invalid array of questions.');
+                        throw new Error(result.error || 'Proxy returned an empty or invalid array of questions.');
                     }
                 } else {
                     throw new Error(result.error || `Proxy server error: ${response.status}`);
