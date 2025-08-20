@@ -283,6 +283,26 @@
             opacity: 1;
             visibility: visible;
         }
+        /* Install button styles */
+        #installAppBtn {
+            background-color: #2563eb; /* Blue */
+            color: white;
+            padding: 12px 25px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+            text-align: center;
+            display: none; /* Hidden by default */
+            margin-top: 10px; /* Space from other buttons */
+        }
+        #installAppBtn:hover {
+            background-color: #1d4ed8;
+            transform: translateY(-2px);
+        }
+        #installAppBtn:active {
+            transform: translateY(0);
+        }
     </style>
 </head>
 <body>
@@ -297,6 +317,11 @@
             <button id="submitBtn" class="btn btn-primary flex-1">Submit Answers</button>
             <button id="downloadPdfBtn" class="btn btn-primary flex-1">Download PDF</button>
         </div>
+        
+        <!-- New Install App Button -->
+        <button id="installAppBtn" class="w-full">
+            <i class="fas fa-download mr-2"></i> Install App
+        </button>
 
         <div id="loadingSpinner" class="loading-spinner"></div>
         <div id="errorMessage" class="error-message"></div>
@@ -378,13 +403,36 @@
         const quizOverlay = document.getElementById('quizOverlay');
         const mainContainer = document.querySelector('.container');
         const notificationElement = document.getElementById('notification');
+        const installAppBtn = document.getElementById('installAppBtn'); // Get the new install button
 
-        let generatedQuestions = [];
-        let startTime;
-        let timerInterval;
-        let pausedTime = 0;
-        let isPaused = false;
-        let questionAnswerTimes = [];
+        let deferredPrompt; // Variable to store the beforeinstallprompt event
+
+        // Event listener for beforeinstallprompt
+        window.addEventListener('beforeinstallprompt', (e) => {
+            // Prevent the mini-infobar from appearing on mobile
+            e.preventDefault();
+            // Stash the event so it can be triggered later.
+            deferredPrompt = e;
+            // Update UI notify the user they can add to home screen
+            installAppBtn.style.display = 'block'; // Show your install button
+            console.log('beforeinstallprompt fired!');
+        });
+
+        // Event listener for the custom install button
+        installAppBtn.addEventListener('click', async () => {
+            // Hide the install button for now
+            installAppBtn.style.display = 'none';
+            // Show the install prompt
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                // Wait for the user to respond to the prompt
+                const { outcome } = await deferredPrompt.userChoice;
+                // Optionally, send analytics to track user choice
+                console.log(`User response to the A2HS prompt: ${outcome}`);
+                // Clear the deferred prompt once it's been used.
+                deferredPrompt = null;
+            }
+        });
 
         // Function to show a notification
         function showNotification(message, duration = 3000) {
@@ -683,12 +731,12 @@
 
             try {
                 const canvas = await html2canvas(elementsToPrint, {
-                    scale: 1.0, // Keeping scale at 1.0 for smaller file size
+                    scale: 1.0,
                     logging: true,
                     useCORS: true,
                 });
 
-                const imgData = canvas.toDataURL('image/jpeg', 0.8); // Use JPEG for better compression, quality 0.8
+                const imgData = canvas.toDataURL('image/jpeg', 0.8);
                 const imgWidth = 210;
                 const pageHeight = 297;
                 const imgHeight = canvas.height * imgWidth / canvas.width;
@@ -735,13 +783,13 @@
             quizContainer.innerHTML = '';
             controls.style.display = 'none';
             resultsContainer.style.display = 'none';
-            floatingTimerControls.style.display = 'none'; // Hide timer on initial load
+            floatingTimerControls.style.display = 'none';
             showError('');
 
             // PWA: Register Service Worker with relative path
             if ('serviceWorker' in navigator) {
                 window.addEventListener('load', () => {
-                    navigator.serviceWorker.register('sw.js') // Changed path to 'sw.js'
+                    navigator.serviceWorker.register('sw.js')
                         .then(registration => {
                             console.log('Service Worker registered with scope:', registration.scope);
                         })
