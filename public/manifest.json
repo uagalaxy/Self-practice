@@ -1,6 +1,6 @@
 {
   "name": "Objective Quiz Generator",
-  "short_name": "QuizGen",
+  "short_name": "Qᵘᵃ Quiz",  
   "description": "Generate and practice objective questions on various topics.",
   "start_url": "index.html",
   "display": "standalone",
