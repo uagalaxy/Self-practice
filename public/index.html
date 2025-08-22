@@ -437,7 +437,7 @@
         <div id="loadingSpinner" class="loading-spinner"></div>
         <div id="errorMessage" class="error-message"></div>
 
-        <div id="resultsContainer" class="results-section mt-5">
+        <div id="resultsContainer" class="results-section mt-5" style="display: none;">
             <h2>Quiz Results</h2>
             <p id="scoreText" class="text-lg"></p>
             <p id="timeText" class="text-lg"></p>
@@ -455,7 +455,7 @@
     </button>
 
     <!-- Floating Timer and Controls -->
-    <div id="floatingTimerControls">
+    <div id="floatingTimerControls" style="display: none;">
         <span id="timer">Time: 00:00</span>
         <button id="pauseBtn"><i class="fas fa-pause"></i></button>
         <button id="resumeBtn" style="display: none;"><i class="fas fa-play"></i></button>
@@ -520,16 +520,20 @@
         const installAppBtn = document.getElementById('installAppBtn');
         const landingPage = document.getElementById('landingPage');
         const startQuizBtn = document.getElementById('startQuizBtn');
-        const themeToggleBtn = document.getElementById('themeToggleBtn'); // New theme toggle button
-        const themeIcon = document.getElementById('themeIcon'); // New theme icon
+        const themeToggleBtn = document.getElementById('themeToggleBtn');
+        const themeIcon = document.getElementById('themeIcon');
 
-        let deferredPrompt = null; // Initialize deferredPrompt to null
-        let startTime;
-        let timerInterval = null; // Initialize timerInterval to null
+        let deferredPrompt = null;
+        let startTime = null;
+        let timerInterval = null;
         let pausedTime = 0;
         let isPaused = false;
         let generatedQuestions = [];
         let questionAnswerTimes = [];
+        let userSelectedAnswers = []; // New: To store user selections
+        let quizSubmitted = false;    // New: Flag for quiz submission state
+        let finalScore = 0;           // New: To store final score
+        let finalTimeTaken = 0;       // New: To store final time
 
         // --- Theme Toggle Logic ---
         function applyTheme(theme) {
@@ -584,14 +588,25 @@
         // --- Local Storage Management ---
         function saveQuizState() {
             try {
+                // Check if there are active questions before saving
+                if (generatedQuestions.length === 0 && !quizSubmitted) {
+                    clearQuizState(); // No active quiz, ensure state is clear
+                    return;
+                }
+
                 localStorage.setItem('quiz_generated_flag', 'true');
                 localStorage.setItem('saved_questions', JSON.stringify(generatedQuestions));
                 localStorage.setItem('saved_start_time', startTime ? startTime.toString() : '');
                 localStorage.setItem('saved_paused_time', pausedTime.toString());
                 localStorage.setItem('saved_is_paused', isPaused.toString());
                 localStorage.setItem('saved_question_answer_times', JSON.stringify(questionAnswerTimes));
+                localStorage.setItem('saved_user_selected_answers', JSON.stringify(userSelectedAnswers)); // Save user selections
+                localStorage.setItem('saved_quiz_submitted', quizSubmitted.toString());                 // Save submission state
+                localStorage.setItem('saved_final_score', finalScore.toString());                       // Save final score
+                localStorage.setItem('saved_final_time_taken', finalTimeTaken.toString());             // Save final time
                 localStorage.setItem('saved_topic', modalTopicInput.value);
                 localStorage.setItem('saved_num_questions', modalNumQuestionsSelect.value);
+                console.log("Quiz state saved.");
             } catch (error) {
                 console.error("Error saving quiz state to local storage:", error);
             }
@@ -607,26 +622,45 @@
                     pausedTime = parseInt(localStorage.getItem('saved_paused_time') || '0');
                     isPaused = localStorage.getItem('saved_is_paused') === 'true';
                     questionAnswerTimes = JSON.parse(localStorage.getItem('saved_question_answer_times') || '[]');
+                    userSelectedAnswers = JSON.parse(localStorage.getItem('saved_user_selected_answers') || '[]'); // Load user selections
+                    quizSubmitted = localStorage.getItem('saved_quiz_submitted') === 'true';                 // Load submission state
+                    finalScore = parseInt(localStorage.getItem('saved_final_score') || '0');                       // Load final score
+                    finalTimeTaken = parseInt(localStorage.getItem('saved_final_time_taken') || '0');             // Load final time
                     modalTopicInput.value = localStorage.getItem('saved_topic') || '';
                     modalNumQuestionsSelect.value = localStorage.getItem('saved_num_questions') || '5';
 
                     if (generatedQuestions.length > 0) {
-                        displayQuestions(generatedQuestions);
+                        displayQuestions(generatedQuestions); // Render questions first
+                        
+                        // Restore user selections and feedback
+                        generatedQuestions.forEach((q, index) => {
+                            const selectedValue = userSelectedAnswers[index];
+                            if (selectedValue !== null && selectedValue !== undefined) {
+                                const radio = quizContainer.querySelector(`input[name="question${index}"][value="${selectedValue}"]`);
+                                if (radio) {
+                                    radio.checked = true;
+                                }
+                            }
+                        });
+
                         landingPage.style.display = 'none';
                         quizContainer.style.display = 'block';
                         controls.style.display = 'flex';
                         floatingTimerControls.style.display = 'flex';
-                        if (!isPaused && startTime !== null) {
-                            timerInterval = setInterval(updateTimerDisplay, 1000);
-                        } else if (isPaused && startTime !== null) {
-                             // If paused, ensure timer display is updated correctly on load
-                             updateTimerDisplay();
-                             pauseBtn.style.display = 'none';
-                             resumeBtn.style.display = 'block';
-                             quizOverlay.style.display = 'flex';
-                             mainContainer.style.pointerEvents = 'none';
+
+                        if (quizSubmitted) { // If quiz was submitted, show results and disable inputs
+                            renderSubmittedState(finalScore, finalTimeTaken);
+                        } else { // If quiz was not submitted, manage timer
+                            if (!isPaused && startTime !== null) {
+                                timerInterval = setInterval(updateTimerDisplay, 1000);
+                            } else if (isPaused && startTime !== null) {
+                                updateTimerDisplay(); // Update display immediately for paused state
+                                quizOverlay.style.display = 'flex';
+                                mainContainer.style.pointerEvents = 'none';
+                            }
+                            submitBtn.disabled = false; // Enable submit button for loaded quiz
                         }
-                        submitBtn.disabled = false; // Enable submit button for loaded quiz
+                        console.log("Quiz state loaded successfully.");
                         return true; // Quiz loaded
                     }
                 }
@@ -644,16 +678,26 @@
             localStorage.removeItem('saved_paused_time');
             localStorage.removeItem('saved_is_paused');
             localStorage.removeItem('saved_question_answer_times');
+            localStorage.removeItem('saved_user_selected_answers');
+            localStorage.removeItem('saved_quiz_submitted');
+            localStorage.removeItem('saved_final_score');
+            localStorage.removeItem('saved_final_time_taken');
             localStorage.removeItem('saved_topic');
             localStorage.removeItem('saved_num_questions');
-            generatedQuestions = []; // Reset in-memory array too
+
+            generatedQuestions = [];
             questionAnswerTimes = [];
-            stopTimer(); // Ensure timer is stopped
+            userSelectedAnswers = [];
+            quizSubmitted = false;
+            finalScore = 0;
+            finalTimeTaken = 0;
+            stopTimer();
+            console.log("Quiz state cleared.");
         }
 
         // --- Event Listeners ---
         fab.addEventListener('click', () => {
-            clearQuizState(); // Clear any existing quiz state for a new one
+            clearQuizState(); // Always clear state for new quiz
             inputModal.style.display = 'flex';
             floatingTimerControls.style.display = 'none';
             resultsContainer.style.display = 'none';
@@ -664,7 +708,7 @@
         });
 
         startQuizBtn.addEventListener('click', () => {
-            clearQuizState(); // Clear any existing quiz state for a new one
+            clearQuizState(); // Always clear state for new quiz
             inputModal.style.display = 'flex';
             landingPage.style.display = 'none';
             quizContainer.style.display = 'none';
@@ -676,12 +720,12 @@
 
         cancelBtn.addEventListener('click', () => {
             inputModal.style.display = 'none';
-            // If user cancels and no quiz was loaded/generated, show landing page
-            const quizLoaded = localStorage.getItem('quiz_generated_flag') === 'true';
-            if (!quizLoaded) {
+            const quizWasActive = localStorage.getItem('quiz_generated_flag') === 'true'; // Check if any quiz was active
+            if (!quizWasActive) { // If no quiz was active before modal opened
                  landingPage.style.display = 'block';
-            } else {
-                // If a quiz was active before opening modal, show it again
+                 quizContainer.style.display = 'none';
+                 controls.style.display = 'none';
+            } else { // If a quiz was active, restore its view
                 quizContainer.style.display = 'block';
                 controls.style.display = 'flex';
                 floatingTimerControls.style.display = 'flex';
@@ -692,16 +736,22 @@
                     mainContainer.style.pointerEvents = 'auto';
                     quizOverlay.style.display = 'none';
                 }
-                updateTimerDisplay(); // Ensure timer display is correct
+                updateTimerDisplay();
+                // Ensure the submit button is re-enabled if quiz was not submitted
+                if (!quizSubmitted) {
+                    submitBtn.disabled = false;
+                }
             }
         });
 
         window.addEventListener('click', (event) => {
             if (event.target === inputModal) {
                 inputModal.style.display = 'none';
-                const quizLoaded = localStorage.getItem('quiz_generated_flag') === 'true';
-                if (!quizLoaded) {
+                const quizWasActive = localStorage.getItem('quiz_generated_flag') === 'true';
+                if (!quizWasActive) {
                      landingPage.style.display = 'block';
+                     quizContainer.style.display = 'none';
+                     controls.style.display = 'none';
                 } else {
                     quizContainer.style.display = 'block';
                     controls.style.display = 'flex';
@@ -714,6 +764,9 @@
                         quizOverlay.style.display = 'none';
                     }
                     updateTimerDisplay();
+                     if (!quizSubmitted) {
+                        submitBtn.disabled = false;
+                    }
                 }
             }
         });
@@ -730,13 +783,19 @@
             quizOverlay.style.display = 'none';
             mainContainer.style.pointerEvents = 'auto';
 
-            if (timerInterval) clearInterval(timerInterval); // Clear any existing timer
+            if (timerInterval) clearInterval(timerInterval);
             timerInterval = setInterval(updateTimerDisplay, 1000);
             saveQuizState(); // Save state when timer starts
         }
 
         function updateTimerDisplay() {
-            const elapsed = (Date.now() - startTime) + pausedTime;
+            let elapsed = 0;
+            if (startTime !== null) { // Ensure startTime is not null before calculating
+                 elapsed = (Date.now() - startTime) + pausedTime;
+            } else {
+                // If startTime is null, it means timer likely not started yet or reset. Display 00:00.
+                elapsed = pausedTime; // If pausedTime has value, use it. Otherwise 0.
+            }
             const minutes = Math.floor(elapsed / 60000);
             const seconds = Math.floor((elapsed % 60000) / 1000);
             timerDisplay.textContent = `Time: ${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
@@ -749,13 +808,14 @@
             }
             pausedTime = 0;
             floatingTimerControls.style.display = 'none';
-            isPaused = false; // Ensure isPaused is false when stopped
+            isPaused = false;
+            startTime = null; // Reset startTime when timer stops
         }
 
         function pauseTimer() {
-            if (isPaused || !timerInterval) return; // Only pause if running
+            if (isPaused || !timerInterval) return;
             clearInterval(timerInterval);
-            timerInterval = null; // Clear interval reference
+            timerInterval = null;
             pausedTime += Date.now() - startTime;
             isPaused = true;
             pauseBtn.style.display = 'none';
@@ -767,7 +827,7 @@
         }
 
         function resumeTimer() {
-            if (!isPaused) return; // Only resume if paused
+            if (!isPaused) return;
             isPaused = false;
             startTime = Date.now();
             pauseBtn.style.display = 'block';
@@ -775,7 +835,7 @@
             document.body.style.overflow = '';
             quizOverlay.style.display = 'none';
             mainContainer.style.pointerEvents = 'auto';
-            if (timerInterval) clearInterval(timerInterval); // Clear any old interval
+            if (timerInterval) clearInterval(timerInterval);
             timerInterval = setInterval(updateTimerDisplay, 1000);
             saveQuizState(); // Save state when resumed
         }
@@ -826,9 +886,9 @@
             landingPage.style.display = 'none';
             quizContainer.style.display = 'block';
             controls.style.display = 'flex';
+            resultsContainer.style.display = 'none'; // Hide results from previous quiz
 
             quizContainer.innerHTML = '';
-            resultsContainer.style.display = 'none';
             showError('');
             loadingSpinner.style.display = 'block';
             fab.disabled = true;
@@ -852,6 +912,11 @@
                     if (Array.isArray(result) && result.length > 0) {
                         generatedQuestions = result;
                         questionAnswerTimes = new Array(generatedQuestions.length).fill(null);
+                        userSelectedAnswers = new Array(generatedQuestions.length).fill(null); // Initialize user selections
+                        quizSubmitted = false; // Reset submission state
+                        finalScore = 0;
+                        finalTimeTaken = 0;
+
                         displayQuestions(generatedQuestions);
                         startTimer();
                         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -867,8 +932,7 @@
             } catch (error) {
                 console.error('Error generating questions via proxy:', error);
                 showError(`Failed to generate questions: ${error.message}. Please try again.`);
-                // If error, return to landing page
-                landingPage.style.display = 'block';
+                landingPage.style.display = 'block'; // If error, return to landing page
                 quizContainer.style.display = 'none';
                 controls.style.display = 'none';
             } finally {
@@ -887,12 +951,13 @@
                     <p class="text-lg font-medium text-gray-900 mb-4">${index + 1}. ${q.questionText}</p>
                     <div class="options-group">
                         ${q.options.map((option, optIndex) => {
-                            // Strip any leading "A. ", "B. ", "C. ", "D. " or "A) ", "B) " from the option string
                             const cleanedOption = option.replace(/^[A-Da-d][\.\)]?\s*/, '');
+                            // Set `checked` attribute based on saved `userSelectedAnswers`
+                            const isChecked = userSelectedAnswers[index] === option;
                             return `
                                 <div class="mb-3 option">
                                     <label class="flex items-center p-3 bg-white border border-gray-300 rounded-md cursor-pointer hover:bg-blue-50 hover:border-blue-400 transition-all duration-200">
-                                        <input type="radio" name="question${index}" value="${option}" class="mr-3 accent-indigo-600 transform scale-125">
+                                        <input type="radio" name="question${index}" value="${option}" class="mr-3 accent-indigo-600 transform scale-125" ${isChecked ? 'checked' : ''}>
                                         <span class="option-text">${String.fromCharCode(65 + optIndex)}) ${cleanedOption}</span>
                                     </label>
                                 </div>
@@ -908,28 +973,29 @@
 
                 const radios = questionCard.querySelectorAll(`input[name="question${index}"]`);
                 radios.forEach(radio => {
-                    radio.addEventListener('change', () => {
+                    // Disable radios if quiz was already submitted
+                    if (quizSubmitted) {
+                        radio.disabled = true;
+                    }
+                    radio.addEventListener('change', (event) => {
                         if (questionAnswerTimes[index] === null) {
                             const currentTime = Date.now();
                             const elapsedDuringSession = currentTime - startTime;
                             const totalElapsedTime = elapsedDuringSession + pausedTime;
                             questionAnswerTimes[index] = totalElapsedTime;
-                            saveQuizState(); // Save state on answer change
                         }
+                        userSelectedAnswers[index] = event.target.value; // Store user's selected answer
+                        saveQuizState(); // Save state on answer change
                     });
                 });
             });
             console.log('Questions rendered to DOM.');
         }
 
-        // --- Submit Answers Function ---
-        function submitAnswers() {
-            stopTimer();
-            let score = 0;
-            const finalElapsedTime = (Date.now() - startTime) + pausedTime;
-
+        // New function to render submitted state feedback
+        function renderSubmittedState(score, time) {
             generatedQuestions.forEach((q, index) => {
-                const selectedOption = document.querySelector(`input[name="question${index}"]:checked`);
+                const selectedOptionValue = userSelectedAnswers[index];
                 const questionCard = quizContainer.children[index];
 
                 questionCard.classList.remove('border-green-500', 'border-red-500', 'border-yellow-500');
@@ -941,9 +1007,13 @@
                 const explanationDiv = questionCard.querySelector('.explanation-text');
                 const answerTimeDisplay = questionCard.querySelector('.answer-time');
 
-                if (selectedOption) {
-                    if (selectedOption.value === q.correctAnswer) {
-                        score++;
+                const selectedRadio = questionCard.querySelector(`input[name="question${index}"][value="${selectedOptionValue}"]`);
+                if (selectedRadio) {
+                    selectedRadio.checked = true; // Ensure radio is checked
+                }
+
+                if (selectedOptionValue) {
+                    if (selectedOptionValue === q.correctAnswer) {
                         questionCard.classList.add('border-green-500');
                         feedbackText.textContent = 'Correct! 🎉';
                         feedbackText.style.color = '#10B981';
@@ -971,16 +1041,42 @@
                     answerTimeDisplay.textContent = 'Not answered.';
                     answerTimeDisplay.style.display = 'block';
                 }
+
+                // Disable all radio buttons after submission
+                questionCard.querySelectorAll('input[type="radio"]').forEach(radio => radio.disabled = true);
             });
 
             scoreText.textContent = `You scored ${score} out of ${generatedQuestions.length}!`;
-            const finalMinutes = Math.floor(finalElapsedTime / 60000);
-            const finalSeconds = Math.floor((finalElapsedTime % 60000) / 1000);
+            const finalMinutes = Math.floor(time / 60000);
+            const finalSeconds = Math.floor((time % 60000) / 1000);
             timeText.textContent = `Total time taken: ${String(finalMinutes).padStart(2, '0')}m ${String(finalSeconds).padStart(2, '0')}s`;
             resultsContainer.style.display = 'block';
             window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-            submitBtn.disabled = true;
-            document.querySelectorAll('input[type="radio"]').forEach(radio => radio.disabled = true);
+            submitBtn.disabled = true; // Submit button remains disabled
+            floatingTimerControls.style.display = 'none'; // Hide timer controls if submitted
+        }
+
+
+        // --- Submit Answers Function ---
+        function submitAnswers() {
+            stopTimer(); // Ensure timer is stopped
+            quizSubmitted = true; // Mark quiz as submitted
+            
+            let score = 0;
+            finalTimeTaken = (Date.now() - startTime) + pausedTime; // Calculate final time
+
+            generatedQuestions.forEach((q, index) => {
+                const selectedOption = document.querySelector(`input[name="question${index}"]:checked`);
+                // Ensure userSelectedAnswers is updated, even if it was pre-selected during load
+                userSelectedAnswers[index] = selectedOption ? selectedOption.value : null;
+
+                if (userSelectedAnswers[index] === q.correctAnswer) {
+                    score++;
+                }
+            });
+            finalScore = score; // Store final score
+
+            renderSubmittedState(finalScore, finalTimeTaken); // Render the state
             saveQuizState(); // Save state after submission
         }
 
@@ -992,10 +1088,12 @@
             const elementsToPrint = document.createElement('div');
             elementsToPrint.style.width = '760px';
             elementsToPrint.style.padding = '20px';
-            elementsToPrint.style.backgroundColor = 'var(--container-bg-color, #ffffff)'; // Use CSS variable for background
+            elementsToPrint.style.backgroundColor = '#ffffff'; // Always white background for PDF
             elementsToPrint.style.position = 'absolute';
             elementsToPrint.style.top = '-9999px';
             elementsToPrint.style.left = '-9999px';
+            elementsToPrint.style.color = '#1f2937'; // Ensure text color is dark for PDF
+
 
             const pdfTitle = document.createElement('h1');
             pdfTitle.textContent = `Quiz on: ${modalTopicInput.value}`;
@@ -1003,15 +1101,15 @@
             pdfTitle.style.fontWeight = 'bold';
             pdfTitle.style.marginBottom = '20px';
             pdfTitle.style.textAlign = 'center';
-            // Ensure text color is dark for PDF, regardless of app theme
-            pdfTitle.style.color = '#1f2937'; 
+            pdfTitle.style.color = '#1f2937'; // Ensure title is dark for PDF
             elementsToPrint.appendChild(pdfTitle);
 
             const clonedQuiz = quizContainer.cloneNode(true);
+            // Remove timer display if it exists in the cloned quiz
             const clonedTimer = clonedQuiz.querySelector('.timer-display');
             if (clonedTimer) clonedTimer.remove();
             
-            // Adjust styles for cloned quiz to ensure readability in PDF
+            // Adjust styles for cloned quiz elements to ensure readability in PDF, overriding any dark mode
             clonedQuiz.querySelectorAll('.question-card').forEach(card => {
                 card.style.backgroundColor = '#f9fafb';
                 card.style.borderColor = '#e5e7eb';
@@ -1024,7 +1122,7 @@
                 label.style.borderColor = '#e5e7eb';
                 label.style.color = '#1f2937';
             });
-            clonedQuiz.querySelectorAll('.feedback-text.mt-3.font-medium').forEach(feedback => {
+            clonedQuiz.querySelectorAll('.feedback-text').forEach(feedback => {
                 if (feedback.textContent.includes('Correct')) feedback.style.color = '#10B981';
                 else if (feedback.textContent.includes('Incorrect')) feedback.style.color = '#EF4444';
                 else feedback.style.color = '#F59E0B';
@@ -1046,7 +1144,7 @@
             if (resultsContainer.style.display !== 'none') {
                 const clonedResults = resultsContainer.cloneNode(true);
                 clonedResults.style.marginTop = '20px';
-                clonedResults.style.backgroundColor = '#ecfdf5';
+                clonedResults.style.backgroundColor = '#ecfdf5'; // Light background for results section in PDF
                 clonedResults.style.borderColor = '#a7f3d0';
                 clonedResults.querySelector('h2').style.color = '#065f46';
                 clonedResults.querySelectorAll('p').forEach(p => p.style.color = '#065f46');
@@ -1060,7 +1158,7 @@
                     scale: 1.0,
                     logging: true,
                     useCORS: true,
-                    backgroundColor: elementsToPrint.style.backgroundColor // Set canvas background to match
+                    backgroundColor: '#ffffff' // Explicitly set canvas background to white
                 });
 
                 const imgData = canvas.toDataURL('image/jpeg', 0.8);
@@ -1114,6 +1212,7 @@
             modalTopicInput.value = '';
             modalNumQuestionsSelect.value = '5';
             quizContainer.innerHTML = '';
+            // Ensure controls and results are hidden by default
             controls.style.display = 'none';
             resultsContainer.style.display = 'none';
             floatingTimerControls.style.display = 'none';
@@ -1126,6 +1225,14 @@
                 landingPage.style.display = 'block'; // Show landing page if no quiz was loaded
                 quizContainer.style.display = 'none'; // Ensure quiz container is hidden
             }
+            // If quiz was loaded but already submitted, ensure controls reflect that
+            if (quizWasLoaded && quizSubmitted) {
+                submitBtn.disabled = true;
+                floatingTimerControls.style.display = 'none';
+            } else if (quizWasLoaded && !quizSubmitted) {
+                submitBtn.disabled = false; // Re-enable submit button if quiz is loaded but not submitted
+            }
+
 
             // PWA: Register Service Worker with relative path
             if ('serviceWorker' in navigator) {
@@ -1142,4 +1249,4 @@
         };
     </script>
 </body>
-</html>
+    </html>
