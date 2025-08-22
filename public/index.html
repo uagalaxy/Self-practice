@@ -11,10 +11,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <link rel="manifest" href="manifest.json">
-
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6415762753353471"
-     crossorigin="anonymous"></script>
     <style>
+        /* Base styles for light mode */
         body {
             font-family: 'Inter', sans-serif;
             background-color: #f3f4f6;
@@ -25,7 +23,7 @@
             padding: 20px;
             box-sizing: border-box;
             overflow-y: auto;
-            color: #1f2937;
+            color: #1f2937; /* Default text color */
         }
         .container {
             background-color: #ffffff;
@@ -202,6 +200,7 @@
             display: none;
             font-weight: 500;
         }
+        /* Floating Timer Styles */
         #floatingTimerControls {
             position: fixed;
             top: 10px;
@@ -230,6 +229,7 @@
         #floatingTimerControls button:hover {
             background-color: rgba(255, 255, 255, 0.4);
         }
+        /* Overlay for pause */
         .quiz-overlay {
             position: absolute;
             top: 0;
@@ -264,6 +264,7 @@
             margin-top: 5px;
             font-style: italic;
         }
+        /* Notification styles */
         #notification {
             position: fixed;
             bottom: 20px;
@@ -284,6 +285,7 @@
             opacity: 1;
             visibility: visible;
         }
+        /* Install button styles */
         #installAppBtn {
             background-color: #2563eb;
             color: white;
@@ -303,12 +305,14 @@
         #installAppBtn:active {
             transform: translateY(0);
         }
+
+        /* Dark Mode Styles */
         html.dark body {
-            background-color: #1a202c;
-            color: #e2e8f0;
+            background-color: #1a202c; /* Darker background */
+            color: #e2e8f0; /* Light text color */
         }
         html.dark .container {
-            background-color: #2d3748;
+            background-color: #2d3748; /* Darker container background */
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
         }
         html.dark .modal-content {
@@ -358,10 +362,10 @@
             border-color: #f87171;
         }
         html.dark .loading-spinner {
-             border-left-color: #8c96f8;
+             border-left-color: #8c96f8; /* Lighter shade for spinner in dark mode */
         }
         html.dark .btn-secondary {
-            background-color: #4a5568 !important;
+            background-color: #4a5568 !important; /* Override inline style if necessary */
             color: #e2e8f0 !important;
         }
         html.dark .landing-page-title {
@@ -387,11 +391,13 @@
 </head>
 <body>
     <div class="container">
+        <!-- Landing Page Section -->
         <div id="landingPage" style="display: none;">
             <h1 class="text-4xl font-bold text-center landing-page-title mb-6">Master Any Subject with Qᵘᵃ Quiz! 🚀</h1>
             <p class="text-lg landing-page-description mb-8 text-center">
                 Generate custom objective question quizzes on a vast array of topics, from **Physics** and **Indian History** to **Human Anatomy** and beyond. Qᵘᵃ Quiz helps you test your knowledge, prepare for exams, and learn effectively through interactive, self-paced practice.
             </p>
+
             <div class="bg-blue-50 p-6 rounded-lg border border-blue-200 mb-8">
                 <h2 class="text-2xl font-semibold text-blue-800 mb-4">Why Choose Qᵘᵃ Quiz?</h2>
                 <ul class="list-disc list-inside text-blue-700 space-y-2">
@@ -402,41 +408,59 @@
                     <li><strong class="text-blue-900">PDF Download:</strong> Save your quizzes with answers for offline review or sharing.</li>
                 </ul>
             </div>
+
             <button id="startQuizBtn" class="btn btn-primary w-full text-xl py-3 mb-6">
                 Start Generating Quizzes Now!
             </button>
+            
             <p class="text-center text-gray-600 landing-page-description">
                 Simply click the button above, enter your desired topic, and let Qᵘᵃ Quiz create an instant practice session for you.
             </p>
         </div>
+
+        <!-- Quiz Container Section -->
         <div id="quizContainer" class="mt-5" style="display: none;">
+            <!-- Questions will be loaded here -->
         </div>
+
         <div id="controls" class="flex flex-col md:flex-row justify-center gap-4 mt-4" style="display: none;">
             <button id="submitBtn" class="btn btn-primary flex-1">Submit Answers</button>
             <button id="downloadPdfBtn" class="btn btn-primary flex-1">Download PDF</button>
         </div>
+        
+        <!-- Install App Button -->
         <button id="installAppBtn" class="w-full">
             <i class="fas fa-download mr-2"></i> Install App
         </button>
+
         <div id="loadingSpinner" class="loading-spinner"></div>
         <div id="errorMessage" class="error-message"></div>
+
         <div id="resultsContainer" class="results-section mt-5" style="display: none;">
             <h2>Quiz Results</h2>
             <p id="scoreText" class="text-lg"></p>
             <p id="timeText" class="text-lg"></p>
         </div>
+
+        <!-- Quiz Overlay for Pause - Inside the container for absolute positioning context -->
         <div id="quizOverlay" class="quiz-overlay">
             Quiz Paused
         </div>
     </div>
+
+    <!-- Floating action button (still available for quick new quiz generation) -->
     <button id="fab" class="fab">
         <i class="fas fa-plus"></i>
     </button>
+
+    <!-- Floating Timer and Controls -->
     <div id="floatingTimerControls" style="display: none;">
         <span id="timer">Time: 00:00</span>
         <button id="pauseBtn"><i class="fas fa-pause"></i></button>
         <button id="resumeBtn" style="display: none;"><i class="fas fa-play"></i></button>
     </div>
+
+    <!-- Modal for question inputs -->
     <div id="inputModal" class="modal">
         <div class="modal-content">
             <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Generate New Quiz</h2>
@@ -465,7 +489,10 @@
             </div>
         </div>
     </div>
+
+    <!-- Notification element -->
     <div id="notification"></div>
+    
     <script>
         const fab = document.getElementById('fab');
         const inputModal = document.getElementById('inputModal');
@@ -507,6 +534,7 @@
         let finalScore = 0;
         let finalTimeTaken = 0;
 
+        // --- Theme Toggle Logic ---
         function applyTheme(theme) {
             const html = document.documentElement;
             if (theme === 'dark') {
@@ -529,10 +557,12 @@
 
         themeToggleBtn.addEventListener('click', toggleTheme);
 
+        // --- PWA Install Prompt Logic ---
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
             installAppBtn.style.display = 'block';
+            console.log('beforeinstallprompt fired!');
         });
 
         installAppBtn.addEventListener('click', async () => {
@@ -540,10 +570,12 @@
             if (deferredPrompt) {
                 deferredPrompt.prompt();
                 const { outcome } = await deferredPrompt.userChoice;
+                console.log(`User response to the A2HS prompt: ${outcome}`);
                 deferredPrompt = null;
             }
         });
 
+        // --- Notification Function ---
         function showNotification(message, duration = 3000) {
             notificationElement.textContent = message;
             notificationElement.classList.add('show');
@@ -552,24 +584,28 @@
             }, duration);
         }
 
+        // --- Local Storage Management ---
         function saveQuizState() {
             try {
-                if (generatedQuestions.length === 0 && !quizSubmitted) {
+                // Only save if there's an active quiz or it was submitted
+                if (generatedQuestions.length > 0 || quizSubmitted) {
+                    localStorage.setItem('quiz_generated_flag', 'true'); // Flag to indicate a quiz was active
+                    localStorage.setItem('saved_questions', JSON.stringify(generatedQuestions));
+                    localStorage.setItem('saved_start_time', startTime ? startTime.toString() : '');
+                    localStorage.setItem('saved_paused_time', pausedTime.toString());
+                    localStorage.setItem('saved_is_paused', isPaused.toString());
+                    localStorage.setItem('saved_question_answer_times', JSON.stringify(questionAnswerTimes));
+                    localStorage.setItem('saved_user_selected_answers', JSON.stringify(userSelectedAnswers));
+                    localStorage.setItem('saved_quiz_submitted', quizSubmitted.toString());
+                    localStorage.setItem('saved_final_score', finalScore.toString());
+                    localStorage.setItem('saved_final_time_taken', finalTimeTaken.toString());
+                    localStorage.setItem('saved_topic', modalTopicInput.value);
+                    localStorage.setItem('saved_num_questions', modalNumQuestionsSelect.value);
+                    console.log("Quiz state saved.");
+                } else {
+                    // If no active quiz, ensure no old state is lingering
                     clearQuizState();
-                    return;
                 }
-                localStorage.setItem('quiz_generated_flag', 'true');
-                localStorage.setItem('saved_questions', JSON.stringify(generatedQuestions));
-                localStorage.setItem('saved_start_time', startTime ? startTime.toString() : '');
-                localStorage.setItem('saved_paused_time', pausedTime.toString());
-                localStorage.setItem('saved_is_paused', isPaused.toString());
-                localStorage.setItem('saved_question_answer_times', JSON.stringify(questionAnswerTimes));
-                localStorage.setItem('saved_user_selected_answers', JSON.stringify(userSelectedAnswers));
-                localStorage.setItem('saved_quiz_submitted', quizSubmitted.toString());
-                localStorage.setItem('saved_final_score', finalScore.toString());
-                localStorage.setItem('saved_final_time_taken', finalTimeTaken.toString());
-                localStorage.setItem('saved_topic', modalTopicInput.value);
-                localStorage.setItem('saved_num_questions', modalNumQuestionsSelect.value);
             } catch (error) {
                 console.error("Error saving quiz state to local storage:", error);
             }
@@ -593,43 +629,35 @@
                     modalNumQuestionsSelect.value = localStorage.getItem('saved_num_questions') || '5';
 
                     if (generatedQuestions.length > 0) {
-                        displayQuestions(generatedQuestions);
-                        
-                        generatedQuestions.forEach((q, index) => {
-                            const selectedValue = userSelectedAnswers[index];
-                            if (selectedValue !== null && selectedValue !== undefined) {
-                                const radio = quizContainer.querySelector(`input[name="question${index}"][value="${selectedValue}"]`);
-                                if (radio) {
-                                    radio.checked = true;
-                                }
-                            }
-                        });
+                        displayQuestions(generatedQuestions); // Render questions with saved selections
 
                         landingPage.style.display = 'none';
                         quizContainer.style.display = 'block';
-                        controls.style.display = 'flex';
-                        floatingTimerControls.style.display = 'flex';
-
-                        if (quizSubmitted) {
+                        controls.style.display = 'flex'; // Show controls
+                        
+                        if (quizSubmitted) { // If quiz was submitted
                             renderSubmittedState(finalScore, finalTimeTaken);
-                        } else {
+                            floatingTimerControls.style.display = 'none'; // Timer not needed if submitted
+                        } else { // If quiz was not submitted, manage timer
+                            floatingTimerControls.style.display = 'flex';
                             if (!isPaused && startTime !== null) {
                                 timerInterval = setInterval(updateTimerDisplay, 1000);
                             } else if (isPaused && startTime !== null) {
-                                updateTimerDisplay();
+                                updateTimerDisplay(); // Update display immediately for paused state
                                 quizOverlay.style.display = 'flex';
                                 mainContainer.style.pointerEvents = 'none';
                             }
-                            submitBtn.disabled = false;
+                            submitBtn.disabled = false; // Enable submit button for loaded quiz not yet submitted
                         }
-                        return true;
+                        console.log("Quiz state loaded successfully.");
+                        return true; // Quiz loaded
                     }
                 }
             } catch (error) {
                 console.error("Error loading quiz state from local storage:", error);
-                clearQuizState();
+                clearQuizState(); // Clear corrupted state
             }
-            return false;
+            return false; // No quiz loaded
         }
 
         function clearQuizState() {
@@ -653,25 +681,27 @@
             finalScore = 0;
             finalTimeTaken = 0;
             stopTimer();
+            console.log("Quiz state cleared.");
         }
 
+        // --- Event Listeners ---
         fab.addEventListener('click', () => {
-            clearQuizState();
+            clearQuizState(); // Always clear state for new quiz
             inputModal.style.display = 'flex';
             floatingTimerControls.style.display = 'none';
             resultsContainer.style.display = 'none';
             landingPage.style.display = 'none';
             quizContainer.style.display = 'none';
-            controls.style.display = 'none';
+            controls.style.display = 'none'; // Hide controls when modal opens
             quizContainer.innerHTML = '';
         });
 
         startQuizBtn.addEventListener('click', () => {
-            clearQuizState();
+            clearQuizState(); // Always clear state for new quiz
             inputModal.style.display = 'flex';
             landingPage.style.display = 'none';
             quizContainer.style.display = 'none';
-            controls.style.display = 'none';
+            controls.style.display = 'none'; // Hide controls when modal opens
             resultsContainer.style.display = 'none';
             floatingTimerControls.style.display = 'none';
             quizContainer.innerHTML = '';
@@ -683,11 +713,16 @@
             if (!quizWasActive) {
                  landingPage.style.display = 'block';
                  quizContainer.style.display = 'none';
-                 controls.style.display = 'none';
+                 controls.style.display = 'none'; // Ensure controls are hidden
+                 resultsContainer.style.display = 'none';
+                 floatingTimerControls.style.display = 'none';
             } else {
                 quizContainer.style.display = 'block';
                 controls.style.display = 'flex';
-                floatingTimerControls.style.display = 'flex';
+                // Only show timer controls if quiz not submitted
+                if (!quizSubmitted) floatingTimerControls.style.display = 'flex'; else floatingTimerControls.style.display = 'none';
+                if (quizSubmitted) resultsContainer.style.display = 'block'; else resultsContainer.style.display = 'none';
+
                 if (isPaused) {
                     quizOverlay.style.display = 'flex';
                     mainContainer.style.pointerEvents = 'none';
@@ -696,6 +731,7 @@
                     quizOverlay.style.display = 'none';
                 }
                 updateTimerDisplay();
+                // Ensure the submit button is re-enabled if quiz was loaded but not submitted
                 if (!quizSubmitted) {
                     submitBtn.disabled = false;
                 }
@@ -709,11 +745,16 @@
                 if (!quizWasActive) {
                      landingPage.style.display = 'block';
                      quizContainer.style.display = 'none';
-                     controls.style.display = 'none';
+                     controls.style.display = 'none'; // Ensure controls are hidden
+                     resultsContainer.style.display = 'none';
+                     floatingTimerControls.style.display = 'none';
                 } else {
                     quizContainer.style.display = 'block';
                     controls.style.display = 'flex';
-                    floatingTimerControls.style.display = 'flex';
+                    // Only show timer controls if quiz not submitted
+                    if (!quizSubmitted) floatingTimerControls.style.display = 'flex'; else floatingTimerControls.style.display = 'none';
+                    if (quizSubmitted) resultsContainer.style.display = 'block'; else resultsContainer.style.display = 'none';
+
                     if (isPaused) {
                         quizOverlay.style.display = 'flex';
                         mainContainer.style.pointerEvents = 'none';
@@ -729,6 +770,7 @@
             }
         });
 
+        // --- Timer Functions ---
         function startTimer() {
             pausedTime = 0;
             isPaused = false;
@@ -747,9 +789,11 @@
 
         function updateTimerDisplay() {
             let elapsed = 0;
+            // Only calculate elapsed time if startTime is valid
             if (startTime !== null) {
                  elapsed = (Date.now() - startTime) + pausedTime;
             } else {
+                // If timer hasn't started (e.g., loaded a submitted quiz), display stored pausedTime or 0
                 elapsed = pausedTime;
             }
             const minutes = Math.floor(elapsed / 60000);
@@ -765,7 +809,7 @@
             pausedTime = 0;
             floatingTimerControls.style.display = 'none';
             isPaused = false;
-            startTime = null;
+            startTime = null; // Reset startTime to null when stopped
         }
 
         function pauseTimer() {
@@ -799,6 +843,7 @@
         pauseBtn.addEventListener('click', pauseTimer);
         resumeBtn.addEventListener('click', resumeTimer);
 
+        // --- API Fetch Function ---
         async function fetchWithExponentialBackoff(url, options, retries = 5, delay = 1000) {
             for (let i = 0; i < retries; i++) {
                 try {
@@ -842,7 +887,7 @@
             showError('');
             loadingSpinner.style.display = 'block';
             fab.disabled = true;
-            clearQuizState();
+            clearQuizState(); // Clear state before generating new questions
 
             const proxyUrl = '/api/generate-quiz';
 
@@ -886,6 +931,13 @@
             }
         }
 
+        // --- Helper function to clean option/answer text before comparison/display ---
+        function cleanTextForComparison(text) {
+            // Remove leading "A. ", "B. ", "C) ", "a)", etc.
+            return text ? text.replace(/^[A-Da-d][\.\)]?\s*/, '').trim() : '';
+        }
+
+        // --- Display Questions Function (with option prefix fix and improved robustness) ---
         function displayQuestions(questions) {
             quizContainer.innerHTML = '';
             questions.forEach((q, index) => {
@@ -895,13 +947,15 @@
                     <p class="text-lg font-medium text-gray-900 mb-4">${index + 1}. ${q.questionText}</p>
                     <div class="options-group">
                         ${q.options.map((option, optIndex) => {
-                            const cleanedOption = option.replace(/^[A-Da-d][\.\)]?\s*/, '');
+                            // Clean option for display, but use original value for radio button
+                            const cleanedOptionForDisplay = cleanTextForComparison(option);
+                            // Check against the original (uncleaned) option value
                             const isChecked = userSelectedAnswers[index] === option;
                             return `
                                 <div class="mb-3 option">
                                     <label class="flex items-center p-3 bg-white border border-gray-300 rounded-md cursor-pointer hover:bg-blue-50 hover:border-blue-400 transition-all duration-200">
                                         <input type="radio" name="question${index}" value="${option}" class="mr-3 accent-indigo-600 transform scale-125" ${isChecked ? 'checked' : ''}>
-                                        <span class="option-text">${String.fromCharCode(65 + optIndex)}) ${cleanedOption}</span>
+                                        <span class="option-text">${String.fromCharCode(65 + optIndex)}) ${cleanedOptionForDisplay}</span>
                                     </label>
                                 </div>
                             `;
@@ -916,28 +970,31 @@
 
                 const radios = questionCard.querySelectorAll(`input[name="question${index}"]`);
                 radios.forEach(radio => {
-                    if (quizSubmitted) {
+                    if (quizSubmitted) { // Disable if already submitted
                         radio.disabled = true;
                     }
                     radio.addEventListener('change', (event) => {
                         if (questionAnswerTimes[index] === null) {
                             const currentTime = Date.now();
-                            const elapsedDuringSession = currentTime - startTime;
+                            // Ensure startTime is not null for calculation, default to current time if needed
+                            const elapsedDuringSession = currentTime - (startTime !== null ? startTime : Date.now()); 
                             const totalElapsedTime = elapsedDuringSession + pausedTime;
                             questionAnswerTimes[index] = totalElapsedTime;
                         }
-                        userSelectedAnswers[index] = event.target.value;
+                        userSelectedAnswers[index] = event.target.value; // Store the original value from radio
                         saveQuizState();
                     });
                 });
             });
         }
 
+        // Function to render submitted state feedback (called on submit and on load if quiz was submitted)
         function renderSubmittedState(score, time) {
             generatedQuestions.forEach((q, index) => {
-                const selectedOptionValue = userSelectedAnswers[index];
+                const selectedOptionValue = userSelectedAnswers[index]; // Original value from user selection
                 const questionCard = quizContainer.children[index];
 
+                // Clear previous feedback classes and text
                 questionCard.classList.remove('border-green-500', 'border-red-500', 'border-yellow-500');
                 const prevFeedback = questionCard.querySelector('.feedback-text');
                 if (prevFeedback) prevFeedback.remove();
@@ -947,29 +1004,34 @@
                 const explanationDiv = questionCard.querySelector('.explanation-text');
                 const answerTimeDisplay = questionCard.querySelector('.answer-time');
 
+                // Ensure the correct radio button is checked visually on reload
                 const selectedRadio = questionCard.querySelector(`input[name="question${index}"][value="${selectedOptionValue}"]`);
                 if (selectedRadio) {
                     selectedRadio.checked = true;
                 }
 
-                if (selectedOptionValue) {
-                    if (selectedOptionValue === q.correctAnswer) {
-                        questionCard.classList.add('border-green-500');
+                // Compare cleaned values for accuracy determination
+                const cleanedSelectedOption = cleanTextForComparison(selectedOptionValue);
+                const cleanedCorrectAnswer = cleanTextForComparison(q.correctAnswer);
+
+                if (selectedOptionValue !== null && selectedOptionValue !== undefined) { // Check if an answer was actually selected
+                    if (cleanedSelectedOption === cleanedCorrectAnswer) {
+                        questionCard.classList.add('border-green-500'); // Green border for correct
                         feedbackText.textContent = 'Correct! 🎉';
-                        feedbackText.style.color = '#10B981';
+                        feedbackText.style.color = '#10B981'; // Green text
                     } else {
-                        questionCard.classList.add('border-red-500');
-                        feedbackText.textContent = `Incorrect. The correct answer was: ${q.correctAnswer}`;
-                        feedbackText.style.color = '#EF4444';
+                        questionCard.classList.add('border-red-500'); // Red border for incorrect
+                        feedbackText.textContent = `Incorrect. The correct answer was: ${q.correctAnswer}`; // Show original correct answer
+                        feedbackText.style.color = '#EF4444'; // Red text
                     }
-                } else {
-                    questionCard.classList.add('border-yellow-500');
+                } else { // No answer selected
+                    questionCard.classList.add('border-yellow-500'); // Yellow border for unanswered
                     feedbackText.textContent = `You did not select an answer. Correct: ${q.correctAnswer}`;
-                    feedbackText.style.color = '#F59E0B';
+                    feedbackText.style.color = '#F59E0B'; // Amber text
                 }
                 questionCard.appendChild(feedbackText);
                 
-                explanationDiv.style.display = 'block';
+                explanationDiv.style.display = 'block'; // Always show explanation after submission
 
                 if (questionAnswerTimes[index] !== null) {
                     const ansTime = questionAnswerTimes[index];
@@ -982,6 +1044,7 @@
                     answerTimeDisplay.style.display = 'block';
                 }
 
+                // Disable all radio buttons after submission
                 questionCard.querySelectorAll('input[type="radio"]').forEach(radio => radio.disabled = true);
             });
 
@@ -991,31 +1054,39 @@
             timeText.textContent = `Total time taken: ${String(finalMinutes).padStart(2, '0')}m ${String(finalSeconds).padStart(2, '0')}s`;
             resultsContainer.style.display = 'block';
             window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-            submitBtn.disabled = true;
-            floatingTimerControls.style.display = 'none';
+            submitBtn.disabled = true; // Submit button remains disabled
+            floatingTimerControls.style.display = 'none'; // Hide timer controls if submitted
         }
 
+
+        // --- Submit Answers Function ---
         function submitAnswers() {
-            stopTimer();
-            quizSubmitted = true;
+            stopTimer(); // Ensure timer is stopped
+            quizSubmitted = true; // Mark quiz as submitted
             
             let score = 0;
-            finalTimeTaken = (Date.now() - startTime) + pausedTime;
+            // Calculate final time, ensuring startTime is not null before calculation
+            finalTimeTaken = (Date.now() - (startTime !== null ? startTime : Date.now())) + pausedTime;
 
             generatedQuestions.forEach((q, index) => {
                 const selectedOption = document.querySelector(`input[name="question${index}"]:checked`);
+                // Store original value for persistence, even if comparison uses cleaned value
                 userSelectedAnswers[index] = selectedOption ? selectedOption.value : null;
 
-                if (userSelectedAnswers[index] === q.correctAnswer) {
+                const cleanedSelected = cleanTextForComparison(userSelectedAnswers[index]);
+                const cleanedCorrect = cleanTextForComparison(q.correctAnswer);
+
+                if (cleanedSelected === cleanedCorrect) {
                     score++;
                 }
             });
-            finalScore = score;
+            finalScore = score; // Store final score
 
-            renderSubmittedState(finalScore, finalTimeTaken);
-            saveQuizState();
+            renderSubmittedState(finalScore, finalTimeTaken); // Render the state
+            saveQuizState(); // Save state after submission
         }
 
+        // --- PDF Download Function ---
         async function downloadPdf() {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF('p', 'mm', 'a4');
@@ -1023,11 +1094,12 @@
             const elementsToPrint = document.createElement('div');
             elementsToPrint.style.width = '760px';
             elementsToPrint.style.padding = '20px';
-            elementsToPrint.style.backgroundColor = '#ffffff';
+            elementsToPrint.style.backgroundColor = '#ffffff'; // Always white background for PDF capture
             elementsToPrint.style.position = 'absolute';
             elementsToPrint.style.top = '-9999px';
             elementsToPrint.style.left = '-9999px';
-            elementsToPrint.style.color = '#1f2937';
+            elementsToPrint.style.color = '#1f2937'; // Ensure text color is dark for PDF
+
 
             const pdfTitle = document.createElement('h1');
             pdfTitle.textContent = `Quiz on: ${modalTopicInput.value}`;
@@ -1035,13 +1107,14 @@
             pdfTitle.style.fontWeight = 'bold';
             pdfTitle.style.marginBottom = '20px';
             pdfTitle.style.textAlign = 'center';
-            pdfTitle.style.color = '#1f2937';
+            pdfTitle.style.color = '#1f2937'; // Ensure title is dark for PDF
             elementsToPrint.appendChild(pdfTitle);
 
             const clonedQuiz = quizContainer.cloneNode(true);
             const clonedTimer = clonedQuiz.querySelector('.timer-display');
             if (clonedTimer) clonedTimer.remove();
             
+            // Adjust styles for cloned quiz elements to ensure readability in PDF, overriding any dark mode
             clonedQuiz.querySelectorAll('.question-card').forEach(card => {
                 card.style.backgroundColor = '#f9fafb';
                 card.style.borderColor = '#e5e7eb';
@@ -1060,7 +1133,7 @@
                 else feedback.style.color = '#F59E0B';
             });
             clonedQuiz.querySelectorAll('.explanation-text').forEach(exp => {
-                exp.style.display = 'block';
+                exp.style.display = 'block'; // Ensure explanations are visible in PDF
                 exp.style.backgroundColor = '#e0f2fe';
                 exp.style.borderColor = '#38bdf8';
                 exp.style.color = '#0c4a6e';
@@ -1069,6 +1142,7 @@
                 at.style.display = 'block';
                 at.style.color = '#6b7280';
             });
+
 
             elementsToPrint.appendChild(clonedQuiz);
 
@@ -1087,9 +1161,9 @@
             try {
                 const canvas = await html2canvas(elementsToPrint, {
                     scale: 1.0,
-                    logging: false,
+                    logging: false, // Set to true for debugging html2canvas issues
                     useCORS: true,
-                    backgroundColor: '#ffffff'
+                    backgroundColor: '#ffffff' // Explicitly set canvas background to white
                 });
 
                 const imgData = canvas.toDataURL('image/jpeg', 0.8);
@@ -1110,10 +1184,25 @@
                     heightLeft -= pageHeight;
                 }
                 
-                doc.save(`Quiz_on_${modalTopicInput.value.replace(/\s+/g, '_')}.pdf`);
+                // Get PDF as a Blob and create a URL
+                const pdfBlob = doc.output('blob'); 
+                const pdfUrl = URL.createObjectURL(pdfBlob);
+
+                // Create a temporary anchor element to trigger download
+                const downloadLink = document.createElement('a');
+                downloadLink.href = pdfUrl;
+                downloadLink.download = `Quiz_on_${modalTopicInput.value.replace(/\s+/g, '_')}.pdf`; // Suggest a filename
+                document.body.appendChild(downloadLink);
+                downloadLink.click(); // Programmatically click the link
+                document.body.removeChild(downloadLink); // Clean up the element
+
                 showNotification('PDF downloaded successfully! 🎉');
 
+                // Revoke the object URL after a short delay to free up resources
+                setTimeout(() => URL.revokeObjectURL(pdfUrl), 10000);
+
             } catch (error) {
+                console.error("Error generating or downloading PDF:", error);
                 showError("Failed to generate PDF. Please try again.");
                 showNotification('PDF download failed! 😢', 5000);
             } finally {
@@ -1123,45 +1212,66 @@
             }
         }
 
+        // --- Error Display Function ---
         function showError(message) {
             errorMessage.textContent = message;
             errorMessage.style.display = message ? 'block' : 'none';
         }
 
+        // --- Initial Setup and Event Bindings ---
         generateBtn.addEventListener('click', generateQuestions);
         submitBtn.addEventListener('click', submitAnswers);
         downloadPdfBtn.addEventListener('click', downloadPdf);
 
         window.onload = () => {
+            // Apply saved theme preference or default to light
             const savedTheme = localStorage.getItem('theme_preference') || 'light';
             applyTheme(savedTheme);
 
             modalTopicInput.value = '';
             modalNumQuestionsSelect.value = '5';
             quizContainer.innerHTML = '';
+            
+            // Ensure controls and results are hidden by default
             controls.style.display = 'none';
             resultsContainer.style.display = 'none';
             floatingTimerControls.style.display = 'none';
+            submitBtn.disabled = true; // Submit button disabled until quiz is active
             showError('');
 
+            // Try to load quiz state from local storage
             const quizWasLoaded = loadQuizState();
 
             if (!quizWasLoaded) {
-                landingPage.style.display = 'block';
-                quizContainer.style.display = 'none';
+                landingPage.style.display = 'block'; // Show landing page if no quiz was loaded
+                quizContainer.style.display = 'none'; // Ensure quiz container is hidden
             }
-            if (quizWasLoaded && quizSubmitted) {
-                submitBtn.disabled = true;
-                floatingTimerControls.style.display = 'none';
-            } else if (quizWasLoaded && !quizSubmitted) {
-                submitBtn.disabled = false;
+            // If a quiz was loaded, adjust button states and timer visibility based on its state
+            if (quizWasLoaded) {
+                controls.style.display = 'flex'; // Ensure controls are visible for loaded quiz
+                if (quizSubmitted) {
+                    submitBtn.disabled = true;
+                    floatingTimerControls.style.display = 'none';
+                    resultsContainer.style.display = 'block'; // Show results if quiz was submitted
+                } else {
+                    submitBtn.disabled = false;
+                    floatingTimerControls.style.display = 'flex';
+                    resultsContainer.style.display = 'none'; // Hide results if not submitted
+                }
             }
 
+
+            // PWA: Register Service Worker
             if ('serviceWorker' in navigator) {
+                // Using 'load' event listener for service worker registration to ensure DOM is ready
                 window.addEventListener('load', () => {
                     navigator.serviceWorker.register('sw.js')
-                        .then(registration => {})
-                        .catch(error => {});
+                        .then(registration => {
+                            console.log('Service Worker registered with scope:', registration.scope);
+                        })
+                        .catch(error => {
+                            console.error('Service Worker registration failed:', error);
+                        });
                 });
             }
         };
