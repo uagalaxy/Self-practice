@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Objective Question Self-Practice</title>
+    <title>Qᵘᵃ Quiz: Objective Question Generator for Exam Prep & Learning</title>
+    <meta name="description" content="Generate and practice objective questions on various subjects. Boost your knowledge with customizable quizzes, instant feedback, and PDF downloads for effective exam preparation and self-learning.">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -12,6 +13,7 @@
     <!-- PWA: Link to manifest.json with relative path -->
     <link rel="manifest" href="manifest.json">
     <style>
+        /* Base styles for light mode */
         body {
             font-family: 'Inter', sans-serif;
             background-color: #f3f4f6;
@@ -22,6 +24,7 @@
             padding: 20px;
             box-sizing: border-box;
             overflow-y: auto;
+            color: #1f2937; /* Default text color */
         }
         .container {
             background-color: #ffffff;
@@ -303,13 +306,121 @@
         #installAppBtn:active {
             transform: translateY(0);
         }
+
+        /* Dark Mode Styles */
+        html.dark body {
+            background-color: #1a202c; /* Darker background */
+            color: #e2e8f0; /* Light text color */
+        }
+        html.dark .container {
+            background-color: #2d3748; /* Darker container background */
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+        html.dark .modal-content {
+            background-color: #2d3748;
+            color: #e2e8f0;
+        }
+        html.dark .input-group label {
+            color: #e2e8f0;
+        }
+        html.dark .input-group input, html.dark .input-group select {
+            background-color: #4a5568;
+            border-color: #6366f1;
+            color: #e2e8f0;
+        }
+        html.dark .question-card {
+            background-color: #2d3748;
+            border-color: #4a5568;
+        }
+        html.dark .question-card p.question-text {
+            color: #e2e8f0;
+        }
+        html.dark .question-card .option label {
+            background-color: #4a5568;
+            border-color: #6366f1;
+            color: #e2e8f0;
+        }
+        html.dark .question-card .option label:hover {
+            background-color: #3b4458;
+            border-color: #8c96f8;
+        }
+        html.dark .explanation-text {
+            background-color: #1a365d;
+            border-left-color: #38bdf8;
+            color: #a7d9f7;
+        }
+        html.dark .results-section {
+            background-color: #1a365d;
+            border-color: #38bdf8;
+            color: #a7d9f7;
+        }
+        html.dark .results-section h2, html.dark .results-section p {
+            color: #a7d9f7;
+        }
+        html.dark .error-message {
+            background-color: #b91c1c;
+            color: #fca5a5;
+            border-color: #f87171;
+        }
+        html.dark .loading-spinner {
+             border-left-color: #8c96f8; /* Lighter shade for spinner in dark mode */
+        }
+        html.dark .btn-secondary {
+            background-color: #4a5568 !important; /* Override inline style if necessary */
+            color: #e2e8f0 !important;
+        }
+        html.dark .landing-page-title {
+            color: #e2e8f0;
+        }
+        html.dark .landing-page-description {
+            color: #cbd5e0;
+        }
+        html.dark .landingPage .bg-blue-50 {
+            background-color: #2d3748;
+            border-color: #4a5568;
+        }
+        html.dark .landingPage h2 {
+            color: #a7d9f7;
+        }
+        html.dark .landingPage li {
+            color: #cbd5e0;
+        }
+        html.dark .landingPage li strong {
+            color: #a7d9f7;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">📝 Objective Question Generator</h1>
+        <!-- Landing Page Section -->
+        <div id="landingPage" style="display: none;">
+            <h1 class="text-4xl font-bold text-center landing-page-title mb-6">Master Any Subject with Qᵘᵃ Quiz! 🚀</h1>
+            <p class="text-lg landing-page-description mb-8 text-center">
+                Generate custom objective question quizzes on a vast array of topics, from **Physics** and **Indian History** to **Human Anatomy** and beyond. Qᵘᵃ Quiz helps you test your knowledge, prepare for exams, and learn effectively through interactive, self-paced practice.
+            </p>
 
-        <div id="quizContainer" class="mt-5">
+            <div class="bg-blue-50 p-6 rounded-lg border border-blue-200 mb-8">
+                <h2 class="text-2xl font-semibold text-blue-800 mb-4">Why Choose Qᵘᵃ Quiz?</h2>
+                <ul class="list-disc list-inside text-blue-700 space-y-2">
+                    <li><strong class="text-blue-900">Customizable Quizzes:</strong> Choose your topic and the number of questions to create a personalized learning experience.</li>
+                    <li><strong class="text-blue-900">Instant Feedback & Explanations:</strong> Understand your mistakes with detailed explanations for every question.</li>
+                    <li><strong class="text-blue-900">Track Your Progress:</strong> See your score and time taken to improve your efficiency.</li>
+                    <li><strong class="text-blue-900">Offline Access (PWA):</strong> Install Qᵘᵃ Quiz as an app and practice anytime, anywhere, even without an internet connection.</li>
+                    <li><strong class="text-blue-900">PDF Download:</strong> Save your quizzes with answers for offline review or sharing.</li>
+                </ul>
+            </div>
+
+            <button id="startQuizBtn" class="btn btn-primary w-full text-xl py-3 mb-6">
+                Start Generating Quizzes Now!
+            </button>
+            
+            <p class="text-center text-gray-600 landing-page-description">
+                Simply click the button above, enter your desired topic, and let Qᵘᵃ Quiz create an instant practice session for you.
+            </p>
+        </div>
+
+        <!-- Quiz Container Section -->
+        <div id="quizContainer" class="mt-5" style="display: none;">
             <!-- Questions will be loaded here -->
         </div>
 
@@ -318,7 +429,7 @@
             <button id="downloadPdfBtn" class="btn btn-primary flex-1">Download PDF</button>
         </div>
         
-        <!-- New Install App Button -->
+        <!-- Install App Button -->
         <button id="installAppBtn" class="w-full">
             <i class="fas fa-download mr-2"></i> Install App
         </button>
@@ -338,7 +449,7 @@
         </div>
     </div>
 
-    <!-- Floating action button -->
+    <!-- Floating action button (still available for quick new quiz generation) -->
     <button id="fab" class="fab">
         <i class="fas fa-plus"></i>
     </button>
@@ -370,9 +481,12 @@
                     <option value="100">100</option>
                 </select>
             </div>
-            <div class="flex gap-4">
+            <div class="flex flex-col gap-4">
                 <button id="generateBtn" class="btn btn-primary w-full">Generate Questions</button>
                 <button id="cancelBtn" class="btn btn-secondary w-full" style="background-color: #d1d5db; color: #374151;">Cancel</button>
+                <button id="themeToggleBtn" class="btn bg-gray-200 text-gray-800 hover:bg-gray-300">
+                    <i class="fas fa-moon mr-2" id="themeIcon"></i> Toggle Theme
+                </button>
             </div>
         </div>
     </div>
@@ -404,14 +518,43 @@
         const mainContainer = document.querySelector('.container');
         const notificationElement = document.getElementById('notification');
         const installAppBtn = document.getElementById('installAppBtn');
+        const landingPage = document.getElementById('landingPage');
+        const startQuizBtn = document.getElementById('startQuizBtn');
+        const themeToggleBtn = document.getElementById('themeToggleBtn'); // New theme toggle button
+        const themeIcon = document.getElementById('themeIcon'); // New theme icon
 
-        let deferredPrompt;
+        let deferredPrompt = null; // Initialize deferredPrompt to null
         let startTime;
-        let timerInterval;
+        let timerInterval = null; // Initialize timerInterval to null
         let pausedTime = 0;
         let isPaused = false;
+        let generatedQuestions = [];
         let questionAnswerTimes = [];
 
+        // --- Theme Toggle Logic ---
+        function applyTheme(theme) {
+            const html = document.documentElement;
+            if (theme === 'dark') {
+                html.classList.add('dark');
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+            } else {
+                html.classList.remove('dark');
+                themeIcon.classList.remove('fa-sun');
+                themeIcon.classList.add('fa-moon');
+            }
+            localStorage.setItem('theme_preference', theme);
+        }
+
+        function toggleTheme() {
+            const currentTheme = localStorage.getItem('theme_preference') || 'light';
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            applyTheme(newTheme);
+        }
+
+        themeToggleBtn.addEventListener('click', toggleTheme);
+
+        // --- PWA Install Prompt Logic ---
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
@@ -429,6 +572,7 @@
             }
         });
 
+        // --- Notification Function ---
         function showNotification(message, duration = 3000) {
             notificationElement.textContent = message;
             notificationElement.classList.add('show');
@@ -437,25 +581,144 @@
             }, duration);
         }
 
+        // --- Local Storage Management ---
+        function saveQuizState() {
+            try {
+                localStorage.setItem('quiz_generated_flag', 'true');
+                localStorage.setItem('saved_questions', JSON.stringify(generatedQuestions));
+                localStorage.setItem('saved_start_time', startTime ? startTime.toString() : '');
+                localStorage.setItem('saved_paused_time', pausedTime.toString());
+                localStorage.setItem('saved_is_paused', isPaused.toString());
+                localStorage.setItem('saved_question_answer_times', JSON.stringify(questionAnswerTimes));
+                localStorage.setItem('saved_topic', modalTopicInput.value);
+                localStorage.setItem('saved_num_questions', modalNumQuestionsSelect.value);
+            } catch (error) {
+                console.error("Error saving quiz state to local storage:", error);
+            }
+        }
+
+        function loadQuizState() {
+            try {
+                const quizFlag = localStorage.getItem('quiz_generated_flag');
+                if (quizFlag === 'true') {
+                    generatedQuestions = JSON.parse(localStorage.getItem('saved_questions') || '[]');
+                    const savedStartTime = localStorage.getItem('saved_start_time');
+                    startTime = savedStartTime ? parseInt(savedStartTime) : null;
+                    pausedTime = parseInt(localStorage.getItem('saved_paused_time') || '0');
+                    isPaused = localStorage.getItem('saved_is_paused') === 'true';
+                    questionAnswerTimes = JSON.parse(localStorage.getItem('saved_question_answer_times') || '[]');
+                    modalTopicInput.value = localStorage.getItem('saved_topic') || '';
+                    modalNumQuestionsSelect.value = localStorage.getItem('saved_num_questions') || '5';
+
+                    if (generatedQuestions.length > 0) {
+                        displayQuestions(generatedQuestions);
+                        landingPage.style.display = 'none';
+                        quizContainer.style.display = 'block';
+                        controls.style.display = 'flex';
+                        floatingTimerControls.style.display = 'flex';
+                        if (!isPaused && startTime !== null) {
+                            timerInterval = setInterval(updateTimerDisplay, 1000);
+                        } else if (isPaused && startTime !== null) {
+                             // If paused, ensure timer display is updated correctly on load
+                             updateTimerDisplay();
+                             pauseBtn.style.display = 'none';
+                             resumeBtn.style.display = 'block';
+                             quizOverlay.style.display = 'flex';
+                             mainContainer.style.pointerEvents = 'none';
+                        }
+                        submitBtn.disabled = false; // Enable submit button for loaded quiz
+                        return true; // Quiz loaded
+                    }
+                }
+            } catch (error) {
+                console.error("Error loading quiz state from local storage:", error);
+                clearQuizState(); // Clear corrupted state
+            }
+            return false; // No quiz loaded
+        }
+
+        function clearQuizState() {
+            localStorage.removeItem('quiz_generated_flag');
+            localStorage.removeItem('saved_questions');
+            localStorage.removeItem('saved_start_time');
+            localStorage.removeItem('saved_paused_time');
+            localStorage.removeItem('saved_is_paused');
+            localStorage.removeItem('saved_question_answer_times');
+            localStorage.removeItem('saved_topic');
+            localStorage.removeItem('saved_num_questions');
+            generatedQuestions = []; // Reset in-memory array too
+            questionAnswerTimes = [];
+            stopTimer(); // Ensure timer is stopped
+        }
+
+        // --- Event Listeners ---
         fab.addEventListener('click', () => {
+            clearQuizState(); // Clear any existing quiz state for a new one
             inputModal.style.display = 'flex';
             floatingTimerControls.style.display = 'none';
             resultsContainer.style.display = 'none';
+            landingPage.style.display = 'none';
+            quizContainer.style.display = 'none';
             controls.style.display = 'none';
             quizContainer.innerHTML = '';
-            stopTimer();
+        });
+
+        startQuizBtn.addEventListener('click', () => {
+            clearQuizState(); // Clear any existing quiz state for a new one
+            inputModal.style.display = 'flex';
+            landingPage.style.display = 'none';
+            quizContainer.style.display = 'none';
+            controls.style.display = 'none';
+            resultsContainer.style.display = 'none';
+            floatingTimerControls.style.display = 'none';
+            quizContainer.innerHTML = '';
         });
 
         cancelBtn.addEventListener('click', () => {
             inputModal.style.display = 'none';
+            // If user cancels and no quiz was loaded/generated, show landing page
+            const quizLoaded = localStorage.getItem('quiz_generated_flag') === 'true';
+            if (!quizLoaded) {
+                 landingPage.style.display = 'block';
+            } else {
+                // If a quiz was active before opening modal, show it again
+                quizContainer.style.display = 'block';
+                controls.style.display = 'flex';
+                floatingTimerControls.style.display = 'flex';
+                if (isPaused) {
+                    quizOverlay.style.display = 'flex';
+                    mainContainer.style.pointerEvents = 'none';
+                } else {
+                    mainContainer.style.pointerEvents = 'auto';
+                    quizOverlay.style.display = 'none';
+                }
+                updateTimerDisplay(); // Ensure timer display is correct
+            }
         });
 
         window.addEventListener('click', (event) => {
             if (event.target === inputModal) {
                 inputModal.style.display = 'none';
+                const quizLoaded = localStorage.getItem('quiz_generated_flag') === 'true';
+                if (!quizLoaded) {
+                     landingPage.style.display = 'block';
+                } else {
+                    quizContainer.style.display = 'block';
+                    controls.style.display = 'flex';
+                    floatingTimerControls.style.display = 'flex';
+                    if (isPaused) {
+                        quizOverlay.style.display = 'flex';
+                        mainContainer.style.pointerEvents = 'none';
+                    } else {
+                        mainContainer.style.pointerEvents = 'auto';
+                        quizOverlay.style.display = 'none';
+                    }
+                    updateTimerDisplay();
+                }
             }
         });
 
+        // --- Timer Functions ---
         function startTimer() {
             pausedTime = 0;
             isPaused = false;
@@ -467,7 +730,9 @@
             quizOverlay.style.display = 'none';
             mainContainer.style.pointerEvents = 'auto';
 
+            if (timerInterval) clearInterval(timerInterval); // Clear any existing timer
             timerInterval = setInterval(updateTimerDisplay, 1000);
+            saveQuizState(); // Save state when timer starts
         }
 
         function updateTimerDisplay() {
@@ -480,14 +745,17 @@
         function stopTimer() {
             if (timerInterval) {
                 clearInterval(timerInterval);
+                timerInterval = null;
             }
             pausedTime = 0;
             floatingTimerControls.style.display = 'none';
+            isPaused = false; // Ensure isPaused is false when stopped
         }
 
         function pauseTimer() {
-            if (isPaused) return;
+            if (isPaused || !timerInterval) return; // Only pause if running
             clearInterval(timerInterval);
+            timerInterval = null; // Clear interval reference
             pausedTime += Date.now() - startTime;
             isPaused = true;
             pauseBtn.style.display = 'none';
@@ -495,10 +763,11 @@
             document.body.style.overflow = 'hidden';
             quizOverlay.style.display = 'flex';
             mainContainer.style.pointerEvents = 'none';
+            saveQuizState(); // Save state when paused
         }
 
         function resumeTimer() {
-            if (!isPaused) return;
+            if (!isPaused) return; // Only resume if paused
             isPaused = false;
             startTime = Date.now();
             pauseBtn.style.display = 'block';
@@ -506,12 +775,15 @@
             document.body.style.overflow = '';
             quizOverlay.style.display = 'none';
             mainContainer.style.pointerEvents = 'auto';
+            if (timerInterval) clearInterval(timerInterval); // Clear any old interval
             timerInterval = setInterval(updateTimerDisplay, 1000);
+            saveQuizState(); // Save state when resumed
         }
 
         pauseBtn.addEventListener('click', pauseTimer);
         resumeBtn.addEventListener('click', resumeTimer);
 
+        // --- API Fetch Function ---
         async function fetchWithExponentialBackoff(url, options, retries = 5, delay = 1000) {
             for (let i = 0; i < retries; i++) {
                 try {
@@ -551,13 +823,16 @@
             }
 
             inputModal.style.display = 'none';
+            landingPage.style.display = 'none';
+            quizContainer.style.display = 'block';
+            controls.style.display = 'flex';
+
             quizContainer.innerHTML = '';
-            controls.style.display = 'none';
             resultsContainer.style.display = 'none';
             showError('');
             loadingSpinner.style.display = 'block';
             fab.disabled = true;
-            stopTimer();
+            clearQuizState(); // Clear state before generating new questions
 
             const proxyUrl = '/api/generate-quiz';
 
@@ -578,10 +853,10 @@
                         generatedQuestions = result;
                         questionAnswerTimes = new Array(generatedQuestions.length).fill(null);
                         displayQuestions(generatedQuestions);
-                        controls.style.display = 'flex';
                         startTimer();
                         window.scrollTo({ top: 0, behavior: 'smooth' });
                         submitBtn.disabled = false;
+                        saveQuizState(); // Save initial state after generation
                         console.log('Questions generated and displayed successfully.');
                     } else {
                         throw new Error(result.error || 'Proxy returned an empty or invalid array of questions.');
@@ -592,12 +867,17 @@
             } catch (error) {
                 console.error('Error generating questions via proxy:', error);
                 showError(`Failed to generate questions: ${error.message}. Please try again.`);
+                // If error, return to landing page
+                landingPage.style.display = 'block';
+                quizContainer.style.display = 'none';
+                controls.style.display = 'none';
             } finally {
                 loadingSpinner.style.display = 'none';
                 fab.disabled = false;
             }
         }
 
+        // --- Display Questions Function (with option prefix fix) ---
         function displayQuestions(questions) {
             quizContainer.innerHTML = '';
             questions.forEach((q, index) => {
@@ -607,8 +887,8 @@
                     <p class="text-lg font-medium text-gray-900 mb-4">${index + 1}. ${q.questionText}</p>
                     <div class="options-group">
                         ${q.options.map((option, optIndex) => {
-                            // Strip any leading "A. ", "B. ", "C. ", "D. " from the option string
-                            const cleanedOption = option.replace(/^[A-D][\.\)]\s*/, '');
+                            // Strip any leading "A. ", "B. ", "C. ", "D. " or "A) ", "B) " from the option string
+                            const cleanedOption = option.replace(/^[A-Da-d][\.\)]?\s*/, '');
                             return `
                                 <div class="mb-3 option">
                                     <label class="flex items-center p-3 bg-white border border-gray-300 rounded-md cursor-pointer hover:bg-blue-50 hover:border-blue-400 transition-all duration-200">
@@ -634,6 +914,7 @@
                             const elapsedDuringSession = currentTime - startTime;
                             const totalElapsedTime = elapsedDuringSession + pausedTime;
                             questionAnswerTimes[index] = totalElapsedTime;
+                            saveQuizState(); // Save state on answer change
                         }
                     });
                 });
@@ -641,6 +922,7 @@
             console.log('Questions rendered to DOM.');
         }
 
+        // --- Submit Answers Function ---
         function submitAnswers() {
             stopTimer();
             let score = 0;
@@ -699,8 +981,10 @@
             window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
             submitBtn.disabled = true;
             document.querySelectorAll('input[type="radio"]').forEach(radio => radio.disabled = true);
+            saveQuizState(); // Save state after submission
         }
 
+        // --- PDF Download Function ---
         async function downloadPdf() {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF('p', 'mm', 'a4');
@@ -708,7 +992,7 @@
             const elementsToPrint = document.createElement('div');
             elementsToPrint.style.width = '760px';
             elementsToPrint.style.padding = '20px';
-            elementsToPrint.style.backgroundColor = '#ffffff';
+            elementsToPrint.style.backgroundColor = 'var(--container-bg-color, #ffffff)'; // Use CSS variable for background
             elementsToPrint.style.position = 'absolute';
             elementsToPrint.style.top = '-9999px';
             elementsToPrint.style.left = '-9999px';
@@ -719,16 +1003,53 @@
             pdfTitle.style.fontWeight = 'bold';
             pdfTitle.style.marginBottom = '20px';
             pdfTitle.style.textAlign = 'center';
+            // Ensure text color is dark for PDF, regardless of app theme
+            pdfTitle.style.color = '#1f2937'; 
             elementsToPrint.appendChild(pdfTitle);
 
             const clonedQuiz = quizContainer.cloneNode(true);
             const clonedTimer = clonedQuiz.querySelector('.timer-display');
             if (clonedTimer) clonedTimer.remove();
+            
+            // Adjust styles for cloned quiz to ensure readability in PDF
+            clonedQuiz.querySelectorAll('.question-card').forEach(card => {
+                card.style.backgroundColor = '#f9fafb';
+                card.style.borderColor = '#e5e7eb';
+            });
+            clonedQuiz.querySelectorAll('.question-card p.question-text').forEach(text => {
+                text.style.color = '#1f2937';
+            });
+            clonedQuiz.querySelectorAll('.question-card .option label').forEach(label => {
+                label.style.backgroundColor = '#ffffff';
+                label.style.borderColor = '#e5e7eb';
+                label.style.color = '#1f2937';
+            });
+            clonedQuiz.querySelectorAll('.feedback-text.mt-3.font-medium').forEach(feedback => {
+                if (feedback.textContent.includes('Correct')) feedback.style.color = '#10B981';
+                else if (feedback.textContent.includes('Incorrect')) feedback.style.color = '#EF4444';
+                else feedback.style.color = '#F59E0B';
+            });
+            clonedQuiz.querySelectorAll('.explanation-text').forEach(exp => {
+                exp.style.display = 'block'; // Ensure explanations are visible in PDF
+                exp.style.backgroundColor = '#e0f2fe';
+                exp.style.borderColor = '#38bdf8';
+                exp.style.color = '#0c4a6e';
+            });
+            clonedQuiz.querySelectorAll('.answer-time').forEach(at => {
+                at.style.display = 'block';
+                at.style.color = '#6b7280';
+            });
+
+
             elementsToPrint.appendChild(clonedQuiz);
 
             if (resultsContainer.style.display !== 'none') {
                 const clonedResults = resultsContainer.cloneNode(true);
                 clonedResults.style.marginTop = '20px';
+                clonedResults.style.backgroundColor = '#ecfdf5';
+                clonedResults.style.borderColor = '#a7f3d0';
+                clonedResults.querySelector('h2').style.color = '#065f46';
+                clonedResults.querySelectorAll('p').forEach(p => p.style.color = '#065f46');
                 elementsToPrint.appendChild(clonedResults);
             }
 
@@ -739,6 +1060,7 @@
                     scale: 1.0,
                     logging: true,
                     useCORS: true,
+                    backgroundColor: elementsToPrint.style.backgroundColor // Set canvas background to match
                 });
 
                 const imgData = canvas.toDataURL('image/jpeg', 0.8);
@@ -773,16 +1095,22 @@
             }
         }
 
+        // --- Error Display Function ---
         function showError(message) {
             errorMessage.textContent = message;
             errorMessage.style.display = message ? 'block' : 'none';
         }
 
+        // --- Initial Setup and Event Bindings ---
         generateBtn.addEventListener('click', generateQuestions);
         submitBtn.addEventListener('click', submitAnswers);
         downloadPdfBtn.addEventListener('click', downloadPdf);
 
         window.onload = () => {
+            // Apply saved theme preference or default to light
+            const savedTheme = localStorage.getItem('theme_preference') || 'light';
+            applyTheme(savedTheme);
+
             modalTopicInput.value = '';
             modalNumQuestionsSelect.value = '5';
             quizContainer.innerHTML = '';
@@ -791,6 +1119,15 @@
             floatingTimerControls.style.display = 'none';
             showError('');
 
+            // Try to load quiz state from local storage
+            const quizWasLoaded = loadQuizState();
+
+            if (!quizWasLoaded) {
+                landingPage.style.display = 'block'; // Show landing page if no quiz was loaded
+                quizContainer.style.display = 'none'; // Ensure quiz container is hidden
+            }
+
+            // PWA: Register Service Worker with relative path
             if ('serviceWorker' in navigator) {
                 window.addEventListener('load', () => {
                     navigator.serviceWorker.register('sw.js')
