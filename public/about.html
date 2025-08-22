@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Qᵘᵃ Quiz</title>
+    <meta name="description" content="Learn more about Qᵘᵃ Quiz, its mission to enhance self-learning and exam preparation through customizable objective quizzes.">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            color: #1f2937;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .content-wrapper {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            width: 100%;
+            margin-bottom: 20px; /* Space before footer */
+        }
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 20px;
+            color: #1f2937;
+        }
+        h2 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            color: #374151;
+        }
+        p {
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            color: #4b5563;
+        }
+        a {
+            color: #6366f1;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s ease;
+        }
+        a:hover {
+            color: #4f46e5;
+            text-decoration: underline;
+        }
+        .header-nav {
+            width: 100%;
+            max-width: 800px;
+            text-align: left;
+            margin-bottom: 20px;
+        }
+        .app-footer {
+            background-color: #e0e7ff;
+            color: #312e81;
+            padding: 20px;
+            margin-top: auto; /* Push footer to bottom */
+            border-top-left-radius: 15px;
+            border-top-right-radius: 15px;
+            width: 100%;
+            max-width: 800px;
+            text-align: center;
+            box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.05);
+        }
+        .app-footer a {
+            color: #4338ca;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s ease;
+        }
+        .app-footer a:hover {
+            color: #3730a3;
+            text-decoration: underline;
+        }
+        /* Dark mode styles (for demonstration, assuming it would be toggled by JS) */
+        html.dark body {
+            background-color: #1a202c;
+            color: #e2e8f0;
+        }
+        html.dark .content-wrapper {
+            background-color: #2d3748;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+        html.dark h1, html.dark h2 {
+            color: #e2e8f0;
+        }
+        html.dark p {
+            color: #cbd5e0;
+        }
+        html.dark a {
+            color: #818cf8;
+        }
+        html.dark a:hover {
+            color: #a78bfa;
+        }
+        html.dark .app-footer {
+            background-color: #1f2937;
+            color: #9ca3af;
+            box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.2);
+        }
+        html.dark .app-footer a {
+            color: #818cf8;
+        }
+        html.dark .app-footer a:hover {
+            color: #a78bfa;
+        }
+    </style>
+</head>
+<body>
+    <header class="header-nav">
+        <a href="index.html" class="text-lg font-semibold text-indigo-600 hover:text-indigo-800">← Qᵘᵃ Quiz Home</a>
+    </header>
+
+    <div class="content-wrapper">
+        <h1>About Qᵘᵃ Quiz</h1>
+        <p>
+            Welcome to Qᵘᵃ Quiz, your dedicated platform for generating custom objective questions for self-practice and exam preparation. Our mission is to provide an intuitive and effective tool for students and learners of all levels to test and reinforce their knowledge across a wide range of subjects.
+        </p>
+        <p>
+            We believe that active recall through practice questions is one of the most powerful learning techniques. Qᵘᵃ Quiz aims to make this process accessible and tailored to your specific needs, allowing you to focus on topics where you need the most improvement.
+        </p>
+
+        <h2>Our Purpose</h2>
+        <p>
+            Qᵘᵃ Quiz is designed with a clear educational purpose: to support and enhance your learning journey. We strive to offer a flexible tool that adapts to various study requirements, from quick topic reviews to comprehensive exam simulations.
+        </p>
+        <p>
+            Our core features include:
+            <ul class="list-disc list-inside ml-5 mb-4 text-gray-700">
+                <li>Instant generation of multiple-choice questions on any topic.</li>
+                <li>Customizable quiz length.</li>
+                <li>Immediate feedback on answers with detailed explanations.</li>
+                <li>Tracking of time taken for each quiz session.</li>
+                <li>Ability to download quizzes as PDF for offline study.</li>
+                <li>Offline functionality as a Progressive Web App (PWA).</li>
+            </ul>
+        </p>
+
+        <h2>Our Vision</h2>
+        <p>
+            We envision Qᵘᵃ Quiz as a simple yet powerful companion for anyone committed to lifelong learning. We are continuously working to improve the question generation quality and add more features that contribute to a seamless and productive self-study experience.
+        </p>
+        <p>
+            Thank you for choosing Qᵘᵃ Quiz as part of your educational toolkit!
+        </p>
+    </div>
+
+    <footer class="app-footer">
+        <div class="flex flex-wrap justify-center gap-x-6 gap-y-2 mb-4 text-sm md:text-base">
+            <a href="about.html">About Us</a>
+            <a href="contact.html">Contact Us</a>
+            <a href="terms-policy.html">Terms & Policy</a>
+        </div>
+        <p class="text-sm">&copy; 2025 Qᵘᵃ Quiz. All rights reserved.</p>
+        <p class="text-xs mt-1">This site uses cookies for functionality and analytics. For educational purposes only.</p>
+    </footer>
+</body>
+</html>
