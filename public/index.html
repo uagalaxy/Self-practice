@@ -17,8 +17,9 @@
             font-family: 'Inter', sans-serif;
             background-color: #f3f4f6;
             display: flex;
+            flex-direction: column; /* Added to push footer to bottom */
             justify-content: center;
-            align-items: flex-start;
+            align-items: center; /* Changed from flex-start to center for overall content */
             min-height: 100vh;
             padding: 20px;
             box-sizing: border-box;
@@ -37,6 +38,7 @@
             gap: 20px;
             position: relative;
             z-index: 1;
+            flex-grow: 1; /* Allows container to grow and push footer down */
         }
         .btn {
             padding: 12px 25px;
@@ -387,6 +389,41 @@
         html.dark .landingPage li strong {
             color: #a7d9f7;
         }
+        /* Footer Specific Styles */
+        .app-footer {
+            background-color: #e0e7ff; /* Light blue for footer */
+            color: #312e81; /* Darker text */
+            padding: 20px;
+            margin-top: 40px; /* Space from main content */
+            border-top-left-radius: 15px;
+            border-top-right-radius: 15px;
+            width: 100%;
+            max-width: 800px;
+            text-align: center;
+            box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.05);
+        }
+        .app-footer a {
+            color: #4338ca; /* Link color */
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s ease;
+        }
+        .app-footer a:hover {
+            color: #3730a3; /* Darker on hover */
+            text-decoration: underline;
+        }
+        /* Dark mode footer styles */
+        html.dark .app-footer {
+            background-color: #1f2937; /* Dark background */
+            color: #9ca3af; /* Lighter text */
+            box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.2);
+        }
+        html.dark .app-footer a {
+            color: #818cf8; /* Light link color */
+        }
+        html.dark .app-footer a:hover {
+            color: #a78bfa; /* Lighter on hover */
+        }
     </style>
 </head>
 <body>
@@ -415,7 +452,7 @@
             
             <p class="text-center text-gray-600 landing-page-description">
                 Simply click the button above, enter your desired topic, and let Qᵘᵃ Quiz create an instant practice session for you.
-			</p>
+            </p>
         </div>
 
         <!-- Quiz Container Section -->
@@ -486,14 +523,23 @@
                 <button id="themeToggleBtn" class="btn bg-gray-200 text-gray-800 hover:bg-gray-300">
                     <i class="fas fa-moon mr-2" id="themeIcon"></i> Toggle Theme
                 </button>
-			<script async="async" data-cfasync="false" src="//pl27477299.profitableratecpm.com/d78f0245dff2fc517a3a2c17e9b2b41b/invoke.js"></script>
-<div id="container-d78f0245dff2fc517a3a2c17e9b2b41b"></div>
             </div>
         </div>
     </div>
 
     <!-- Notification element -->
     <div id="notification"></div>
+
+    <!-- Footer Section -->
+    <footer class="app-footer">
+        <div class="flex flex-wrap justify-center gap-x-6 gap-y-2 mb-4 text-sm md:text-base">
+            <a href="#about" class="hover:underline">About Us</a>
+            <a href="#contact" class="hover:underline">Contact Us</a>
+            <a href="#terms" class="hover:underline">Terms & Policy</a>
+            </div>
+        <p class="text-sm">&copy; 2025 Qᵘᵃ Quiz. All rights reserved.</p>
+        <p class="text-xs mt-1">This site uses cookies for functionality and analytics. For educational purposes only.</p>
+    </footer>
     
     <script>
         const fab = document.getElementById('fab');
@@ -1193,10 +1239,12 @@
                 // Create a temporary anchor element to trigger download
                 const downloadLink = document.createElement('a');
                 downloadLink.href = pdfUrl;
-                downloadLink.download = `Quiz_on_${modalTopicInput.value.replace(/\s+/g, '_')}.pdf`; // Suggest a filename
+                downloadLink.download = `Qᵘᵃ_Quiz_on_${modalTopicInput.value.replace(/\s+/g, '_')}.pdf`; // Suggest a filename
+                // This approach will trigger a download and typically handles opening in a PWA better
                 document.body.appendChild(downloadLink);
                 downloadLink.click(); // Programmatically click the link
                 document.body.removeChild(downloadLink); // Clean up the element
+
 
                 showNotification('PDF downloaded successfully! 🎉');
 
@@ -1278,7 +1326,5 @@
             }
         };
     </script>
-    
-<script type="text/javascript" src="//www.highperformanceformat.com/f45859095fd800ce0f8dc5935d81ed17/invoke.js"></script>
 </body>
 </html>
