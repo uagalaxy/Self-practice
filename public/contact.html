@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Qᵘᵃ Quiz</title>
+    <meta name="description" content="Get in touch with Qᵘᵃ Quiz for support, feedback, or inquiries. Your questions and suggestions help us improve.">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            color: #1f2937;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .content-wrapper {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 20px;
+            color: #1f2937;
+        }
+        h2 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            color: #374151;
+        }
+        p {
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            color: #4b5563;
+        }
+        a {
+            color: #6366f1;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s ease;
+        }
+        a:hover {
+            color: #4f46e5;
+            text-decoration: underline;
+        }
+        .header-nav {
+            width: 100%;
+            max-width: 800px;
+            text-align: left;
+            margin-bottom: 20px;
+        }
+        .app-footer {
+            background-color: #e0e7ff;
+            color: #312e81;
+            padding: 20px;
+            margin-top: auto;
+            border-top-left-radius: 15px;
+            border-top-right-radius: 15px;
+            width: 100%;
+            max-width: 800px;
+            text-align: center;
+            box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.05);
+        }
+        .app-footer a {
+            color: #4338ca;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s ease;
+        }
+        .app-footer a:hover {
+            color: #3730a3;
+            text-decoration: underline;
+        }
+        /* Form specific styles */
+        .contact-form label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #374151;
+        }
+        .contact-form input[type="text"],
+        .contact-form input[type="email"],
+        .contact-form textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 1rem;
+            color: #4b5563;
+            margin-bottom: 15px;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        .contact-form input[type="text"]:focus,
+        .contact-form input[type="email"]:focus,
+        .contact-form textarea:focus {
+            outline: none;
+            border-color: #6366f1;
+            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+        }
+        .contact-form textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+        .contact-form button {
+            padding: 12px 25px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            background-color: #6366f1;
+            color: #ffffff;
+            box-shadow: 0 4px 10px rgba(99, 102, 241, 0.3);
+            transition: background-color 0.2s ease, transform 0.1s ease;
+            width: 100%;
+        }
+        .contact-form button:hover {
+            background-color: #4f46e5;
+            transform: translateY(-2px);
+        }
+        .contact-form button:active {
+            transform: translateY(0);
+        }
+
+        /* Dark mode styles */
+        html.dark body {
+            background-color: #1a202c;
+            color: #e2e8f0;
+        }
+        html.dark .content-wrapper {
+            background-color: #2d3748;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+        html.dark h1, html.dark h2 {
+            color: #e2e8f0;
+        }
+        html.dark p {
+            color: #cbd5e0;
+        }
+        html.dark a {
+            color: #818cf8;
+        }
+        html.dark a:hover {
+            color: #a78bfa;
+        }
+        html.dark .app-footer {
+            background-color: #1f2937;
+            color: #9ca3af;
+            box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.2);
+        }
+        html.dark .app-footer a {
+            color: #818cf8;
+        }
+        html.dark .app-footer a:hover {
+            color: #a78bfa;
+        }
+        html.dark .contact-form label {
+            color: #e2e8f0;
+        }
+        html.dark .contact-form input[type="text"],
+        html.dark .contact-form input[type="email"],
+        html.dark .contact-form textarea {
+            background-color: #4a5568;
+            border-color: #6366f1;
+            color: #e2e8f0;
+        }
+        html.dark .contact-form input[type="text"]:focus,
+        html.dark .contact-form input[type="email"]:focus,
+        html.dark .contact-form textarea:focus {
+            border-color: #8c96f8;
+            box-shadow: 0 0 0 2px rgba(140, 150, 248, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <header class="header-nav">
+        <a href="index.html" class="text-lg font-semibold text-indigo-600 hover:text-indigo-800">← Qᵘᵃ Quiz Home</a>
+    </header>
+
+    <div class="content-wrapper">
+        <h1>Contact Us</h1>
+        <p>
+            We'd love to hear from you! Whether you have questions, feedback, suggestions, or need support, please don't hesitate to reach out. Your input is valuable as we strive to improve Qᵘᵃ Quiz.
+        </p>
+
+        <h2>Get in Touch</h2>
+        <p>
+            You can reach us directly via email or through our associated website:
+        </p>
+        <p class="text-center text-xl font-bold mb-4">
+            Email: <a href="mailto:maakasamindian@gmail.com" class="text-indigo-600">maakasamindian@gmail.com</a>
+        </p>
+        <p class="text-center text-xl font-bold mb-6">
+            Our Website: <a href="https://uagalaxy.netlify.app/uasocial" target="_blank" rel="noopener noreferrer" class="text-indigo-600">uagalaxy.netlify.app/uasocial</a>
+            <i class="fas fa-external-link-alt text-sm ml-2"></i>
+        </p>
+        <p>
+            We aim to respond to all inquiries as quickly as possible, typically within 2-3 business days.
+        </p>
+
+        <h2 class="mt-8">Send Us a Message</h2>
+        <p>
+            Use the form below to send us a quick message. Please note that clicking "Send Message" will open your default email application.
+        </p>
+        <form id="contactForm" class="contact-form"action="https://formsubmit.co/c133e40e14339e711bb386f7bed75d5c" method="POST">
+            <div class="mb-4">
+                <label for="name">Your Name:</label>
+                <input type="text" id="name" name="name" placeholder="Enter your name" required>
+            </div>
+            <div class="mb-4">
+                <label for="email">Your Email:</label>
+                <input type="email" id="email" name="email" placeholder="Enter your email" required>
+            </div>
+            <div class="mb-6">
+                <label for="message">Your Message:</label>
+                <textarea id="message" name="message" placeholder="Type your message here..." required></textarea>
+            </div>
+            <button type="submit">Send Message</button>
+          <input type="hidden" name="_next" value="https://selfquizai-ua.vercel.app">
+             <input type="hidden" name="_captcha" value="false">
+             <input type="hidden" name="_subject" value="kauno ke msg">
+        </form>
+
+        
+
+        <h2 class="mt-8">Feedback and Suggestions</h2>
+        <p>
+            Your experience matters! If you have ideas for new features, improvements, or if you encounter any issues while using Qᵘᵃ Quiz, please let us know. We are committed to making Qᵘᵃ Quiz the best possible tool for your educational needs.
+        </p>
+        <p>
+            Thank you for being part of the Qᵘᵃ Quiz community.
+        </p>
+    </div>
+
+    <footer class="app-footer">
+        <div class="flex flex-wrap justify-center gap-x-6 gap-y-2 mb-4 text-sm md:text-base">
+            <a href="about.html">About Us</a>
+            <a href="contact.html">Contact Us</a>
+            <a href="terms-policy.html">Terms & Policy</a>
+            <a href="terms-policy.html#educational-purpose">Educational Purpose</a>
+            <a href="terms-policy.html#cookies">Use of Cookies</a>
+        </div>
+        <p class="text-sm">&copy; 2025 Qᵘᵃ Quiz. All rights reserved.</p>
+        <p class="text-xs mt-1">This site uses cookies for functionality and analytics. For educational purposes only.</p>
+    </footer>
+
+    <script>
+        
+        // Function to apply theme on page load
+        function applyThemeOnLoad() {
+            const savedTheme = localStorage.getItem('theme_preference') || 'light';
+            document.documentElement.classList.toggle('dark', savedTheme === 'dark');
+        }
+
+        // Apply theme when the page loads
+        applyThemeOnLoad();
+    </script>
+</body>
+</html>
