@@ -27,7 +27,7 @@
             box-sizing: border-box;
             overflow-y: auto;
             color: #1f2937; /* Default text color */
-            max-width:400px;
+            
         }
         .container {
             background-color: #ffffff;
@@ -1289,7 +1289,8 @@
             controls.style.display = 'none';
             resultsContainer.style.display = 'none';
             floatingTimerControls.style.display = 'none';
-            submitBtn.disabled = true; // Submit button disabled until quiz is active
+            submitBtn.disabled = true;
+           bdownloadPdfBtn.disabled = true;// Submit button disabled until quiz is active
             showError('');
 
             // Try to load quiz state from local storage
