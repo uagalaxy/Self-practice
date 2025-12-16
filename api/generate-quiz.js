@@ -1,49 +1,49 @@
 // api/generate-quiz.js
-const fetch = require('node-fetch'); // Required for making HTTP requests in Node.js environments
 
-// This is the main handler for your Vercel Serverless Function
+// Note: 'node-fetch' is no longer required in Node.js 18+ (Vercel's default)
+// as the 'fetch' API is now built-in.
+
 module.exports = async (req, res) => {
-    // Ensure the request method is POST, as expected by the frontend
+    // 1. Validate Method
     if (req.method !== 'POST') {
         return res.status(405).json({ error: 'Method Not Allowed. Only POST requests are accepted.' });
     }
 
-    // Get your Gemini API key from Vercel's environment variables.
-    // This variable (GEMINI_API_KEY) must be configured in your Vercel project settings.
+    // 2. Validate API Key
     const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-
-    // Check if the API key is provided. If not, return a server error.
     if (!GEMINI_API_KEY) {
-        console.error('GEMINI_API_KEY is not set in Vercel environment variables!');
-        return res.status(500).json({ error: 'Server configuration error: API key missing. Please ensure GEMINI_API_KEY is set in Vercel project settings.' });
+        console.error('GEMINI_API_KEY is missing from environment variables.');
+        return res.status(500).json({ 
+            error: 'Server configuration error: API key missing.' 
+        });
     }
 
     try {
-        // Extract 'topic' and 'numQuestions' from the request body sent by your frontend.
         const { topic, numQuestions } = req.body;
 
-        // Basic validation for required parameters
+        // 3. Validate Input
         if (!topic || !numQuestions) {
-            return res.status(400).json({ error: 'Topic and number of questions are required in the request body.' });
+            return res.status(400).json({ error: 'Topic and number of questions are required.' });
         }
 
-        // Construct the prompt string that will be sent to the Gemini API
-        // Added instruction for explanation.
-        const prompt = `Generate ${numQuestions} objective questions about "${topic}". Each question should have exactly 4 options (A, B, C, D), one correct answer, and a short, concise explanation for why the correct answer is correct. Provide the output as a JSON array of objects. Each object should have 'questionText', 'options' (an array of strings), 'correctAnswer' (the string of the correct option), and 'explanation' (a string explaining the correct answer). Ensure the options are clearly distinct and the question is clear. For example:
-[
-  {
-    "questionText": "What is the capital of France?",
-    "options": ["Berlin", "Madrid", "Paris", "Rome"],
-    "correctAnswer": "Paris",
-    "explanation": "Paris is the largest city and capital of France, known for its art, fashion, and culture."
-  }
-]`;
+        // 4. Construct Prompt
+        const prompt = `Generate ${numQuestions} objective questions about "${topic}". 
+        Each question must have exactly 4 options (A, B, C, D), one correct answer, and a concise explanation. 
+        Provide the output as a JSON array of objects.
+        Structure:
+        {
+          "questionText": "string",
+          "options": ["option1", "option2", "option3", "option4"],
+          "correctAnswer": "the exact string of the correct option",
+          "explanation": "string"
+        }`;
 
-        // Define the payload structure required by the Gemini API
+        // 5. Define Payload & Correct Model Name
         const payload = {
             contents: [{ role: "user", parts: [{ text: prompt }] }],
             generationConfig: {
                 responseMimeType: "application/json",
+                // The schema ensures the AI adheres strictly to your data format
                 responseSchema: {
                     type: "ARRAY",
                     items: {
@@ -52,51 +52,45 @@ module.exports = async (req, res) => {
                             "questionText": { "type": "STRING" },
                             "options": { "type": "ARRAY", "items": { "type": "STRING" } },
                             "correctAnswer": { "type": "STRING" },
-                            "explanation": { "type": "STRING" } // Added explanation to the schema
+                            "explanation": { "type": "STRING" }
                         },
-                        required: ["questionText", "options", "correctAnswer", "explanation"] // Mark explanation as required
+                        required: ["questionText", "options", "correctAnswer", "explanation"]
                     }
                 }
             }
         };
 
-        // Construct the full URL for the Gemini API endpoint
-        const geminiApiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${GEMINI_API_KEY}`;
+        // Corrected URL: Using gemini-1.5-flash
+        const geminiApiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
 
-        // Make the actual HTTP POST request to the Gemini API
+        // 6. Execute Request
         const geminiResponse = await fetch(geminiApiUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
         });
 
-        // Parse the JSON response received from the Gemini API
         const geminiResult = await geminiResponse.json();
 
-        // Check if the response from Gemini was successful (HTTP status 2xx)
+        // 7. Handle Response
         if (geminiResponse.ok) {
-            // Validate the structure of the Gemini API's response
-            if (geminiResult.candidates && geminiResult.candidates.length > 0 &&
-                geminiResult.candidates[0].content && geminiResult.candidates[0].content.parts &&
-                geminiResult.candidates[0].content.parts.length > 0) {
-                const jsonString = geminiResult.candidates[0].content.parts[0].text;
-                // Parse the JSON string from Gemini and send it directly back to your frontend.
-                // This assumes Gemini correctly returns a JSON array of questions.
-                res.status(200).json(JSON.parse(jsonString));
+            const content = geminiResult.candidates?.[0]?.content?.parts?.[0]?.text;
+            
+            if (content) {
+                // Return the parsed JSON directly to the frontend
+                return res.status(200).json(JSON.parse(content));
             } else {
-                // If Gemini's response structure is unexpected
-                console.error('Gemini API returned an unexpected structure:', JSON.stringify(geminiResult));
-                res.status(500).json({ error: 'No valid content found in Gemini API response or unexpected structure.' });
+                throw new Error('Gemini returned an empty response.');
             }
         } else {
-            // If Gemini API returns an error status (e.g., 400, 403, 500), forward its error message.
-            console.error('Error from Gemini API:', geminiResult.error?.message || 'Unknown error');
-            res.status(geminiResponse.status).json({ error: geminiResult.error?.message || 'Unknown Gemini API error' });
+            console.error('Gemini API Error:', geminiResult.error);
+            return res.status(geminiResponse.status).json({ 
+                error: geminiResult.error?.message || 'Gemini API Error' 
+            });
         }
 
     } catch (error) {
-        // Catch any network or parsing errors that occur during the process
-        console.error('Error in Vercel serverless function during quiz generation:', error);
-        res.status(500).json({ error: 'Internal server error during quiz generation.' });
+        console.error('Internal Server Error:', error);
+        return res.status(500).json({ error: 'Internal server error during quiz generation.' });
     }
 };
