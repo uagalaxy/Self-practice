@@ -1,69 +1,59 @@
-// api/generate-quiz.js
-
-// Note: 'node-fetch' is no longer required in Node.js 18+ (Vercel's default)
-// as the 'fetch' API is now built-in.
+/**
+ * Vercel Serverless Function: api/generate-quiz.js
+ * Model: gemini-1.5-flash-8b (Free Tier Optimized)
+ */
 
 module.exports = async (req, res) => {
-    // 1. Validate Method
+    // 1. Only allow POST requests
     if (req.method !== 'POST') {
-        return res.status(405).json({ error: 'Method Not Allowed. Only POST requests are accepted.' });
+        return res.status(405).json({ error: 'Method Not Allowed. Use POST.' });
     }
 
-    // 2. Validate API Key
+    // 2. Check for the API Key in Environment Variables
     const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
     if (!GEMINI_API_KEY) {
-        console.error('GEMINI_API_KEY is missing from environment variables.');
+        console.error('SERVER ERROR: GEMINI_API_KEY is missing.');
         return res.status(500).json({ 
-            error: 'Server configuration error: API key missing.' 
+            error: 'Server configuration error. Please check environment variables.' 
         });
     }
 
     try {
         const { topic, numQuestions } = req.body;
 
-        // 3. Validate Input
+        // 3. Simple validation of user input
         if (!topic || !numQuestions) {
-            return res.status(400).json({ error: 'Topic and number of questions are required.' });
+            return res.status(400).json({ error: 'Missing topic or number of questions.' });
         }
 
-        // 4. Construct Prompt
-        const prompt = `Generate ${numQuestions} objective questions about "${topic}". 
-        Each question must have exactly 4 options (A, B, C, D), one correct answer, and a concise explanation. 
-        Provide the output as a JSON array of objects.
-        Structure:
+        // 4. Construct the prompt for the AI
+        const prompt = `Generate a JSON array containing ${numQuestions} multiple-choice questions about "${topic}". 
+        Each object in the array must follow this exact structure:
         {
-          "questionText": "string",
-          "options": ["option1", "option2", "option3", "option4"],
-          "correctAnswer": "the exact string of the correct option",
-          "explanation": "string"
-        }`;
+          "questionText": "The question string",
+          "options": ["Option A", "Option B", "Option C", "Option D"],
+          "correctAnswer": "The exact string from the options array that is correct",
+          "explanation": "A brief explanation of why the answer is correct"
+        }
+        Return ONLY the JSON array. Do not include introductory text.`;
 
-        // 5. Define Payload & Correct Model Name
+        // 5. Setup the API request payload
         const payload = {
-            contents: [{ role: "user", parts: [{ text: prompt }] }],
+            contents: [{ 
+                role: "user", 
+                parts: [{ text: prompt }] 
+            }],
             generationConfig: {
                 responseMimeType: "application/json",
-                // The schema ensures the AI adheres strictly to your data format
-                responseSchema: {
-                    type: "ARRAY",
-                    items: {
-                        type: "OBJECT",
-                        properties: {
-                            "questionText": { "type": "STRING" },
-                            "options": { "type": "ARRAY", "items": { "type": "STRING" } },
-                            "correctAnswer": { "type": "STRING" },
-                            "explanation": { "type": "STRING" }
-                        },
-                        required: ["questionText", "options", "correctAnswer", "explanation"]
-                    }
-                }
             }
         };
 
-        // Corrected URL: Using gemini-1.5-flash
+        /**
+         * 6. Use the V1 endpoint and the Flash-8B model.
+         * Flash-8B is currently the best choice for free usage and high speed.
+         */
         const geminiApiUrl = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash-8b:generateContent?key=${GEMINI_API_KEY}`;
 
-        // 6. Execute Request
         const geminiResponse = await fetch(geminiApiUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -72,25 +62,37 @@ module.exports = async (req, res) => {
 
         const geminiResult = await geminiResponse.json();
 
-        // 7. Handle Response
+        // 7. Handle Success or Failure from Google
         if (geminiResponse.ok) {
-            const content = geminiResult.candidates?.[0]?.content?.parts?.[0]?.text;
+            let content = geminiResult.candidates?.[0]?.content?.parts?.[0]?.text;
             
             if (content) {
-                // Return the parsed JSON directly to the frontend
-                return res.status(200).json(JSON.parse(content));
+                try {
+                    /**
+                     * Clean the response: sometimes the AI includes markdown backticks 
+                     * like ```json ... ``` even when told not to.
+                     */
+                    const sanitizedJson = content.replace(/```json|```/g, "").trim();
+                    const parsedData = JSON.parse(sanitizedJson);
+                    
+                    return res.status(200).json(parsedData);
+                } catch (parseError) {
+                    console.error('JSON Parse Error:', content);
+                    return res.status(500).json({ error: 'AI returned invalid JSON format.' });
+                }
             } else {
-                throw new Error('Gemini returned an empty response.');
+                return res.status(500).json({ error: 'AI returned an empty response.' });
             }
         } else {
-            console.error('Gemini API Error:', geminiResult.error);
+            // Log the specific error from Google for debugging
+            console.error('Google API Error Details:', geminiResult.error);
             return res.status(geminiResponse.status).json({ 
-                error: geminiResult.error?.message || 'Gemini API Error' 
+                error: geminiResult.error?.message || 'Error communicating with Gemini API' 
             });
         }
 
     } catch (error) {
-        console.error('Internal Server Error:', error);
-        return res.status(500).json({ error: 'Internal server error during quiz generation.' });
+        console.error('CRITICAL SERVER ERROR:', error);
+        return res.status(500).json({ error: 'Internal server error. Please try again later.' });
     }
 };
