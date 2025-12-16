@@ -61,7 +61,7 @@ module.exports = async (req, res) => {
         };
 
         // Corrected URL: Using gemini-1.5-flash
-        const geminiApiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+        const geminiApiUrl = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash-8b:generateContent?key=${GEMINI_API_KEY}`;
 
         // 6. Execute Request
         const geminiResponse = await fetch(geminiApiUrl, {
