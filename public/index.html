@@ -992,10 +992,7 @@
         }
 
         // --- Helper function to clean option/answer text before comparison/display ---
-        function cleanTextForComparison(text) {
-            // Remove leading "A. ", "B. ", "C) ", "a)", etc.
-            return text ? text.replace(/^[A-Da-d][\.\)]?\s*/, '').trim() : '';
-        }
+        
 
         // --- Display Questions Function (with option prefix fix and improved robustness) ---
         function displayQuestions(questions) {
