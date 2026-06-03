@@ -41,7 +41,7 @@
             background-color: #111; /* Provides a solid dark edge */
         }
         html.dark body {
-            background-color: #111; 
+            background-color: #000; 
         }
         /* Keep images/iframes normal if any are added later */
         html.dark img, html.dark iframe {
@@ -400,9 +400,7 @@
             </button>
         </div>
 
-        <div id="progressWrapper" class="progress-wrapper">
-            <div id="progressBarFill" class="progress-bar-fill"></div>
-        </div>
+        
 
         <div id="quizContainer" class="mt-5" style="display: none;">
             </div>
@@ -426,7 +424,7 @@
     </div>
 
     <div id="quizOverlay" class="quiz-overlay">
-        <span>Quiz Paused ⏸️</span>
+        <span>Quiz Paused</span>
         <button id="overlayResumeBtn" class="btn btn-primary mt-6 px-10 py-4"><i class="fas fa-play mr-2"></i> Resume</button>
     </div>
 
@@ -438,6 +436,9 @@
         <span id="timer">Time: 00:00</span>
         <button id="pauseBtn" title="Pause Quiz"><i class="fas fa-pause"></i></button>
         <button id="resumeBtn" title="Resume Quiz" style="display: none;"><i class="fas fa-play"></i></button>
+        <div id="progressWrapper" class="progress-wrapper">
+            <div id="progressBarFill" class="progress-bar-fill"></div>
+        </div>
     </div>
 
     <div id="inputModal" class="modal">
@@ -472,6 +473,7 @@
             <div class="flex flex-col gap-4">
                 <button id="generateBtn" class="btn btn-primary w-full">Generate Questions</button>
                 <button id="cancelBtn" class="btn btn-secondary w-full" style="background-color: #d1d5db; color: #374151;">Close</button>
+                <button id="resetQuizBtn" class="btn btn-danger w-full">Reset Quiz</button>
                 <button id="themeToggleBtn" class="btn bg-gray-200 text-gray-800 hover:bg-gray-300">
                     <i class="fas fa-moon mr-2" id="themeIcon"></i> Toggle Dark Mode
                 </button>
