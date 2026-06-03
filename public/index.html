@@ -2,12 +2,12 @@
 <html lang="en">
 <head>
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-6XHY0E1B80"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'G-6XHY0E1B80');
-</script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-6XHY0E1B80');
+    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Qᵘᵃ Quiz: Objective Question Generator</title>
@@ -35,13 +35,12 @@
             transition: background-color 0.3s;
         }
         
-        /* New Dark Mode using Invert & Hue-Rotate */
+        /* Dark Mode using Invert & Hue-Rotate */
         html.dark {
             filter: invert(1) hue-rotate(180deg);
-            background-color: #ffffff !important; /* Provides a solid dark edge */
+            background-color: #ffffff !important; 
         }
         
-        /* Keep images/iframes normal if any are added later */
         html.dark img, html.dark iframe {
             filter: invert(1) hue-rotate(180deg);
         }
@@ -402,10 +401,7 @@
             </button>
         </div>
 
-        
-
-        <div id="quizContainer" class="mt-5" style="display: none;">
-            </div>
+        <div id="quizContainer" class="mt-5" style="display: none;"></div>
 
         <div id="controls" class="flex flex-col md:flex-row justify-center gap-4 mt-4" style="display: none;">
             <button id="submitBtn" class="btn btn-primary flex-1">Submit Answers</button>
@@ -437,12 +433,13 @@
     <div id="floatingTimerControls" style="display: none;">
         <span id="timer">Time: 00:00</span>
         <button id="pauseBtn" title="Pause Quiz"><i class="fas fa-pause"></i></button>
-        
     </div>
-<button id="resumeBtn" title="Resume Quiz" style="display: none;"><i class="fas fa-play"></i></button>
-        <div id="progressWrapper" class="progress-wrapper">
-            <div id="progressBarFill" class="progress-bar-fill"></div>
-        </div>
+    
+    <button id="resumeBtn" title="Resume Quiz" style="display: none;"><i class="fas fa-play"></i></button>
+    <div id="progressWrapper" class="progress-wrapper">
+        <div id="progressBarFill" class="progress-bar-fill"></div>
+    </div>
+    
     <div id="inputModal" class="modal">
         <div class="modal-content">
             <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Generate New Quiz</h2>
@@ -528,8 +525,8 @@
         const progressBarFill = document.getElementById('progressBarFill');
 
         // State Variables
-        let totalElapsedTime = 0; // Total accumulated MS before current interval
-        let currentStartTime = null; // Timestamp of when timer most recently resumed
+        let totalElapsedTime = 0; 
+        let currentStartTime = null; 
         let timerInterval = null;
         let isPaused = false;
         
@@ -540,7 +537,7 @@
         let finalScore = 0;
         let finalTimeTaken = 0;
 
-        // --- Theme Toggle Logic (Invert Mode) ---
+        // --- Theme Toggle Logic ---
         function applyTheme(theme) {
             const html = document.documentElement;
             if (theme === 'dark') {
@@ -560,13 +557,14 @@
             applyTheme(currentTheme === 'light' ? 'dark' : 'light');
         });
 
+        // --- Notification System Implementation ---
         function showNotification(message, duration = 3000) {
             notificationElement.textContent = message;
             notificationElement.classList.add('show');
             setTimeout(() => notificationElement.classList.remove('show'), duration);
         }
 
-        // --- Timer Functions (Bug Fixed) ---
+        // --- Timer Functions ---
         function startTimer() {
             totalElapsedTime = 0;
             currentStartTime = Date.now();
@@ -612,8 +610,9 @@
             pauseBtn.style.display = 'none';
             resumeBtn.style.display = 'block';
             document.body.style.overflow = 'hidden';
-            quizOverlay.style.display = 'flex'; // Fullscreen blur active
+            quizOverlay.style.display = 'flex'; 
             saveQuizState();
+            showNotification("Quiz Paused");
         }
 
         function resumeTimer() {
@@ -628,11 +627,12 @@
             
             timerInterval = setInterval(updateTimerDisplay, 1000);
             saveQuizState();
+            showNotification("Quiz Resumed");
         }
 
         pauseBtn.addEventListener('click', pauseTimer);
         resumeBtn.addEventListener('click', resumeTimer);
-        overlayResumeBtn.addEventListener('click', resumeTimer); // Allow resume from overlay
+        overlayResumeBtn.addEventListener('click', resumeTimer); 
 
         // --- Progress Bar Logic ---
         function updateProgressBar() {
@@ -707,14 +707,13 @@
         }
 
         function clearQuizState() {
-            localStorage.clear(); // Clear all state
+            localStorage.clear(); 
             generatedQuestions = []; questionAnswerTimes = []; userSelectedAnswers = [];
             quizSubmitted = false; finalScore = 0; finalTimeTaken = 0;
             totalElapsedTime = 0; currentStartTime = null;
             stopTimer();
             progressBarFill.style.width = '0%';
             
-            // Go back to landing page
             inputModal.style.display = 'none';
             quizContainer.style.display = 'none';
             controls.style.display = 'none';
@@ -723,45 +722,46 @@
             landingPage.style.display = 'block';
         }
 
-        // Action Bindings for FAB and Start (Do NOT reset quiz, just open modal)
         fab.addEventListener('click', () => { inputModal.style.display = 'flex'; });
         startQuizBtn.addEventListener('click', () => { inputModal.style.display = 'flex'; });
         cancelBtn.addEventListener('click', () => { inputModal.style.display = 'none'; });
         
-        // Modal Backdrop Click
         window.addEventListener('click', (event) => {
             if (event.target === inputModal) inputModal.style.display = 'none';
         });
 
-        // Hard Reset Button Action
         resetQuizBtn.addEventListener('click', () => {
             if(confirm("Are you sure you want to reset this quiz? Progress will be lost.")) {
                 clearQuizState();
+                showNotification("Quiz Reset Complete");
             }
         });
         resetQuizBtn2.addEventListener('click', () => {
             if(confirm("Are you sure you want to reset this quiz? Progress will be lost.")) {
                 clearQuizState();
+                showNotification("Quiz Reset Complete");
             }
         });
 
-        async function generateQuestions() {
+        async function generateQuestionsAction() {
             const topic = modalTopicInput.value.trim();
             const numQuestions = parseInt(modalNumQuestionsSelect.value);
             const difficulty = modalDifficultySelect.value;
 
-            if (!topic) return alert('Please enter a topic.');
+            if (!topic) {
+                showNotification("Please enter a valid topic.");
+                return alert('Please enter a topic.');
+            }
 
-            // Now we clear state because user explicitly asked for a NEW quiz
             clearQuizState(); 
             inputModal.style.display = 'none';
             landingPage.style.display = 'none';
             quizContainer.style.display = 'block';
             progressWrapper.style.display = 'block';
             quizContainer.innerHTML = '<div class="text-center font-bold text-lg mt-10">Loading questions...</div>';
+            showNotification("Generating your setup...");
 
             try {
-                // Mocking fetch call with payload that includes difficulty
                 const response = await fetch('/api/generate-quiz', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -781,12 +781,14 @@
                     startTimer();
                     updateProgressBar();
                     window.scrollTo({ top: 0, behavior: 'smooth' });
+                    showNotification("Quiz generated successfully!");
                 } else {
                     throw new Error(result.error || 'Failed to fetch.');
                 }
             } catch (error) {
                 quizContainer.innerHTML = `<div class="text-red-500 font-bold text-center mt-10">Error: ${error.message}</div>`;
                 controls.style.display = 'none';
+                showNotification("Generation Failed!");
             }
         }
 
@@ -821,7 +823,6 @@
                 `;
                 quizContainer.appendChild(questionCard);
 
-                // Option Select Tracking
                 questionCard.querySelectorAll(`input[type="radio"]`).forEach(radio => {
                     if (quizSubmitted) radio.disabled = true;
                     radio.addEventListener('change', (e) => {
@@ -842,6 +843,7 @@
             generatedQuestions.forEach((q, index) => {
                 const selected = userSelectedAnswers[index]; 
                 const card = quizContainer.children[index];
+                if(!card) return;
 
                 const feedback = document.createElement('p');
                 feedback.className = 'feedback-text mt-3 font-medium';
@@ -862,7 +864,8 @@
                     feedback.textContent = `Unanswered. Correct: ${q.correctAnswer}`; feedback.style.color = '#F59E0B'; 
                 }
                 card.appendChild(feedback);
-                card.querySelector('.explanation-text').style.display = 'block'; 
+                const exp = card.querySelector('.explanation-text');
+                if(exp) exp.style.display = 'block'; 
                 card.querySelectorAll('input[type="radio"]').forEach(r => r.disabled = true);
             });
 
@@ -894,10 +897,99 @@
             finalScore = score; 
             renderSubmittedState(finalScore, finalTimeTaken); 
             saveQuizState(); 
+            showNotification("Quiz Submitted!");
         }
 
-        generateBtn.addEventListener('click', generateQuestions);
+        // --- PDF Generation Logic ---
+        async function downloadPdf() {
+            if (generatedQuestions.length === 0) {
+                showNotification("No quiz content available to download.");
+                return;
+            }
+            
+            showNotification("Preparing PDF download...");
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({ orientation: 'p', unit: 'pt', format: 'a4' });
+            
+            const pageWidth = doc.internal.pageSize.getWidth();
+            const pageHeight = doc.internal.pageSize.getHeight();
+            const margin = 40;
+            let currentY = margin;
+
+            // Helper to handle text layout on pages safely
+            function addTextLine(text, fontSize = 12, isBold = false, color = '#1f2937') {
+                doc.setFont("Inter", isBold ? "bold" : "normal");
+                doc.setFontSize(fontSize);
+                
+                // Set color hex mapping
+                if(color === '#10B981') doc.setTextColor(16, 185, 129);
+                else if(color === '#EF4444') doc.setTextColor(239, 68, 68);
+                else if(color === '#0c4a6e') doc.setTextColor(12, 74, 110);
+                else doc.setTextColor(31, 41, 55);
+
+                const lines = doc.splitTextToSize(text, pageWidth - (margin * 2));
+                
+                lines.forEach(line => {
+                    if (currentY + fontSize > pageHeight - margin) {
+                        doc.addPage();
+                        currentY = margin;
+                    }
+                    doc.text(line, margin, currentY + fontSize);
+                    currentY += fontSize + 5;
+                });
+                currentY += 5; // padding below paragraph block
+            }
+
+            // Title Header
+            addTextLine("Qua Quiz Evaluation Sheet", 22, true);
+            currentY += 10;
+
+            if (quizSubmitted) {
+                addTextLine(`Final Evaluation: ${scoreText.textContent}`, 13, true, '#10B981');
+                addTextLine(timeText.textContent, 11, false);
+                currentY += 15;
+            }
+
+            generatedQuestions.forEach((q, index) => {
+                // Add Question
+                addTextLine(`${index + 1}. ${q.questionText}`, 12, true);
+                
+                // Add Options
+                q.options.forEach((opt, optIdx) => {
+                    const optionLabel = `${String.fromCharCode(65 + optIdx)}) ${cleanTextForComparison(opt)}`;
+                    addTextLine(`   ${optionLabel}`, 11, false);
+                });
+
+                // Add selection results if quiz submitted
+                if (quizSubmitted) {
+                    const selected = userSelectedAnswers[index];
+                    const cleanedSelected = cleanTextForComparison(selected);
+                    const cleanedCorrect = cleanTextForComparison(q.correctAnswer);
+
+                    if (selected) {
+                        if (cleanedSelected === cleanedCorrect) {
+                            addTextLine(`Selected Status: Correct (🎉 ${selected})`, 11, true, '#10B981');
+                        } else {
+                            addTextLine(`Selected Status: Incorrect (Chosen: ${selected} | Target: ${q.correctAnswer})`, 11, true, '#EF4444');
+                        }
+                    } else {
+                        addTextLine(`Selected Status: Unanswered (Target: ${q.correctAnswer})`, 11, true, '#EF4444');
+                    }
+                    
+                    if(q.explanation) {
+                        addTextLine(`Explanation: ${q.explanation}`, 10, false, '#0c4a6e');
+                    }
+                }
+                currentY += 15; // gap between questions
+            });
+
+            doc.save('quas_generated_quiz.pdf');
+            showNotification("PDF Downloaded successfully!");
+        }
+
+        generateBtn.addEventListener('click', generateQuestionsAction);
         submitBtn.addEventListener('click', submitAnswers);
+        downloadPdfBtn.addEventListener('click', downloadPdf);
 
         window.onload = () => {
             applyTheme(localStorage.getItem('theme_preference') || 'light');
@@ -908,4 +1000,3 @@
     </script>
 </body>
 </html>
-
