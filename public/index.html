@@ -475,7 +475,7 @@
             <div class="flex flex-col gap-4">
                 <button id="generateBtn" class="btn btn-primary w-full">Generate Questions</button>
                 <button id="cancelBtn" class="btn btn-secondary w-full" style="background-color: #d1d5db; color: #374151;">Close</button>
-                <button id="resetQuizBtn" class="btn btn-danger w-full">Reset Quiz</button>
+                <button id="resetQuizBtn2" class="btn btn-danger w-full">Reset Quiz</button>
                 <button id="themeToggleBtn" class="btn bg-gray-200 text-gray-800 hover:bg-gray-300">
                     <i class="fas fa-moon mr-2" id="themeIcon"></i> Toggle Dark Mode
                 </button>
@@ -507,6 +507,7 @@
         const controls = document.getElementById('controls');
         const submitBtn = document.getElementById('submitBtn');
         const resetQuizBtn = document.getElementById('resetQuizBtn');
+        const resetQuizBtn2 = document.getElementById('resetQuizBtn2');
         const downloadPdfBtn = document.getElementById('downloadPdfBtn');
         const resultsContainer = document.getElementById('resultsContainer');
         const scoreText = document.getElementById('scoreText');
@@ -734,6 +735,11 @@
 
         // Hard Reset Button Action
         resetQuizBtn.addEventListener('click', () => {
+            if(confirm("Are you sure you want to reset this quiz? Progress will be lost.")) {
+                clearQuizState();
+            }
+        });
+        resetQuizBtn2.addEventListener('click', () => {
             if(confirm("Are you sure you want to reset this quiz? Progress will be lost.")) {
                 clearQuizState();
             }
