@@ -9,7 +9,6 @@ module.exports = async (req, res) => {
     }
 
     // Get your Gemini API key from Vercel's environment variables.
-    // This variable (GEMINI_API_KEY) must be configured in your Vercel project settings.
     const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
     // Check if the API key is provided. If not, return a server error.
@@ -19,17 +18,23 @@ module.exports = async (req, res) => {
     }
 
     try {
-        // Extract 'topic' and 'numQuestions' from the request body sent by your frontend.
-        const { topic, numQuestions } = req.body;
+        // Extract 'topic', 'numQuestions', and 'difficulty' from the request body sent by your frontend.
+        const { topic, numQuestions, difficulty } = req.body;
 
         // Basic validation for required parameters
         if (!topic || !numQuestions) {
             return res.status(400).json({ error: 'Topic and number of questions are required in the request body.' });
         }
 
-        // Construct the prompt string that will be sent to the Gemini API
-        // Added instruction for explanation.
-        const prompt = `Generate ${numQuestions} objective questions about "${topic}". Each question should have exactly 4 options (A, B, C, D), one correct answer, and a short, concise explanation for why the correct answer is correct. Provide the output as a JSON array of objects. Each object should have 'questionText', 'options' (an array of strings), 'correctAnswer' (the string of the correct option), and 'explanation' (a string explaining the correct answer). Ensure the options are clearly distinct and the question is clear. For example:
+        // Standardize the difficulty value, defaulting to 'medium' if not provided
+        const quizDifficulty = (difficulty || 'medium').toLowerCase();
+
+        // Construct the prompt string including the difficulty constraint
+        const prompt = `Generate ${numQuestions} objective questions about "${topic}" tailored exactly to a **${quizDifficulty}** level of difficulty. 
+Each question should have exactly 4 options (A, B, C, D), one correct answer, and a short, concise explanation for why the correct answer is correct. 
+Provide the output as a JSON array of objects. Each object should have 'questionText', 'options' (an array of strings), 'correctAnswer' (the string of the correct option), and 'explanation' (a string explaining the correct answer). 
+
+Ensure the options are clearly distinct and the question is clear. For example:
 [
   {
     "questionText": "What is the capital of France?",
@@ -52,9 +57,9 @@ module.exports = async (req, res) => {
                             "questionText": { "type": "STRING" },
                             "options": { "type": "ARRAY", "items": { "type": "STRING" } },
                             "correctAnswer": { "type": "STRING" },
-                            "explanation": { "type": "STRING" } // Added explanation to the schema
+                            "explanation": { "type": "STRING" }
                         },
-                        required: ["questionText", "options", "correctAnswer", "explanation"] // Mark explanation as required
+                        required: ["questionText", "options", "correctAnswer", "explanation"]
                     }
                 }
             }
@@ -81,21 +86,17 @@ module.exports = async (req, res) => {
                 geminiResult.candidates[0].content.parts.length > 0) {
                 const jsonString = geminiResult.candidates[0].content.parts[0].text;
                 // Parse the JSON string from Gemini and send it directly back to your frontend.
-                // This assumes Gemini correctly returns a JSON array of questions.
                 res.status(200).json(JSON.parse(jsonString));
             } else {
-                // If Gemini's response structure is unexpected
                 console.error('Gemini API returned an unexpected structure:', JSON.stringify(geminiResult));
                 res.status(500).json({ error: 'No valid content found in Gemini API response or unexpected structure.' });
             }
         } else {
-            // If Gemini API returns an error status (e.g., 400, 403, 500), forward its error message.
             console.error('Error from Gemini API:', geminiResult.error?.message || 'Unknown error');
             res.status(geminiResponse.status).json({ error: geminiResult.error?.message || 'Unknown Gemini API error' });
         }
 
     } catch (error) {
-        // Catch any network or parsing errors that occur during the process
         console.error('Error in Vercel serverless function during quiz generation:', error);
         res.status(500).json({ error: 'Internal server error during quiz generation.' });
     }
