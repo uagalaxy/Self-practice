@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Daily Rhythm & Quiz App</title>
-    
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#000000">
 
@@ -12,42 +11,41 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
     <style>
-        /* --- Deep Contrast Glassmorphic Dark Theme Setup --- */
+        /* --- Basic Setup (Dark UI Glassmorphism Theme) --- */
         :root {
-            --bg-color: #000000; 
-            --text-color: #FFFFFF; 
-            --text-muted: #8b949e;
-            --base-circle-color: #161b22; 
+            --bg-color: #050505; /* Deep pure black background */
+            --text-color: #FFFFFF; /* Pure white text */
+            --base-circle-color: rgba(33, 38, 45, 0.4); 
             --body-font: 'Inter', sans-serif;
-            --border-color: rgba(255, 255, 255, 0.12); 
-            --glass-bg: rgba(22, 27, 34, 0.6);
-            --glass-bg-hover: rgba(33, 38, 45, 0.8);
-            --header-bg: #161b22; 
-            --button-bg-primary: #FFFFFF; 
-            --button-text-primary: #000000; 
+            --border-color: rgba(255, 255, 255, 0.08); /* Translucent sleek borders */
+            --header-bg: rgba(22, 27, 34, 0.6); 
+            --button-bg-primary: #FFFFFF; /* Pure white for primary buttons */
+            --button-text-primary: #000000; /* Pure black text for primary buttons */
             --button-hover-bg-primary: #E0E0E0; 
             --button-bg-secondary: rgba(255, 255, 255, 0.1); 
             --button-text-secondary: #FFFFFF; 
-            --button-hover-bg-secondary: rgba(255, 255, 255, 0.2);
-            --danger-bg: #da3633; 
-            --danger-hover-bg: #f85149;
+            --button-hover-bg-secondary: rgba(255, 255, 255, 0.18);
+            --danger-bg: rgba(218, 54, 51, 0.8); 
+            --danger-hover-bg: rgba(248, 81, 73, 0.9);
             --input-bg: rgba(0, 0, 0, 0.6); 
-            --accent-color: #58a6ff; 
-            --accent-success: #10b981;
-            --active-routine-color: #FFD700; 
+            --input-border: rgba(255, 255, 255, 0.12); 
+            --accent-color: #58a6ff; /* Clear blue accent */
+            --card-bg: rgba(20, 24, 33, 0.45); /* Semi-transparent frosted card background */
+            --active-routine-color: #FFD700; /* Gold for active routine highlight */
             --tab-bar-bg: rgba(255, 255, 255, 0.06); 
             --tab-button-active-bg: #FFFFFF; 
             --tab-button-active-text: #000000; 
-            --card-depth-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.6);
+            --glass-blur: blur(16px);
+            --card-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
         }
 
         body {
             background-color: var(--bg-color);
-            background-image: radial-gradient(circle at 50% 0%, #161b22 0%, #000000 70%);
+            background-image: radial-gradient(circle at 50% -20%, #161b22 0%, #050505 80%);
             color: var(--text-color);
             font-family: var(--body-font);
             display: flex;
@@ -56,7 +54,7 @@
             min-height: 100vh;
             margin: 0;
             padding: 20px;
-            padding-bottom: 100px; 
+            padding-bottom: 100px; /* Space for floating tab bar */
             text-align: center;
             flex-direction: column;
             gap: 1.5rem;
@@ -65,37 +63,38 @@
         }
 
         h1 {
+            font-family: var(--body-font);
             font-weight: 700;
             font-size: 2.2rem;
             color: var(--text-color);
-            margin: 0.5rem 0 0 0;
-            letter-spacing: -0.05em;
+            margin-bottom: 0.2rem;
+            letter-spacing: -0.5px;
         }
 
+        /* --- Header for Date/Day --- */
         .date-day-header {
-            font-size: 1.1rem;
+            font-size: 1.05rem;
             font-weight: 500;
-            color: var(--text-muted);
+            color: #8b949e; 
             margin-bottom: 0.5rem;
         }
 
-        /* --- Global Structural Depth Styles (Glassmorphism) --- */
+        /* --- Global Depth & Blur containers --- */
         .glass-panel {
-            background: var(--glass-bg);
-            backdrop-filter: blur(16px) saturate(180%);
-            -webkit-backdrop-filter: blur(16px) saturate(180%);
+            background-color: var(--card-bg);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
             border: 1px solid var(--border-color);
             border-radius: 24px;
-            box-shadow: var(--card-depth-shadow);
-            padding: 25px;
+            box-shadow: var(--card-shadow);
+            padding: 24px;
             width: 90vw;
-            max-width: 650px;
+            max-width: 600px;
             box-sizing: border-box;
             text-align: left;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
 
-        /* --- Chart System Layout --- */
+        /* --- Chart Layout --- */
         .chart-container {
             position: relative;
             width: 75vw;
@@ -111,6 +110,7 @@
             display: block;
         }
 
+        /* --- SVG Element Styles --- */
         .background-circle {
             fill: none;
             stroke: var(--base-circle-color);
@@ -118,113 +118,66 @@
 
         .schedule-arc {
             fill: none;
-            stroke-linecap: round;
-            transition: stroke 0.3s ease-in-out;
-            cursor: pointer;
+            stroke-linecap: round; 
+            transition: stroke 0.3s ease-in-out; 
+            cursor: pointer; 
         }
 
         .active-routine-arc {
             fill: none;
             stroke: var(--active-routine-color);
             stroke-linecap: round;
-            filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.8));
+            filter: drop-shadow(0 0 6px rgba(255, 215, 0, 0.8)); 
         }
 
+        /* --- Center Active Activity Label --- */
         .center-activity-label {
             position: absolute;
             top: 50%;
             left: 50%;
-            transform: translate(-50%, -50%);
+            transform: translate(-50%, -50%); 
             font-size: 1.15rem;
             font-weight: 700;
-            color: var(--active-routine-color);
+            color: var(--active-routine-color); 
             text-align: center;
-            max-width: 75%;
+            max-width: 75%; 
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
             padding: 8px 12px;
             border-radius: 12px;
-            background: rgba(0, 0, 0, 0.7);
-            border: 1px solid rgba(255, 215, 0, 0.2);
+            background-color: rgba(0, 0, 0, 0.75);
             backdrop-filter: blur(4px);
+            border: 1px solid rgba(255, 215, 0, 0.2);
         }
 
-        /* --- Interactive Tables Structure --- */
-        .schedule-table-container {
-            width: 100%;
-            overflow: hidden;
-            border-radius: 16px;
-            border: 1px solid var(--border-color);
-            background: rgba(0, 0, 0, 0.2);
-            margin-bottom: 1rem;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: left;
-        }
-
-        th, td {
-            padding: 14px 16px;
-            border-bottom: 1px solid var(--border-color);
-            font-size: 0.95rem;
-        }
-
-        th {
-            background-color: rgba(22, 27, 34, 0.8);
-            color: var(--text-muted);
-            font-weight: 600;
-            text-transform: uppercase;
-            font-size: 0.8rem;
-            letter-spacing: 0.05em;
-        }
-
-        tr:last-child td {
-            border-bottom: none;
-        }
-
-        tbody tr {
-            transition: background-color 0.2s ease;
-        }
-
-        tbody tr:hover {
-            background-color: var(--glass-bg-hover);
-        }
-
-        .table-actions {
-            display: flex;
-            gap: 8px;
-        }
-
-        .table-actions button {
-            padding: 6px 10px;
-            font-size: 0.85rem;
-            border-radius: 8px;
-            flex: none;
-            width: auto;
-        }
-
-        /* --- Advanced Clean Inputs --- */
-        .form-group {
+        /* --- Form Styles (inside modal) --- */
+        .form-card h2 {
+            font-size: 1.4rem;
+            margin-top: 0;
             margin-bottom: 1.25rem;
+            color: var(--accent-color);
+            font-weight: 600;
+        }
+
+        .form-group {
+            margin-bottom: 1.2rem;
         }
 
         .form-group label {
             display: block;
             margin-bottom: 0.5rem;
-            font-weight: 600;
-            font-size: 0.9rem;
-            color: var(--text-color);
+            font-weight: 500;
+            font-size: 0.95rem;
+            color: #c9d1d9;
         }
 
         .form-group input[type="text"],
-        .form-group select {
+        .form-group select { 
             width: 100%;
             padding: 12px 16px;
-            border: 1px solid var(--border-color);
-            border-radius: 14px;
+            border: 1px solid var(--input-border);
+            border-radius: 14px; 
             background-color: var(--input-bg);
             color: var(--text-color);
             font-family: var(--body-font);
@@ -237,39 +190,38 @@
         .form-group select:focus {
             outline: none;
             border-color: var(--accent-color);
-            box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.25);
+            box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.2);
         }
 
         .time-inputs {
             display: flex;
-            gap: 10px;
+            gap: 12px;
         }
 
         .time-inputs select {
             flex: 1;
         }
 
-        /* --- Buttons Blueprint --- */
         .button-group {
             display: flex;
-            gap: 10px;
+            gap: 12px;
             margin-top: 1.5rem;
         }
 
         button {
             padding: 12px 20px;
             border: none;
-            border-radius: 14px;
+            border-radius: 14px; 
             font-family: var(--body-font);
-            font-size: 0.95rem;
+            font-size: 1rem;
             cursor: pointer;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out, box-shadow 0.2s;
             font-weight: 600;
+            flex: 1; 
             display: inline-flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
-            box-sizing: border-box;
         }
 
         button.primary {
@@ -285,7 +237,7 @@
         button.secondary {
             background-color: var(--button-bg-secondary);
             color: var(--button-text-secondary);
-            border: 1px solid var(--border-color);
+            border: 1px solid rgba(255,255,255,0.05);
         }
 
         button.secondary:hover {
@@ -295,7 +247,7 @@
 
         button.danger {
             background-color: var(--danger-bg);
-            color: #FFFFFF;
+            color: #FFFFFF; 
         }
 
         button.danger:hover {
@@ -303,13 +255,92 @@
             transform: translateY(-1px);
         }
 
-        button:disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-            transform: none !important;
+        /* --- Table Layout Upgrades --- */
+        .schedule-table-container {
+            width: 100%;
+            background-color: rgba(22, 27, 34, 0.4);
+            border: 1px solid var(--border-color); 
+            border-radius: 16px; 
+            overflow: hidden;
+            margin-bottom: 0.5rem;
         }
 
-        /* --- Dynamic Modal Structure --- */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th, td {
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.95rem;
+        }
+
+        th {
+            background-color: rgba(22, 27, 34, 0.7);
+            color: #8b949e;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 0.5px;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tbody tr {
+            transition: background-color 0.2s;
+        }
+
+        tbody tr:hover {
+            background-color: rgba(255, 255, 255, 0.03); 
+        }
+
+        .table-actions {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-start;
+        }
+
+        .table-actions button {
+            padding: 8px 10px;
+            font-size: 0.85rem;
+            border-radius: 8px;
+            flex: none;
+        }
+
+        /* --- Custom System Toast Message Box --- */
+        .message-box {
+            background-color: rgba(33, 38, 45, 0.85); 
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 40px; 
+            padding: 12px 24px;
+            position: fixed;
+            bottom: 90px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            font-size: 0.95rem;
+            color: #FFFFFF;
+            text-align: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, transform 0.3s, visibility 0.3s;
+            z-index: 99999;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+            white-space: nowrap;
+        }
+
+        .message-box.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* --- Dynamic Modal Structure Overlay --- */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -317,15 +348,15 @@
             width: 100%;
             height: 100%;
             background-color: rgba(0, 0, 0, 0.75);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             display: flex;
             justify-content: center;
             align-items: center;
-            z-index: 2000;
+            z-index: 10000;
             visibility: hidden;
             opacity: 0;
-            transition: opacity 0.3s ease, visibility 0.3s ease;
+            transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
         }
 
         .modal-overlay.show {
@@ -334,16 +365,18 @@
         }
 
         .modal-content {
-            background: rgba(22, 27, 34, 0.7);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 28px;
-            padding: 30px;
+            background-color: rgba(15, 18, 25, 0.75);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 24px; 
+            padding: 24px;
             width: 85vw;
-            max-width: 500px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.9);
+            max-width: 460px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
             position: relative;
-            transform: translateY(-30px);
-            transition: transform 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+            transform: translateY(-20px);
+            transition: transform 0.3s ease-in-out;
             text-align: left;
         }
 
@@ -353,40 +386,41 @@
 
         .modal-close-button {
             position: absolute;
-            top: 15px;
+            top: 16px;
             right: 20px;
             cursor: pointer;
-            font-size: 1.8rem;
-            color: var(--text-muted);
+            font-size: 1.6rem;
+            color: #8b949e; 
             background: none;
             border: none;
             padding: 0;
-            transition: color 0.2s;
+            line-height: 1;
+            transition: color 0.2s ease-in-out;
         }
 
         .modal-close-button:hover {
             color: var(--text-color);
         }
 
-        /* --- Floating UI Tooltip --- */
+        /* --- Arc Info Tooltip Styles --- */
         .arc-info-tooltip {
-            position: fixed;
-            background-color: rgba(255, 255, 255, 0.1);
-            color: #ffffff;
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255,255,255,0.2);
+            position: absolute;
+            background-color: rgba(22, 27, 34, 0.8); 
+            color: #ffffff; 
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,255,255,0.1);
             padding: 10px 14px;
-            border-radius: 16px;
+            border-radius: 14px;
             font-size: 0.85rem;
-            pointer-events: none;
+            pointer-events: none; 
             opacity: 0;
             visibility: hidden;
-            transition: opacity 0.2s, visibility 0.2s;
-            z-index: 3000;
-            white-space: nowrap;
-            transform: translate(-50%, -120%);
-            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+            transition: opacity 0.2s ease-in-out, visibility 0.2s ease-in-out;
+            z-index: 1000; 
+            white-space: nowrap; 
+            transform: translate(-50%, -100%); 
+            box-shadow: var(--card-shadow);
         }
 
         .arc-info-tooltip.show {
@@ -400,42 +434,42 @@
             color: var(--accent-color);
         }
 
-        /* --- Tab Bar Controller --- */
+        /* --- Floating Tab Bar Styles --- */
         .tab-bar-container {
             position: fixed;
-            bottom: 20px;
+            bottom: 20px; 
             left: 50%;
             transform: translateX(-50%);
             display: flex;
             background-color: var(--tab-bar-bg);
-            backdrop-filter: blur(24px) saturate(180%);
-            -webkit-backdrop-filter: blur(24px) saturate(180%);
-            border: 1px solid var(--border-color);
-            border-radius: 30px;
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 40px; 
             padding: 6px;
-            box-shadow: 0 10px 35px rgba(0, 0, 0, 0.7);
-            z-index: 1000;
+            box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.6);
+            z-index: 999; 
             gap: 6px;
-            width: 85vw;
-            max-width: 360px;
+            width: 88vw;
+            max-width: 340px; 
             justify-content: space-around;
         }
 
         .tab-button {
             flex: 1;
-            padding: 12px 16px;
+            padding: 10px 14px;
             border: none;
-            border-radius: 25px;
+            border-radius: 30px; 
             font-size: 0.95rem;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.25s ease;
+            transition: background-color 0.3s ease, color 0.3s ease;
             background-color: transparent;
-            color: var(--text-muted);
+            color: #8b949e;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
+            gap: 6px;
         }
 
         .tab-button.active {
@@ -444,107 +478,94 @@
             box-shadow: 0 4px 12px rgba(255,255,255,0.15);
         }
 
-        .tab-button:hover:not(.active) {
-            background-color: rgba(255, 255, 255, 0.08);
-            color: var(--text-color);
-        }
-
-        /* --- Content Layout Management --- */
+        /* --- Content Sections --- */
         .content-section {
             width: 100%;
-            display: none;
-            flex-direction: column;
-            align-items: center;
+            display: none; 
+            flex-direction: column; 
+            align-items: center; 
             gap: 1.5rem;
         }
 
         .content-section.active {
-            display: flex;
+            display: flex; 
         }
 
-        /* --- Self Quiz Domain Styling Module --- */
-        .quiz-welcome-panel h2 {
-            font-size: 1.6rem;
-            font-weight: 700;
-            margin-top: 0;
-            background: linear-gradient(90deg, #ffffff, var(--accent-color));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .quiz-welcome-panel p {
-            color: var(--text-muted);
-            line-height: 1.5;
-            font-size: 0.95rem;
-        }
-
-        .question-card {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid var(--border-color);
-            border-radius: 18px;
-            padding: 20px;
-            margin-bottom: 1.25rem;
-        }
-
-        .question-text {
-            font-size: 1.1rem;
-            font-weight: 600;
-            margin-bottom: 15px;
-            line-height: 1.4;
-        }
-
-        .option-wrapper {
-            margin-bottom: 10px;
-        }
-
-        .option-wrapper label {
+        /* --- SELF QUIZ COMPONENT MODULE STYLES --- */
+        .quiz-option-item {
             display: flex;
             align-items: center;
             padding: 12px 16px;
-            background: rgba(255, 255, 255, 0.02);
+            background-color: rgba(255, 255, 255, 0.03);
             border: 1px solid var(--border-color);
             border-radius: 12px;
+            margin-bottom: 10px;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: background-color 0.2s, border-color 0.2s;
+            text-align: left;
         }
 
-        .option-wrapper label:hover {
-            background: rgba(255, 255, 255, 0.07);
-            border-color: rgba(255,255,255,0.3);
+        .quiz-option-item:hover {
+            background-color: rgba(255, 255, 255, 0.07);
+            border-color: rgba(255, 255, 255, 0.2);
         }
 
-        .option-wrapper input[type="radio"] {
+        .quiz-option-item input[type="radio"] {
             margin-right: 14px;
             accent-color: var(--accent-color);
             transform: scale(1.2);
-            cursor: pointer;
         }
 
-        .explanation-box {
-            background-color: rgba(88, 166, 255, 0.07);
-            border-left: 4px solid var(--accent-color);
-            padding: 12px 16px;
-            border-radius: 0 12px 12px 0;
-            margin-top: 15px;
-            font-size: 0.9rem;
-            color: #c9d1d9;
-            display: none;
+        .progress-wrapper {
+            width: 100%;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 9999px;
+            height: 8px;
+            overflow: hidden;
+            position: relative;
         }
 
-        .feedback-banner {
+        .progress-bar-fill {
+            background-color: #10b981;
+            height: 100%;
+            width: 0%;
+            transition: width 0.4s ease;
+        }
+
+        .floating-timer-widget {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background-color: rgba(22, 27, 34, 0.8);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--border-color);
+            padding: 8px 16px;
+            border-radius: 30px;
             font-weight: 600;
-            margin-top: 10px;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
+            box-shadow: var(--card-shadow);
         }
 
-        /* Quiz Focus Overlay */
-        .quiz-overlay {
+        .floating-timer-widget button {
+            padding: 4px 8px;
+            font-size: 0.8rem;
+            border-radius: 20px;
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+            flex: none;
+        }
+
+        .quiz-blur-overlay {
             position: fixed;
-            top: 0; left: 0; width: 100vw; height: 100vh;
-            background-color: rgba(0, 0, 0, 0.85);
-            backdrop-filter: blur(25px);
-            -webkit-backdrop-filter: blur(25px);
-            z-index: 9999;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            z-index: 99999;
             display: none;
             justify-content: center;
             align-items: center;
@@ -552,62 +573,29 @@
             gap: 20px;
         }
 
-        .quiz-overlay span {
-            font-size: 2.2rem;
+        .quiz-blur-overlay span {
+            font-size: 2rem;
             font-weight: 800;
-            letter-spacing: -0.03em;
+            letter-spacing: -0.5px;
         }
 
-        /* Floating Dynamic Timer */
-        .timer-badge {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: rgba(22, 27, 34, 0.8);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid var(--border-color);
-            padding: 8px 14px;
-            border-radius: 14px;
-            display: none;
-            align-items: center;
-            gap: 12px;
-            font-weight: 600;
+        .explanation-box {
+            background-color: rgba(88, 166, 255, 0.1);
+            padding: 14px;
+            border-left: 4px solid var(--accent-color);
+            border-radius: 8px;
+            margin-top: 14px;
             font-size: 0.9rem;
-            z-index: 1500;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
-        }
-
-        .timer-badge button {
-            padding: 4px 8px;
-            font-size: 0.75rem;
-            border-radius: 6px;
-        }
-
-        /* Progress Bar HUD */
-        .hud-progress-container {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 6px;
-            background: rgba(255, 255, 255, 0.05);
-            z-index: 99999;
+            color: #c9d1d9;
             display: none;
-        }
-
-        .hud-progress-bar {
-            height: 100%;
-            width: 0%;
-            background: var(--accent-success);
-            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-align: left;
         }
 
         .results-panel {
-            background: rgba(16, 185, 129, 0.08);
-            border: 1px solid rgba(16, 185, 129, 0.3);
-            border-radius: 20px;
+            background-color: rgba(16, 185, 129, 0.08);
             padding: 20px;
+            border-radius: 16px;
+            border: 1px solid rgba(16, 185, 129, 0.2);
             text-align: center;
             display: none;
             width: 100%;
@@ -616,84 +604,44 @@
 
         .results-panel h3 {
             margin: 0 0 8px 0;
-            color: var(--accent-success);
-            font-size: 1.4rem;
+            color: #10b981;
+            font-size: 1.3rem;
         }
 
-        /* Global HUD Toast Notification System */
-        #hud-toast {
-            position: fixed;
-            bottom: 90px;
-            left: 50%;
-            transform: translateX(-50%) translateY(20px);
-            background: rgba(255, 255, 255, 0.95);
-            color: #000000;
-            padding: 12px 24px;
-            border-radius: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            font-weight: 600;
-            font-size: 0.9rem;
-            z-index: 5000;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.3s, transform 0.3s, visibility 0.3s;
-        }
-
-        #hud-toast.show {
-            opacity: 1;
-            visibility: visible;
-            transform: translateX(-50%) translateY(0);
-        }
-
-        /* Footers Architecture */
         .app-footer {
-            border-top: 1px solid var(--border-color);
-            padding: 20px 0;
-            margin-top: 2rem;
+            color: #8b949e; 
+            padding: 10px 20px;
+            margin-top: 20px;
             width: 100%;
-            max-width: 650px;
+            max-width: 600px;
             text-align: center;
-            color: var(--text-muted);
             font-size: 0.85rem;
         }
+        .app-footer a { color: var(--accent-color); text-decoration: none; }
 
-        .app-footer a {
-            color: var(--text-color);
-            text-decoration: none;
-            margin: 0 10px;
-        }
-
-        .app-footer a:hover {
-            text-decoration: underline;
-        }
-
-        /* Responsive Layout Optimization */
+        /* Responsive adjustments */
         @media (max-width: 600px) {
             body {
                 padding: 12px;
-                padding-bottom: 100px;
+                padding-bottom: 90px;
             }
             h1 {
                 font-size: 1.75rem;
             }
-            .glass-panel {
-                padding: 16px;
+            .glass-panel, .modal-content {
+                padding: 18px;
+                border-radius: 20px;
             }
             th, td {
-                padding: 10px 8px;
+                padding: 10px 12px;
                 font-size: 0.85rem;
-            }
-            .time-inputs {
-                flex-direction: column;
             }
             .button-group {
                 flex-direction: column;
+                gap: 8px;
             }
             button {
-                width: 100%;
-            }
-            .tab-bar-container {
-                width: calc(100% - 24px);
+                width: 100%; 
             }
         }
     </style>
@@ -707,6 +655,10 @@
         <div class="chart-container">
             <svg id="schedule-chart" class="chart" viewBox="0 0 100 100"></svg>
             <div id="center-activity-label" class="center-activity-label">No Active Routine</div>
+            <div id="arc-info-tooltip" class="arc-info-tooltip">
+                <div class="info-label"></div>
+                <div class="info-time"></div>
+            </div>
         </div>
 
         <div class="glass-panel">
@@ -723,36 +675,75 @@
                     <tbody id="schedule-table-body"></tbody>
                 </table>
             </div>
-            <button type="button" class="primary" id="add-activity-button" style="margin: 0 auto; display: flex;">
+            <button type="button" class="primary" id="add-activity-button" style="margin-top: 10px;">
                 <i class="fas fa-plus-circle"></i> Add New Activity
             </button>
         </div>
     </div>
 
     <div id="quiz-section" class="content-section">
-        <div id="landingPage" class="glass-panel quiz-welcome-panel">
-            <h2>Master Any Subject dynamically! 🚀</h2>
-            <p>
-                Generate high-end personalized quiz structures customized right into your configuration. Test tracking metrics instantly with offline support parameters.
+        <div id="quiz-setup-panel" class="glass-panel">
+            <h2 style="font-size: 1.4rem; margin-top:0; margin-bottom:1rem; font-weight:600; color:var(--accent-color);">
+                <i class="fas fa-graduation-cap mr-2"></i> Self Quiz Engine
+            </h2>
+            <p style="color:#8b949e; font-size:0.9rem; margin-bottom:1.5rem; margin-top:0;">
+                Challenge your comprehension. Set up a subject topic below to dynamically build an educational evaluation.
             </p>
-            <button id="startQuizBtn" class="primary w-full" style="margin-top: 15px;">
-                <i class="fas fa-magic"></i> Configure Quiz Engine
+            
+            <div class="form-group">
+                <label for="quizTopicInput">Topic / Subject:</label>
+                <input type="text" id="quizTopicInput" placeholder="e.g., Quantum Physics, Ancient History, Javascript Frameworks">
+            </div>
+            
+            <div class="time-inputs" style="margin-bottom: 1.5rem;">
+                <div class="form-group" style="flex:1; margin-bottom:0;">
+                    <label for="quizDifficulty">Difficulty:</label>
+                    <select id="quizDifficulty">
+                        <option value="easy">Easy Level</option>
+                        <option value="medium" selected>Medium Level</option>
+                        <option value="hard">Hard Level</option>
+                    </select>
+                </div>
+                <div class="form-group" style="flex:1; margin-bottom:0;">
+                    <label for="quizNumQuestions">Pool Length:</label>
+                    <select id="quizNumQuestions">
+                        <option value="5">5 Questions</option>
+                        <option value="10" selected>10 Questions</option>
+                        <option value="20">20 Questions</option>
+                    </select>
+                </div>
+            </div>
+            
+            <button id="generateQuizBtn" class="primary" style="width:100%;">
+                <i class="fas fa-bolt"></i> Generate Practice Quiz
             </button>
         </div>
 
-        <div id="quizContainer" class="glass-panel" style="display: none; background: rgba(255,255,255,0.02);"></div>
+        <div id="quiz-execution-panel" class="glass-panel" style="display:none; width:90vw; max-width:600px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+                <span id="quiz-meta-title" style="font-weight:700; font-size:1.1rem; color:var(--accent-color);">Quiz Sheet</span>
+                <div id="floatingTimerControls" class="floating-timer-widget">
+                    <span id="timerDisplay">Time: 00:00</span>
+                    <button id="pauseBtn" title="Pause Engine"><i class="fas fa-pause"></i></button>
+                </div>
+            </div>
 
-        <div id="resultsContainer" class="results-panel glass-panel">
-            <h3>Quiz Analysis Finalized</h3>
-            <p id="scoreText" style="font-size: 1.1rem; margin: 5px 0;"></p>
-            <p id="timeText" style="font-size: 0.95rem; color: var(--text-muted); margin: 0;"></p>
-        </div>
+            <div class="progress-wrapper" style="margin-bottom:1.5rem;">
+                <div id="progressBarFill" class="progress-bar-fill"></div>
+            </div>
 
-        <div id="controls" class="glass-panel" style="display: none; padding: 15px;">
-            <div class="button-group" style="margin: 0;">
-                <button id="submitBtn" class="primary flex-1">Submit Test</button>
-                <button id="downloadPdfBtn" class="secondary flex-1"><i class="fas fa-file-pdf"></i> Save PDF</button>
-                <button id="resetQuizBtn" class="danger flex-1">Reset</button>
+            <div id="quizQuestionsContainer"></div>
+
+            <div id="resultsContainer" class="results-panel" style="margin-top:1.5rem;">
+                <h3>Evaluation Complete</h3>
+                <p id="scoreText" style="margin: 4px 0; font-size:1.05rem;"></p>
+                <p id="timeText" style="margin: 4px 0; font-size:0.9rem; color:#8b949e;"></p>
+            </div>
+
+            <div id="quizActionControls" class="button-group">
+                <button id="submitQuizBtn" class="primary"><i class="fas fa-check-circle"></i> Submit Answers</button>
+                <button id="downloadPdfBtn" class="secondary"><i class="fas fa-file-pdf"></i> Save PDF</button>
+                <button id="abortQuizBtn" class="danger"><i class="fas fa-times-circle"></i> Reset Engine</button>
             </div>
         </div>
     </div>
@@ -760,7 +751,7 @@
     <div id="activity-modal" class="modal-overlay">
         <div class="modal-content">
             <button class="modal-close-button" id="modal-close-button">&times;</button>
-            <h2 id="form-title" style="margin-top:0; margin-bottom:1.5rem; font-size:1.4rem;">Add New Activity</h2>
+            <h2 id="form-title">Add New Activity</h2>
             <form id="activity-form">
                 <input type="hidden" id="activity-id">
                 <div class="form-group">
@@ -789,56 +780,12 @@
         </div>
     </div>
 
-    <div id="inputModal" class="modal-overlay">
-        <div class="modal-content">
-            <button class="modal-close-button" id="closeQuizConfigBtn">&times;</button>
-            <h2 style="margin-top: 0; margin-bottom: 1.5rem; font-size: 1.4rem;">Setup Self Quiz Engine</h2>
-            <div class="form-group">
-                <label for="modalTopicInput">Subject Matter Topic:</label>
-                <input type="text" id="modalTopicInput" placeholder="e.g., Quantum Mechanics, European History" required>
-            </div>
-            <div class="time-inputs" style="margin-bottom: 1.25rem;">
-                <div class="form-group" style="flex: 1; margin: 0;">
-                    <label for="modalDifficultySelect">Difficulty Level:</label>
-                    <select id="modalDifficultySelect">
-                        <option value="easy">Easy</option>
-                        <option value="medium" selected>Medium</option>
-                        <option value="hard">Hard</option>
-                    </select>
-                </div>
-                <div class="form-group" style="flex: 1; margin: 0;">
-                    <label for="modalNumQuestionsSelect">Total Items:</label>
-                    <select id="modalNumQuestionsSelect">
-                        <option value="5" selected>5 Items</option>
-                        <option value="10">10 Items</option>
-                        <option value="20">20 Items</option>
-                    </select>
-                </div>
-            </div>
-            <button id="generateBtn" class="primary w-full"><i class="fas fa-cog"></i> Construct Engine Questions</button>
-        </div>
+    <div id="quizOverlay" class="quiz-blur-overlay">
+        <span>Evaluation Paused</span>
+        <button id="overlayResumeBtn" class="primary" style="max-width:200px;"><i class="fas fa-play"></i> Resume Engine</button>
     </div>
 
-    <div id="arc-info-tooltip" class="arc-info-tooltip">
-        <div class="info-label"></div>
-        <div class="info-time"></div>
-    </div>
-
-    <div id="floatingTimerControls" class="timer-badge">
-        <span id="timer"><i class="far fa-clock"></i> 00:00</span>
-        <button id="pauseBtn" class="secondary"><i class="fas fa-pause"></i> Focus Lock</button>
-    </div>
-
-    <div id="quizOverlay" class="quiz-overlay">
-        <span>Focus Shield Engaged</span>
-        <button id="overlayResumeBtn" class="primary"><i class="fas fa-play"></i> Unlock Content</button>
-    </div>
-
-    <div id="progressWrapper" class="hud-progress-container">
-        <div id="progressBarFill" class="hud-progress-bar"></div>
-    </div>
-
-    <div id="hud-toast"></div>
+    <div id="message-box" class="message-box"></div>
 
     <div class="tab-bar-container">
         <button id="activity-tab-btn" class="tab-button active">
@@ -850,39 +797,39 @@
     </div>
 
     <footer class="app-footer">
-        <a href="#">Security Parameters</a> &bull; <a href="#">Local State Terms</a>
-        <p style="margin-top: 8px; opacity:0.6;">&copy; 2026 Daily Rhythm Frameworks. Fully Localized Array.</p>
+        <p>&copy; 2026 Daily Rhythm & Self Quiz. Built with Depth Engineering.</p>
     </footer>
 
     <script type="module">
-        // Capacitor Native Fallbacks Engine
+        // Import LocalNotifications from Capacitor safely
         let LocalNotifications = null;
         try {
-            import('@capacitor/local-notifications').then(module => {
-                LocalNotifications = module.LocalNotifications;
-            }).catch(e => console.log("Native notifications decoupled. Running via Local Sandboxed Web Engine."));
-        } catch(err) {}
+            const capacitorNotifications = await import('@capacitor/local-notifications');
+            LocalNotifications = capacitorNotifications.LocalNotifications;
+        } catch(e) {
+            console.log("Capacitor Environment not detected. Running standard Web application setup.");
+        }
 
-        // --- CORE STATE PERSISTENCE SCHEMAS ---
+        // --- GLOBAL SETTINGS & DECLARATIONS ---
         const LOCAL_STORAGE_KEY_SCHEDULE = 'dailyRhythmSchedule';
-        const LOCAL_STORAGE_KEY_QUIZ = 'dailyRhythmSelfQuizState';
+        const LOCAL_STORAGE_KEY_QUIZ_STATE = 'dailyRhythmActiveQuizState';
         
         let currentScheduleData = [];
         let activeRoutineBarInterval;
+        let tooltipTimeout;
 
-        // SVG Constants
         const svgNS = "http://www.w3.org/2000/svg";
-        const cx = 50; const cy = 50; const radius = 45;
-        const strokeWidth = 9; const activeBarStrokeWidth = 7;
+        const cx = 50, cy = 50, radius = 45;
+        const strokeWidth = 10, activeBarStrokeWidth = 8;
 
-        // DOM Pointers
+        // --- CORE DOM CAPTURES ---
         const dateDayHeader = document.getElementById('date-day-header');
         const svgChart = document.getElementById('schedule-chart');
         const centerActivityLabel = document.getElementById('center-activity-label');
         const addActivityButton = document.getElementById('add-activity-button');
         const scheduleTableBody = document.getElementById('schedule-table-body');
-        
-        // Activity Form elements
+        const messageBox = document.getElementById('message-box');
+
         const activityModal = document.getElementById('activity-modal');
         const modalCloseButton = document.getElementById('modal-close-button');
         const activityForm = document.getElementById('activity-form');
@@ -896,79 +843,77 @@
         const cancelEditButton = document.getElementById('cancel-edit-button');
         const formTitle = document.getElementById('form-title');
 
-        // Tooltip pointer
         const arcInfoTooltip = document.getElementById('arc-info-tooltip');
         const infoLabel = arcInfoTooltip.querySelector('.info-label');
         const infoTime = arcInfoTooltip.querySelector('.info-time');
 
-        // Navigation Switch tabs
         const activityTabBtn = document.getElementById('activity-tab-btn');
         const quizTabBtn = document.getElementById('quiz-tab-btn');
         const activitySection = document.getElementById('activity-section');
         const quizSection = document.getElementById('quiz-section');
 
-        // Quiz State Vectors 
-        let quizState = {
-            activeQuestions: [],
-            selections: {},
-            submitted: false,
-            score: 0,
-            elapsedSeconds: 0,
-            isLocked: false
-        };
-        let quizTimerInterval = null;
-
-        // Quiz DOM mappings
-        const landingPage = document.getElementById('landingPage');
-        const startQuizBtn = document.getElementById('startQuizBtn');
-        const inputModal = document.getElementById('inputModal');
-        const closeQuizConfigBtn = document.getElementById('closeQuizConfigBtn');
-        const generateBtn = document.getElementById('generateBtn');
-        const quizContainer = document.getElementById('quizContainer');
-        const controls = document.getElementById('controls');
-        const submitBtn = document.getElementById('submitBtn');
-        const resetQuizBtn = document.getElementById('resetQuizBtn');
-        const downloadPdfBtn = document.getElementById('downloadPdfBtn');
-        const resultsContainer = document.getElementById('resultsContainer');
-        const scoreText = document.getElementById('scoreText');
-        const timeText = document.getElementById('timeText');
-        const floatingTimerControls = document.getElementById('floatingTimerControls');
-        const timerDisplay = document.getElementById('timer');
+        // --- QUIZ DATA NODES ---
+        const quizSetupPanel = document.getElementById('quiz-setup-panel');
+        const quizExecutionPanel = document.getElementById('quiz-execution-panel');
+        const quizTopicInput = document.getElementById('quizTopicInput');
+        const quizDifficulty = document.getElementById('quizDifficulty');
+        const quizNumQuestions = document.getElementById('quizNumQuestions');
+        const generateQuizBtn = document.getElementById('generateQuizBtn');
+        const quizQuestionsContainer = document.getElementById('quizQuestionsContainer');
+        
+        const timerDisplay = document.getElementById('timerDisplay');
         const pauseBtn = document.getElementById('pauseBtn');
         const quizOverlay = document.getElementById('quizOverlay');
         const overlayResumeBtn = document.getElementById('overlayResumeBtn');
-        const progressWrapper = document.getElementById('progressWrapper');
         const progressBarFill = document.getElementById('progressBarFill');
+        const resultsContainer = document.getElementById('resultsContainer');
+        const scoreText = document.getElementById('scoreText');
+        const timeText = document.getElementById('timeText');
+        
+        const submitQuizBtn = document.getElementById('submitQuizBtn');
+        const downloadPdfBtn = document.getElementById('downloadPdfBtn');
+        const abortQuizBtn = document.getElementById('abortQuizBtn');
+        const quizMetaTitle = document.getElementById('quiz-meta-title');
 
-        // --- INFRASTRUCTURE MICROUTILITIES ---
+        // --- STATE MANAGEMENT ENGINE FOR SELF-QUIZ ---
+        let quizState = {
+            generatedQuestions: [],
+            userAnswers: [],
+            elapsedTime: 0,
+            startTimeStamp: null,
+            isPaused: false,
+            submitted: false,
+            score: 0,
+            metaTopic: ""
+        };
+        let quizTimerInterval = null;
+
+        // --- CORE REUSABLE HELPER FUNCTIONS ---
         function generateUniqueId() {
-            return Date.now().toString(36) + Math.random().toString(36).substring(2, 7);
+            return Date.now().toString(36) + Math.random().toString(36).substring(2);
         }
 
         function getRandomLightColor() {
             const hue = Math.floor(Math.random() * 360);
-            return `hsl(${hue}, 75%, 70%)`;
+            return `hsl(${hue}, 70%, 65%)`;
         }
 
-        function triggerHUDToast(msg) {
-            const el = document.getElementById('hud-toast');
-            el.textContent = msg;
-            el.classList.add('show');
-            setTimeout(() => el.classList.remove('show'), 3500);
+        function showMessage(message, duration = 3000) {
+            messageBox.textContent = message;
+            messageBox.classList.add('show');
+            setTimeout(() => messageBox.classList.remove('show'), duration);
         }
 
         function populateTimeSelects() {
-            startHourSelect.innerHTML = ''; endHourSelect.innerHTML = '';
-            startMinuteSelect.innerHTML = ''; endMinuteSelect.innerHTML = '';
             for (let i = 0; i < 24; i++) {
-                const opt = i < 10 ? `0${i}` : i;
-                startHourSelect.add(new Option(opt, i));
-                endHourSelect.add(new Option(opt, i));
+                const optStr = i < 10 ? `0${i}` : i;
+                startHourSelect.appendChild(new Option(optStr, i));
+                endHourSelect.appendChild(new Option(optStr, i));
             }
             for (let i = 0; i < 60; i += 5) {
-                const opt = i < 10 ? `0${i}` : i;
-                startMinuteSelect.add(new Option(opt, i));
-                endMinuteSelect.add(new Option(opt, i));
+                const optStr = i < 10 ? `0${i}` : i;
+                startMinuteSelect.appendChild(new Option(optStr, i));
+                endMinuteSelect.appendChild(new Option(optStr, i));
             }
         }
 
@@ -995,25 +940,31 @@
         function formatTime(h, m) {
             const period = h >= 12 ? 'PM' : 'AM';
             const hour12 = h % 12 === 0 ? 12 : h % 12;
-            return `${hour12}:${m < 10 ? '0' + m : m} ${period}`;
+            const minutes = m < 10 ? '0' + m : m;
+            return `${hour12}:${minutes} ${period}`;
         }
 
         function updateDateHeader() {
-            const now = new Date();
-            dateDayHeader.textContent = now.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            dateDayHeader.textContent = new Date().toLocaleDateString('en-US', options);
         }
 
-        // --- ROUTINE SVG GENERATOR ENGINE ---
+        // --- SVG ROUTINE RENDERING SYSTEM ---
         function drawChart() {
             svgChart.innerHTML = '';
-            const bgCircle = document.createElementNS(svgNS, 'circle');
-            bgCircle.setAttribute('cx', cx); bgCircle.setAttribute('cy', cy); bgCircle.setAttribute('r', radius);
-            bgCircle.setAttribute('class', 'background-circle'); bgCircle.setAttribute('stroke-width', strokeWidth);
-            svgChart.appendChild(bgCircle);
+
+            const backgroundCircle = document.createElementNS(svgNS, 'circle');
+            backgroundCircle.setAttribute('cx', cx);
+            backgroundCircle.setAttribute('cy', cy);
+            backgroundCircle.setAttribute('r', radius);
+            backgroundCircle.setAttribute('class', 'background-circle');
+            backgroundCircle.setAttribute('stroke-width', strokeWidth);
+            svgChart.appendChild(backgroundCircle);
 
             currentScheduleData.forEach((item) => {
                 const startAngle = timeToAngle(item.startH, item.startM);
                 const endAngle = timeToAngle(item.endH, item.endM);
+
                 const arc = document.createElementNS(svgNS, 'path');
                 arc.setAttribute('d', describeArc(cx, cy, radius, startAngle, endAngle));
                 arc.setAttribute('stroke', item.color);
@@ -1021,9 +972,10 @@
                 arc.setAttribute('class', 'schedule-arc');
                 arc.setAttribute('data-id', item.id);
 
-                arc.addEventListener('mouseenter', handleArcHoverIn);
-                arc.addEventListener('mousemove', handleArcHoverMove);
-                arc.addEventListener('mouseleave', handleArcHoverOut);
+                arc.addEventListener('mouseover', handleArcInteraction);
+                arc.addEventListener('mouseout', handleArcInteraction);
+                arc.addEventListener('click', handleArcInteraction);
+
                 svgChart.appendChild(arc);
             });
 
@@ -1034,35 +986,42 @@
             svgChart.appendChild(activeBar);
 
             if (activeRoutineBarInterval) clearInterval(activeRoutineBarInterval);
-            activeRoutineBarInterval = setInterval(updateActiveRoutineBar, 15000);
+            activeRoutineBarInterval = setInterval(updateActiveRoutineBar, 10000);
             updateActiveRoutineBar();
         }
 
         function updateActiveRoutineBar() {
             const now = new Date();
-            const curH = now.getHours(); const curM = now.getMinutes();
-            const currentMinutes = curH * 60 + curM;
+            const currentHour = now.getHours();
+            const currentMinute = now.getMinutes();
+            const currentTimeInMinutes = currentHour * 60 + currentMinute;
+
             const activeBar = document.getElementById('active-routine-bar');
             if (!activeBar) return;
 
             let activeRoutine = null;
             for (const activity of currentScheduleData) {
-                const startMin = activity.startH * 60 + activity.startM;
-                let endMin = activity.endH * 60 + activity.endM;
+                const startMinutes = activity.startH * 60 + activity.startM;
+                let endMinutes = activity.endH * 60 + activity.endM;
 
-                if (endMin <= startMin) {
-                    endMin += 1440;
-                    let adjustedCur = currentMinutes;
-                    if (currentMinutes < startMin) adjustedCur += 1440;
-                    if (adjustedCur >= startMin && adjustedCur < endMin) { activeRoutine = activity; break; }
-                } else if (currentMinutes >= startMin && currentMinutes < endMin) {
-                    activeRoutine = activity; break;
+                if (endMinutes <= startMinutes) {
+                    endMinutes += 1440;
+                    let adjustedCurrentTime = currentTimeInMinutes;
+                    if (currentTimeInMinutes < startMinutes) adjustedCurrentTime += 1440;
+                    if (adjustedCurrentTime >= startMinutes && adjustedCurrentTime < endMinutes) {
+                        activeRoutine = activity;
+                        break;
+                    }
+                } else if (currentTimeInMinutes >= startMinutes && currentTimeInMinutes < endMinutes) {
+                    activeRoutine = activity;
+                    break;
                 }
             }
 
             if (activeRoutine) {
-                const curAngle = timeToAngle(curH, curM);
-                activeBar.setAttribute('d', describeArc(cx, cy, radius, curAngle - 0.2, curAngle + 0.2));
+                const currentAngle = timeToAngle(currentHour, currentMinute);
+                const barLength = 0.2;
+                activeBar.setAttribute('d', describeArc(cx, cy, radius, currentAngle - barLength / 2, currentAngle + barLength / 2));
                 activeBar.style.display = 'block';
                 centerActivityLabel.textContent = activeRoutine.label;
             } else {
@@ -1074,13 +1033,16 @@
         function createScheduleTable() {
             scheduleTableBody.innerHTML = '';
             if (currentScheduleData.length === 0) {
-                scheduleTableBody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--text-muted);">No assigned blocks found. Setup a routine to monitor progress.</td></tr>`;
+                scheduleTableBody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: #8b949e;">No activities yet. Add some to get started!</td></tr>`;
                 return;
             }
+
             currentScheduleData.forEach(item => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td style="font-weight:600;"><i class="fas fa-dot-circle" style="color:${item.color}; margin-right:8px;"></i>${item.label}</td>
+                const row = document.createElement('tr');
+                row.setAttribute('data-id', item.id);
+
+                row.innerHTML = `
+                    <td><strong>${item.label}</strong></td>
                     <td>${formatTime(item.startH, item.startM)}</td>
                     <td>${formatTime(item.endH, item.endM)}</td>
                     <td class="table-actions">
@@ -1088,28 +1050,35 @@
                         <button class="danger delete-btn"><i class="fas fa-trash-alt"></i></button>
                     </td>
                 `;
-                tr.querySelector('.edit-btn').onclick = () => editActivity(item);
-                tr.querySelector('.delete-btn').onclick = () => deleteActivity(item.id);
-                scheduleTableBody.appendChild(tr);
+
+                row.querySelector('.edit-btn').onclick = () => editActivity(item);
+                row.querySelector('.delete-btn').onclick = () => deleteActivity(item.id);
+                scheduleTableBody.appendChild(row);
             });
         }
 
-        // --- ROUTINE EVENT INTERACTIVE METHODS ---
-        function handleArcHoverIn(e) {
-            const target = currentScheduleData.find(item => item.id === e.target.dataset.id);
-            if (!target) return;
-            infoLabel.textContent = target.label;
-            infoTime.textContent = `${formatTime(target.startH, target.startM)} - ${formatTime(target.endH, target.endM)}`;
-            arcInfoTooltip.classList.add('show');
+        function saveScheduleToLocalStorage(data) {
+            localStorage.setItem(LOCAL_STORAGE_KEY_SCHEDULE, JSON.stringify(data));
         }
 
-        function handleArcHoverMove(e) {
-            arcInfoTooltip.style.left = `${e.clientX}px`;
-            arcInfoTooltip.style.top = `${e.clientY}px`;
+        function updateUIAndSave() {
+            drawChart();
+            createScheduleTable();
+            saveScheduleToLocalStorage(currentScheduleData);
+            if (LocalNotifications) scheduleNotifications(currentScheduleData);
         }
 
-        function handleArcHoverOut() {
-            arcInfoTooltip.classList.remove('show');
+        // --- ROUTINE FORM MODAL WORKFLOW ---
+        function showModal() { activityModal.classList.add('show'); }
+        function hideModal() { activityModal.classList.remove('show'); resetActivityForm(); }
+
+        function resetActivityForm() {
+            activityIdInput.value = '';
+            activityLabelInput.value = '';
+            startHourSelect.value = '0'; startMinuteSelect.value = '0';
+            endHourSelect.value = '0'; endMinuteSelect.value = '0';
+            saveButton.textContent = 'Add Activity';
+            formTitle.textContent = 'Add New Activity';
         }
 
         function editActivity(item) {
@@ -1120,348 +1089,461 @@
             endHourSelect.value = item.endH;
             endMinuteSelect.value = item.endM;
             saveButton.textContent = 'Update Activity';
-            formTitle.textContent = 'Edit Activity Area';
-            activityModal.classList.add('show');
+            formTitle.textContent = 'Edit Activity';
+            showModal();
         }
 
-        function deleteActivity(id) {
-            if(confirm("Purge selected routine timeframe block completely?")) {
-                currentScheduleData = currentScheduleData.filter(i => i.id !== id);
-                localStorage.setItem(LOCAL_STORAGE_KEY_SCHEDULE, JSON.stringify(currentScheduleData));
-                drawChart(); createScheduleTable();
-                triggerHUDToast("Routine item purged successfully.");
-            }
-        }
+        addActivityButton.addEventListener('click', () => { resetActivityForm(); showModal(); });
+        modalCloseButton.addEventListener('click', hideModal);
+        cancelEditButton.addEventListener('click', hideModal);
 
-        // Routine Event Triggers
-        addActivityButton.onclick = () => {
-            activityIdInput.value = ''; activityForm.reset();
-            saveButton.textContent = 'Add Activity'; formTitle.textContent = 'Add New Activity';
-            activityModal.classList.add('show');
-        };
-        modalCloseButton.onclick = cancelEditButton.onclick = () => activityModal.classList.remove('show');
-
-        activityForm.onsubmit = (e) => {
+        activityForm.addEventListener('submit', (e) => {
             e.preventDefault();
             const id = activityIdInput.value || generateUniqueId();
             const label = activityLabelInput.value.trim();
-            const startH = parseInt(startHourSelect.value); const startM = parseInt(startMinuteSelect.value);
-            const endH = parseInt(endHourSelect.value); const endM = parseInt(endMinuteSelect.value);
+            const startH = parseInt(startHourSelect.value);
+            const startM = parseInt(startMinuteSelect.value);
+            const endH = parseInt(endHourSelect.value);
+            const endM = parseInt(endMinuteSelect.value);
             
-            const existing = currentScheduleData.find(i => i.id === id);
-            const color = existing ? existing.color : getRandomLightColor();
+            const existingActivity = currentScheduleData.find(item => item.id === id);
+            const color = existingActivity ? existingActivity.color : getRandomLightColor();
 
-            const packed = { id, label, startH, startM, endH, endM, color };
-            if(existing) {
-                const idx = currentScheduleData.findIndex(i => i.id === id);
-                currentScheduleData[idx] = packed;
+            if (!label) return showMessage("Activity label cannot be empty.");
+
+            const newActivity = { id, label, startH, startM, endH, endM, color };
+            const existingIndex = currentScheduleData.findIndex(item => item.id === id);
+
+            if (existingIndex > -1) {
+                currentScheduleData[existingIndex] = newActivity;
+                showMessage("Activity updated successfully!");
             } else {
-                currentScheduleData.push(packed);
+                currentScheduleData.push(newActivity);
+                showMessage("Activity added successfully!");
             }
 
-            currentScheduleData.sort((a,b) => (a.startH * 60 + a.startM) - (b.startH * 60 + b.startM));
-            localStorage.setItem(LOCAL_STORAGE_KEY_SCHEDULE, JSON.stringify(currentScheduleData));
-            
-            drawChart(); createScheduleTable();
-            activityModal.classList.remove('show');
-            triggerHUDToast("State synchronization verified.");
-        };
+            currentScheduleData.sort((a, b) => (a.startH * 60 + a.startM) - (b.startH * 60 + b.startM));
+            updateUIAndSave();
+            hideModal();
+        });
 
-        // --- SUB SECTION TABS NAV CONTROLLER ---
+        function deleteActivity(id) {
+            showConfirmationModal('Are you sure you want to delete this activity?', () => {
+                currentScheduleData = currentScheduleData.filter(item => item.id !== id);
+                updateUIAndSave();
+                showMessage("Activity removed.");
+            });
+        }
+
+        // --- CAPACITOR NOTIFICATIONS DISPATCH ENGINE ---
+        async function scheduleNotifications(activities) {
+            if (!LocalNotifications) return;
+            try {
+                const pending = await LocalNotifications.getPending();
+                const ids = pending.notifications.filter(n => n.extra && n.extra.type === 'activity').map(n => n.id);
+                if (ids.length > 0) await LocalNotifications.cancel({ ids });
+
+                const notifications = [];
+                const now = new Date();
+                const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+                for (const act of activities) {
+                    let startTime = new Date(today.getFullYear(), today.getMonth(), today.getDate(), act.startH, act.startM, 0);
+                    if (startTime < now) startTime.setDate(startTime.getDate() + 1);
+
+                    const targetNotifyTime = new Date(startTime.getTime() - 300000); // 5 minutes prior
+                    if (targetNotifyTime.getTime() > now.getTime()) {
+                        const intId = Math.abs(act.id.split('').reduce((acc, char) => (acc << 5) - acc + char.charCodeAt(0), 0));
+                        notifications.push({
+                            id: intId,
+                            title: `Upcoming: ${act.label}`,
+                            body: `"${act.label}" begins in 5 minutes at ${formatTime(act.startH, act.startM)}!`,
+                            schedule: { at: targetNotifyTime },
+                            extra: { originalId: act.id, type: 'activity' }
+                        });
+                    }
+                }
+                if (notifications.length > 0) await LocalNotifications.schedule({ notifications });
+            } catch(e) { console.error(e); }
+        }
+
+        // --- CONFIRMATION CUSTOM MODAL MODULATOR ---
+        function showConfirmationModal(message, onConfirm) {
+            const overlay = document.createElement('div');
+            overlay.classList.add('modal-overlay');
+            overlay.innerHTML = `
+                <div class="modal-content">
+                    <h2 style="color:var(--danger-bg); font-size:1.2rem; margin-top:0;">Confirm Action</h2>
+                    <p style="color:#c9d1d9; font-size:0.95rem; margin-bottom:1.5rem;">${message}</p>
+                    <div class="button-group">
+                        <button type="button" class="danger" id="conf-yes">Confirm</button>
+                        <button type="button" class="secondary" id="conf-no">Cancel</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(overlay);
+            setTimeout(() => overlay.classList.add('show'), 10);
+
+            overlay.querySelector('#conf-yes').onclick = () => { onConfirm(); overlay.classList.remove('show'); setTimeout(() => overlay.remove(), 300); };
+            overlay.querySelector('#conf-no').onclick = () => { overlay.classList.remove('show'); setTimeout(() => overlay.remove(), 300); };
+        }
+
+        function handleArcInteraction(event) {
+            const id = event.target.dataset.id;
+            const item = currentScheduleData.find(x => x.id === id);
+            if (!item) return;
+
+            clearTimeout(tooltipTimeout);
+            if (event.type === 'mouseover') {
+                infoLabel.textContent = item.label;
+                infoTime.textContent = `${formatTime(item.startH, item.startM)} - ${formatTime(item.endH, item.endM)}`;
+                arcInfoTooltip.style.left = `${event.clientX}px`;
+                arcInfoTooltip.style.top = `${event.clientY}px`;
+                arcInfoTooltip.classList.add('show');
+            } else if (event.type === 'mouseout') {
+                tooltipTimeout = setTimeout(() => arcInfoTooltip.classList.remove('show'), 150);
+            }
+        }
+
+        // --- NAVIGATION TAB ROUTER COUPLER ---
         activityTabBtn.onclick = () => switchTab('activity');
         quizTabBtn.onclick = () => switchTab('quiz');
 
-        function switchTab(target) {
-            activityTabBtn.classList.remove('active'); quizTabBtn.classList.remove('active');
-            activitySection.classList.remove('active'); quizSection.classList.remove('active');
-            if(target === 'activity') {
-                activityTabBtn.classList.add('active'); activitySection.classList.add('active');
+        function switchTab(tabName) {
+            activityTabBtn.classList.remove('active');
+            quizTabBtn.classList.remove('active');
+            activitySection.classList.remove('active');
+            quizSection.classList.remove('active');
+
+            if (tabName === 'activity') {
+                activityTabBtn.classList.add('active');
+                activitySection.classList.add('active');
             } else {
-                quizTabBtn.classList.add('active'); quizSection.classList.add('active');
+                quizTabBtn.classList.add('active');
+                quizSection.classList.add('active');
             }
         }
 
-        // --- LOCALIZED SELF QUIZ MOCK ENGINE DATA ---
-        // High-fidelity fallback dataset optimized cleanly with structural mapping arrays matching routine aesthetics
-        const mockQuestionsPool = [
-            { questionText: "Which mechanism isolates execution threads safely under synchronized memory bounds?", options: ["Mutex Core Lock registers", "Thread Boundary Sandboxing virtualization", "Volatile Memory registers mapping", "Atomic Isolation vectors"], correctAnswer: "Mutex Core Lock registers", explanation: "Mutex architectures prevent asynchronous read/write overrides efficiently under core memory execution environments." },
-            { questionText: "What structural design principle establishes predictable performance matrices under asynchronous data streaming?", options: ["Linear Queue Balancing arrays", "Backpressure propagation pipelines", "Multiplexed Thread pools cascading", "Distributed Allocation offsets"], correctAnswer: "Backpressure propagation pipelines", explanation: "Backpressure tracks buffer limits and alerts preceding clusters before hardware capacity allocation overruns trigger crashes." },
-            { questionText: "How does layout compilation density directly manipulate visual performance rendering targets on core mobile viewports?", options: ["By restricting layered z-index compositions", "By minimizing operational thread allocations", "By reducing nested layout evaluation recalculations", "By forcing system landscape canvas orientation matrices"], correctAnswer: "By reducing nested layout evaluation recalculations", explanation: "Flat UI layout architectures minimize layout nesting tree iterations, boosting framerates on lower-spec display chipsets." },
-            { questionText: "Which data layer access architecture scales cleanly without risking deadlocks across shared localized caching instances?", options: ["Synchronized Sequential read pipelines", "Immutable State snapshots replication", "Dynamic Heap allocation partitioning", "Cascading relational locks"], correctAnswer: "Immutable State snapshots replication", explanation: "Immutable data snapshots eliminate race conditions entirely by neutralizing side-effects during concurrent runtime threads." },
-            { questionText: "What optimization approach delivers the most noticeable reduction in canvas asset rasterization latency?", options: ["Enforcing vector path stroke constraints", "Caching pre-rendered bitwise layer grids", "Injecting redundant alpha channel data paths", "Scaling up native aspect ratio boundaries"], correctAnswer: "Caching pre-rendered bitwise layer grids", explanation: "Storing canvas drawings on offscreen layers bypasses repetitive drawing computations for complex graphic operations." }
-        ];
+        // --- SELF QUIZ LOGIC ENGINE & LOCAL STATE BACKING ---
+        function saveQuizState() {
+            localStorage.setItem(LOCAL_STORAGE_KEY_QUIZ_STATE, JSON.stringify(quizState));
+        }
 
-        // --- QUIZ ACTION CONTROLLERS ---
-        startQuizBtn.onclick = () => inputModal.classList.add('show');
-        closeQuizConfigBtn.onclick = () => inputModal.classList.remove('show');
+        function loadQuizState() {
+            const raw = localStorage.getItem(LOCAL_STORAGE_KEY_QUIZ_STATE);
+            if (!raw) return;
+            try {
+                quizState = JSON.parse(raw);
+                if (quizState.generatedQuestions && quizState.generatedQuestions.length > 0) {
+                    renderQuizActiveForm();
+                    if (!quizState.submitted) {
+                        resumeQuizTimerEngine();
+                    } else {
+                        renderQuizEvaluationResults();
+                    }
+                }
+            } catch(e) { console.error("Failed to restore quiz state context", e); }
+        }
 
-        generateBtn.onclick = () => {
-            const topic = document.getElementById('modalTopicInput').value.trim();
-            const total = parseInt(document.getElementById('modalNumQuestionsSelect').value);
-            if(!topic) { alert("Please provide a target topic area configuration parameter."); return; }
+        generateQuizBtn.onclick = async () => {
+            const topic = quizTopicInput.value.trim();
+            const count = parseInt(quizNumQuestions.value);
+            const diff = quizDifficulty.value;
 
-            inputModal.classList.remove('show');
-            landingPage.style.display = 'none';
-            quizContainer.style.display = 'block';
-            controls.style.display = 'block';
-            progressWrapper.style.display = 'block';
+            if(!topic) return showMessage("Please enter a valid evaluation topic target.");
 
-            // Select specified quantity randomly from pool array mapping parameters
-            let shuffled = [...mockQuestionsPool].sort(() => 0.5 - Math.random());
-            quizState.activeQuestions = shuffled.slice(0, Math.min(total, shuffled.length));
-            quizState.selections = {};
-            quizState.submitted = false;
-            quizState.score = 0;
-            quizState.elapsedSeconds = 0;
-            quizState.isLocked = false;
+            generateQuizBtn.disabled = true;
+            generateQuizBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Synthesizing Questions...`;
+            
+            // Simulating API architecture structure response matching provided schemas
+            setTimeout(() => {
+                const mockupDataset = [];
+                for(let i=1; i<=count; i++) {
+                    mockupDataset.push({
+                        questionText: `Conceptual standardized baseline prompt detail number ${i} evaluating criteria elements inside context area of ${topic} (${diff}).`,
+                        options: [`Option Statement Evaluation Vector Alpha`, `Option Alpha Beta Compound Model`, `Option Vector Content Verification Target C`, `Alternative Hypothesis Proposition Scenario Delta`],
+                        correctAnswer: `Option Statement Evaluation Vector Alpha`,
+                        explanation: `The baseline parameters validation standard requires matching verification properties inside contextual elements mapped directly to original operational criteria guidelines.`
+                    });
+                }
 
-            renderQuizStructure();
-            beginQuizTimer();
-            saveQuizToLocalStorage();
-            triggerHUDToast("Quiz environment generated smoothly.");
+                quizState = {
+                    generatedQuestions: mockupDataset,
+                    userAnswers: new Array(count).fill(null),
+                    elapsedTime: 0,
+                    startTimeStamp: Date.now(),
+                    isPaused: false,
+                    submitted: false,
+                    score: 0,
+                    metaTopic: topic
+                };
+
+                generateQuizBtn.disabled = false;
+                generateQuizBtn.innerHTML = `<i class="fas fa-bolt"></i> Generate Practice Quiz`;
+                
+                saveQuizState();
+                renderQuizActiveForm();
+                resumeQuizTimerEngine();
+                showMessage("Practice Exam Sheet Assembled!");
+            }, 1200);
         };
 
-        function renderQuizStructure() {
-            quizContainer.innerHTML = `<h2>Self Quiz Workspace Panel</h2>`;
-            quizState.activeQuestions.forEach((q, idx) => {
-                const card = document.createElement('div');
-                card.className = 'question-card';
+        function resumeQuizTimerEngine() {
+            quizState.isPaused = false;
+            quizState.startTimeStamp = Date.now();
+            quizOverlay.style.display = "none";
+            document.body.style.overflow = "";
+            
+            if(quizTimerInterval) clearInterval(quizTimerInterval);
+            quizTimerInterval = setInterval(() => {
+                if(quizState.isPaused) return;
+                const incremental = Date.now() - quizState.startTimeStamp;
+                const totalMilli = quizState.elapsedTime + incremental;
                 
-                let optionsHtml = '';
-                q.options.forEach((opt) => {
-                    const checked = quizState.selections[idx] === opt ? 'checked' : '';
-                    const disabled = quizState.submitted ? 'disabled' : '';
-                    optionsHtml += `
-                        <div class="option-wrapper">
-                            <label>
-                                <input type="radio" name="q-${idx}" value="${opt}" ${checked} ${disabled}>
-                                <span>${opt}</span>
-                            </label>
-                        </div>
+                const secs = Math.floor(totalMilli / 1000);
+                const m = Math.floor(secs / 60);
+                const s = secs % 60;
+                timerDisplay.textContent = `Time: ${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+            }, 1000);
+            saveQuizState();
+        }
+
+        function pauseQuizTimerEngine() {
+            if(quizState.isPaused || quizState.submitted) return;
+            clearInterval(quizTimerInterval);
+            quizState.elapsedTime += (Date.now() - quizState.startTimeStamp);
+            quizState.isPaused = true;
+            
+            quizOverlay.style.display = "flex";
+            document.body.style.overflow = "hidden";
+            saveQuizState();
+            showMessage("Quiz Engine Suspended.");
+        }
+
+        pauseBtn.onclick = pauseQuizTimerEngine;
+        overlayResumeBtn.onclick = resumeQuizTimerEngine;
+
+        function refreshQuizProgressMetrics() {
+            if(quizState.generatedQuestions.length === 0) return;
+            const metricsFilled = quizState.userAnswers.filter(x => x !== null).length;
+            const scorePercent = (metricsFilled / quizState.generatedQuestions.length) * 100;
+            progressBarFill.style.width = `${scorePercent}%`;
+        }
+
+        function cleanTextMap(txt) {
+            if (!txt) return '';
+            return txt.toString().replace(/^[a-zA-Z][.)]\s*/, '').trim();
+        }
+
+        function renderQuizActiveForm() {
+            quizSetupPanel.style.display = "none";
+            quizExecutionPanel.style.display = "block";
+            quizMetaTitle.textContent = `Topic: ${quizState.metaTopic}`;
+            quizQuestionsContainer.innerHTML = "";
+            resultsContainer.style.display = "none";
+            submitQuizBtn.disabled = false;
+            downloadPdfBtn.style.display = quizState.submitted ? "inline-flex" : "none";
+
+            quizState.generatedQuestions.forEach((q, idx) => {
+                const nodeCard = document.createElement('div');
+                nodeCard.style.marginBottom = "20px";
+                nodeCard.style.paddingBottom = "15px";
+                nodeCard.style.borderBottom = "1px solid rgba(255,255,255,0.06)";
+                
+                let answersOptionsLayout = "";
+                q.options.forEach((opt, oIdx) => {
+                    const cleanOpt = cleanTextMap(opt);
+                    const markChecked = quizState.userAnswers[idx] === opt ? "checked" : "";
+                    answersOptionsLayout += `
+                        <label class="quiz-option-item">
+                            <input type="radio" name="quiz_q_${idx}" value="${opt}" ${markChecked} ${quizState.submitted ? 'disabled' : ''}>
+                            <span>${String.fromCharCode(65 + oIdx)}) ${cleanOpt}</span>
+                        </label>
                     `;
                 });
 
-                card.innerHTML = `
-                    <div class="question-text">${idx + 1}. ${q.questionText}</div>
-                    <div class="options-block">${optionsHtml}</div>
-                    <div class="feedback-banner" id="fb-${idx}"></div>
-                    <div class="explanation-box" id="exp-${idx}"><strong>Exploratory Data:</strong> ${q.explanation}</div>
+                nodeCard.innerHTML = `
+                    <p style="font-weight:600; margin-bottom:12px; font-size:1rem; line-height:1.4;">${idx + 1}. ${q.questionText}</p>
+                    <div>${answersOptionsLayout}</div>
+                    <div class="explanation-box" id="exp_node_${idx}">
+                        <strong>Explanation:</strong> ${q.explanation}
+                    </div>
                 `;
 
-                // Wire up dynamic change listener
-                card.querySelectorAll('input[type="radio"]').forEach(radio => {
-                    radio.onchange = (e) => {
-                        quizState.selections[idx] = e.target.value;
-                        updateQuizProgressBarHUD();
-                        saveQuizToLocalStorage();
+                quizQuestionsContainer.appendChild(nodeCard);
+
+                // Setup Event Listeners to monitor changes
+                nodeCard.querySelectorAll('input[type="radio"]').forEach(radioNode => {
+                    radioNode.onchange = (e) => {
+                        if(quizState.submitted) return;
+                        quizState.userAnswers[idx] = e.target.value;
+                        refreshQuizProgressMetrics();
+                        saveQuizState();
                     };
                 });
-
-                quizContainer.appendChild(card);
             });
 
-            if(quizState.submitted) {
-                applyQuizEvaluationFeedback();
-            }
+            refreshQuizProgressMetrics();
         }
 
-        function updateQuizProgressBarHUD() {
-            const total = quizState.activeQuestions.length;
-            if(total === 0) return;
-            const filled = Object.keys(quizState.selections).length;
-            progressBarFill.style.width = `${(filled / total) * 100}%`;
-        }
-
-        // --- TIMER ENGINE SYSTEMS ---
-        function beginQuizTimer() {
-            if(quizTimerInterval) clearInterval(quizTimerInterval);
-            floatingTimerControls.style.display = 'flex';
-            updateTimerDisplayHUD();
-            quizTimerInterval = setInterval(() => {
-                if(!quizState.isLocked && !quizState.submitted) {
-                    quizState.elapsedSeconds++;
-                    updateTimerDisplayHUD();
-                    if(quizState.elapsedSeconds % 5 === 0) saveQuizToLocalStorage();
-                }
-            }, 1000);
-        }
-
-        function updateTimerDisplayHUD() {
-            const m = Math.floor(quizState.elapsedSeconds / 60);
-            const s = quizState.elapsedSeconds % 60;
-            timerDisplay.innerHTML = `<i class="far fa-clock"></i> Session Pace: ${m < 10 ? '0'+m : m}:${s < 10 ? '0'+s : s}`;
-        }
-
-        pauseBtn.onclick = () => {
-            quizState.isLocked = true;
-            quizOverlay.style.display = 'flex';
-            saveQuizToLocalStorage();
-        };
-
-        overlayResumeBtn.onclick = () => {
-            quizState.isLocked = false;
-            quizOverlay.style.display = 'none';
-            saveQuizToLocalStorage();
-        };
-
-        // --- EVALUATION EXECUTION METHOD ---
-        submitBtn.onclick = () => {
-            if(Object.keys(quizState.selections).length < quizState.activeQuestions.length) {
-                if(!confirm("Several questions remain unanswered. Submit evaluation regardless?")) return;
-            }
-            
+        submitQuizBtn.onclick = () => {
+            if(quizState.submitted) return;
             clearInterval(quizTimerInterval);
+            
+            if(!quizState.isPaused) {
+                quizState.elapsedTime += (Date.now() - quizState.startTimeStamp);
+            }
+            
             quizState.submitted = true;
-            
-            let finalScore = 0;
-            quizState.activeQuestions.forEach((q, idx) => {
-                if(quizState.selections[idx] === q.correctAnswer) finalScore++;
-            });
-            quizState.score = finalScore;
+            let currentCalculatedScore = 0;
 
-            applyQuizEvaluationFeedback();
-            renderQuizStructure(); // re-render layout matrices to apply standard disabled attributes safely
-            saveQuizToLocalStorage();
-        };
-
-        function applyQuizEvaluationFeedback() {
-            floatingTimerControls.style.display = 'none';
-            progressWrapper.style.display = 'none';
-            
-            quizState.activeQuestions.forEach((q, idx) => {
-                const fb = document.getElementById(`fb-${idx}`);
-                const exp = document.getElementById(`exp-${idx}`);
-                if(!fb) return;
-
-                exp.style.display = 'block';
-                const selected = quizState.selections[idx];
-                if(selected === q.correctAnswer) {
-                    fb.innerHTML = `<span style="color:var(--accent-success);"><i class="fas fa-check-circle"></i> Verification Correct match.</span>`;
-                } else if(!selected) {
-                    fb.innerHTML = `<span style="color:var(--danger-hover-bg);"><i class="fas fa-exclamation-triangle"></i> Unresolved item. Core Requirement: ${q.correctAnswer}</span>`;
-                } else {
-                    fb.innerHTML = `<span style="color:var(--danger-hover-bg);"><i class="fas fa-times-circle"></i> Overridden Target. Target parameter: ${q.correctAnswer}</span>`;
+            quizState.generatedQuestions.forEach((q, idx) => {
+                if(cleanTextMap(quizState.userAnswers[idx]) === cleanTextMap(q.correctAnswer)) {
+                    currentCalculatedScore++;
                 }
             });
 
-            scoreText.textContent = `Scored Accuracy Level: ${quizState.score} / ${quizState.activeQuestions.length} Units`;
-            const m = Math.floor(quizState.elapsedSeconds / 60); const s = quizState.elapsedSeconds % 60;
-            timeText.textContent = `Chronograph Metric: ${m} Minutes ${s} Seconds total duration elapsed.`;
-            resultsContainer.style.display = 'block';
-            submitBtn.disabled = true;
-            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-        }
-
-        resetQuizBtn.onclick = () => {
-            if(confirm("Flush running self quiz parameters and return to welcome module configuration screen?")) {
-                clearInterval(quizTimerInterval);
-                localStorage.removeItem(LOCAL_STORAGE_KEY_QUIZ);
-                quizState = { activeQuestions: [], selections: {}, submitted: false, score: 0, elapsedSeconds: 0, isLocked: false };
-                
-                quizContainer.style.display = 'none';
-                controls.style.display = 'none';
-                resultsContainer.style.display = 'none';
-                progressWrapper.style.display = 'none';
-                floatingTimerControls.style.display = 'none';
-                quizOverlay.style.display = 'none';
-                landingPage.style.display = 'block';
-                submitBtn.disabled = false;
-                triggerHUDToast("Workspace configuration flushed cleanly.");
-            }
+            quizState.score = currentCalculatedScore;
+            saveQuizState();
+            renderQuizEvaluationResults();
+            showMessage("Answers evaluation verified successfully!");
         };
 
-        // --- LOCAL DATA BACKUPS PERSISTENCE LAYER ---
-        function saveQuizToLocalStorage() {
-            localStorage.setItem(LOCAL_STORAGE_KEY_QUIZ, JSON.stringify(quizState));
-        }
+        function renderQuizEvaluationResults() {
+            submitQuizBtn.disabled = true;
+            downloadPdfBtn.style.display = "inline-flex";
+            
+            quizState.generatedQuestions.forEach((q, idx) => {
+                const cardNode = quizQuestionsContainer.children[idx];
+                const expBox = document.getElementById(`exp_node_${idx}`);
+                if(expBox) expBox.style.display = "block";
 
-        function loadQuizFromLocalStorage() {
-            const raw = localStorage.getItem(LOCAL_STORAGE_KEY_QUIZ);
-            if(!raw) return;
-            try {
-                const parsed = JSON.parse(raw);
-                if(parsed && parsed.activeQuestions && parsed.activeQuestions.length > 0) {
-                    quizState = parsed;
-                    landingPage.style.display = 'none';
-                    quizContainer.style.display = 'block';
-                    controls.style.display = 'block';
-                    
-                    renderQuizStructure();
-                    
-                    if(!quizState.submitted) {
-                        progressWrapper.style.display = 'block';
-                        updateQuizProgressBarHUD();
-                        beginQuizTimer();
-                        if(quizState.isLocked) {
-                            quizOverlay.style.display = 'flex';
-                        }
+                const resultBanner = document.createElement('p');
+                resultBanner.style.fontWeight = "700";
+                resultBanner.style.fontSize = "0.9rem";
+                resultBanner.style.marginTop = "8px";
+
+                const sel = quizState.userAnswers[idx];
+                if(sel) {
+                    if(cleanTextMap(sel) === cleanTextMap(q.correctAnswer)) {
+                        resultBanner.innerHTML = `<span style="color:#10b981;"><i class="fas fa-check"></i> Correct Response</span>`;
                     } else {
-                        applyQuizEvaluationFeedback();
+                        resultBanner.innerHTML = `<span style="color:#da3633;"><i class="fas fa-times"></i> Incorrect. Target Answer: ${q.correctAnswer}</span>`;
                     }
+                } else {
+                    resultBanner.innerHTML = `<span style="color:#ffd700;"><i class="fas fa-exclamation-triangle"></i> Skipped. Target Answer: ${q.correctAnswer}</span>`;
                 }
-            } catch(e) {
-                console.error("Storage vector initialization parsing payload array corruption exception.", e);
-            }
+                cardNode.appendChild(resultBanner);
+            });
+
+            const secs = Math.floor(quizState.elapsedTime / 1000);
+            const m = Math.floor(secs / 60); const s = secs % 60;
+
+            scoreText.textContent = `Scored matching ${quizState.score} out of ${quizState.generatedQuestions.length} units correct!`;
+            timeText.textContent = `Completed processing inside timeline duration: ${m}m ${s}s.`;
+            resultsContainer.style.display = "block";
+            
+            quizExecutionPanel.scrollTo({ top: resultsContainer.offsetTop, behavior: 'smooth' });
         }
 
-        // --- JSpdf COMPILER LOGIC INTEGRATION ---
+        abortQuizBtn.onclick = () => {
+            showConfirmationModal("Reset quiz completely? Progress loss is permanent.", () => {
+                clearInterval(quizTimerInterval);
+                quizTimerInterval = null;
+                localStorage.removeItem(LOCAL_STORAGE_KEY_QUIZ_STATE);
+                quizState = { generatedQuestions: [], userAnswers: [], elapsedTime: 0, startTimeStamp: null, isPaused: false, submitted: false, score: 0, metaTopic: "" };
+                
+                quizExecutionPanel.style.display = "none";
+                quizSetupPanel.style.display = "block";
+                quizTopicInput.value = "";
+                document.body.style.overflow = "";
+                quizOverlay.style.display = "none";
+            });
+        };
+
+        // --- PDF GENERATION ENGINE PIPELINE ---
         downloadPdfBtn.onclick = () => {
-            if(quizState.activeQuestions.length === 0) return;
-            triggerHUDToast("Assembling diagnostic PDF summary...");
+            if (quizState.generatedQuestions.length === 0) return;
             
+            showMessage("Assembling PDF document layout...");
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF({ orientation: 'p', unit: 'pt', format: 'a4' });
             
-            let currentY = 50;
-            doc.setFont("Helvetica", "bold"); doc.setFontSize(20);
-            doc.text("Self Quiz Diagnostic Summary Report", 40, currentY);
-            currentY += 30;
+            const pageWidth = doc.internal.pageSize.getWidth();
+            const pageHeight = doc.internal.pageSize.getHeight();
+            const horizontalMargin = 40;
+            let executionY = horizontalMargin;
 
-            if (quizState.submitted) {
-                doc.setFontSize(12); doc.setFont("Helvetica", "normal");
-                doc.text(`Evaluation Score Target Accuracy: ${quizState.score} / ${quizState.activeQuestions.length}`, 40, currentY);
-                currentY += 20;
+            function renderLineString(text, size = 11, boldFlag = false, specColor = '#ffffff') {
+                doc.setFont("Helvetica", boldFlag ? "bold" : "normal");
+                doc.setFontSize(size);
+                
+                if(specColor === '#10b981') doc.setTextColor(16, 185, 129);
+                else if(specColor === '#da3633') doc.setTextColor(218, 54, 51);
+                else doc.setTextColor(60, 60, 60);
+
+                const chunkSplits = doc.splitTextToSize(text, pageWidth - (horizontalMargin * 2));
+                chunkSplits.forEach(strUnit => {
+                    if (executionY + size > pageHeight - horizontalMargin) {
+                        doc.addPage();
+                        executionY = horizontalMargin;
+                    }
+                    doc.text(strUnit, horizontalMargin, executionY + size);
+                    executionY += size + 6;
+                });
+                executionY += 3;
             }
 
-            quizState.activeQuestions.forEach((q, idx) => {
-                if(currentY > 750) { doc.addPage(); currentY = 50; }
-                
-                doc.setFont("Helvetica", "bold"); doc.setFontSize(11);
-                doc.text(`${idx + 1}. ${q.questionText}`, 40, currentY);
-                currentY += 18;
+            renderLineString("Self Quiz Performance Evaluation Summary", 20, true);
+            executionY += 10;
+            renderLineString(`Topic Subject: ${quizState.metaTopic}`, 12, true);
+            renderLineString(`Result Profile: Correct elements match count ${quizState.score} / ${quizState.generatedQuestions.length}`, 11, false, '#10b981');
+            executionY += 15;
 
-                doc.setFont("Helvetica", "normal"); doc.setFontSize(10);
-                q.options.forEach((opt, oIdx) => {
-                    doc.text(`   [${String.fromCharCode(65+oIdx)}] ${opt}`, 40, currentY);
-                    currentY += 15;
+            quizState.generatedQuestions.forEach((q, idx) => {
+                renderLineString(`${idx + 1}. ${q.questionText}`, 11, true);
+                
+                q.options.forEach((oVal, oIdx) => {
+                    renderLineString(`   ${String.fromCharCode(65 + oIdx)}) ${cleanTextMap(oVal)}`, 10, false);
                 });
 
-                if(quizState.submitted) {
-                    const userAns = quizState.selections[idx] || "Unassigned Option Block";
-                    doc.setFont("Helvetica", "oblique");
-                    doc.text(`   Provided Selection: ${userAns} | Correct Verified: ${q.correctAnswer}`, 40, currentY);
-                    currentY += 15;
+                const userSelectionStr = quizState.userAnswers[idx] || "Unanswered / Empty";
+                const isMatch = cleanTextMap(userSelectionStr) === cleanTextMap(q.correctAnswer);
+                
+                renderLineString(`Your Selection: ${userSelectionStr}`, 10, true, isMatch ? '#10b981' : '#da3633');
+                if(!isMatch) {
+                    renderLineString(`Correct Target match: ${q.correctAnswer}`, 10, false, '#10b981');
                 }
-                currentY += 10;
+                renderLineString(`Explanation note analysis: ${q.explanation}`, 9, false);
+                executionY += 12;
             });
 
-            doc.save('Self_Quiz_Performance_Array.pdf');
-            triggerHUDToast("PDF document download pipeline dispatched successfully.");
+            doc.save(`Self_Quiz_Report_${quizState.metaTopic.replace(/\s+/g, '_')}.pdf`);
+            showMessage("PDF Download tracking dispatched!");
         };
 
-        // --- INITIALIZATION DEPLOYMENT SEQUENCES ---
-        document.addEventListener('DOMContentLoaded', () => {
+        // --- PWA APPLICATION LIFECYCLE HOOKS ---
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/service-worker.js').catch(err => console.log(err));
+            });
+        }
+
+        // --- INITIALIZATION CONTEXT ENGINE START ---
+        document.addEventListener('DOMContentLoaded', async function () {
             populateTimeSelects();
             updateDateHeader();
             
-            // Load routine items data array structure safely
-            const storedSchedule = localStorage.getItem(LOCAL_STORAGE_KEY_SCHEDULE);
-            currentScheduleData = storedSchedule ? JSON.parse(storedSchedule) : [];
+            const savedSchedule = localStorage.getItem(LOCAL_STORAGE_KEY_SCHEDULE);
+            currentScheduleData = savedSchedule ? JSON.parse(savedSchedule) : [];
             
             drawChart();
             createScheduleTable();
-            loadQuizFromLocalStorage();
+            loadQuizState();
+
+            switchTab('activity');
         });
     </script>
 </body>
 </html>
+
