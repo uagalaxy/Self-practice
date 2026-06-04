@@ -16,35 +16,43 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
     <style>
-        /* --- Deep Contrast Glassmorphic Dark Theme Setup --- */
+        /* --- Samsung One UI 8.5 Inspired Dark Theme Setup --- */
         :root {
-            --bg-color: #000000; 
-            --text-color: #FFFFFF; 
-            --text-muted: #8b949e;
-            --base-circle-color: #161b22; 
+            --bg-color: #000000; /* Pure AMOLED Black */
+            --text-color: #FFFFFF; /* Pure White */
+            --text-muted: #9E9E9E; /* Softer One UI Gray */
+            --base-circle-color: #1C1C1E; 
             --body-font: 'Inter', sans-serif;
-            --border-color: rgba(255, 255, 255, 0.12); 
-            --glass-bg: rgba(22, 27, 34, 0.6);
-            --glass-bg-hover: rgba(33, 38, 45, 0.8);
-            --header-bg: #161b22; 
-            --button-bg-primary: #FFFFFF; 
+            
+            /* Reduced contrast, ultra-subtle borders */
+            --border-color: rgba(255, 255, 255, 0.04); 
+            --glass-bg: rgba(28, 28, 30, 0.4);
+            --glass-bg-hover: rgba(44, 44, 46, 0.55);
+            --header-bg: #000000; 
+            
+            /* Samsung Blue Accents */
+            --accent-color: #3E91FF; 
+            --accent-success: #32D74B;
+            --accent-warning: #FFD60A;
+            --active-routine-color: #3E91FF; 
+            
+            /* Buttons adapted to One UI */
+            --button-bg-primary: #3E91FF; 
             --button-text-primary: #000000; 
-            --button-hover-bg-primary: #E0E0E0; 
-            --button-bg-secondary: rgba(255, 255, 255, 0.08); 
+            --button-hover-bg-primary: #5E9BFF; 
+            --button-bg-secondary: rgba(255, 255, 255, 0.1); 
             --button-text-secondary: #FFFFFF; 
-            --button-hover-bg-secondary: rgba(255, 255, 255, 0.18);
-            --danger-bg: rgba(218, 54, 51, 0.2); 
-            --danger-text: #ff6b6b;
-            --danger-hover-bg: #da3633;
-            --input-bg: rgba(0, 0, 0, 0.6); 
-            --accent-color: #58a6ff; 
-            --accent-success: #10b981;
-            --accent-warning: #F59E0B;
-            --active-routine-color: #FFD700; 
-            --tab-bar-bg: rgba(255, 255, 255, 0.06); 
-            --tab-button-active-bg: #FFFFFF; 
-            --tab-button-active-text: #000000; 
-            --card-depth-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.6);
+            --button-hover-bg-secondary: rgba(255, 255, 255, 0.15);
+            
+            --danger-bg: rgba(255, 69, 58, 0.15); 
+            --danger-text: #FF453A;
+            --danger-hover-bg: #FF453A;
+            --input-bg: rgba(255, 255, 255, 0.05); 
+            
+            --tab-bar-bg: rgba(10, 10, 10, 0.7); 
+            --tab-button-active-bg: rgba(62, 145, 255, 0.15); 
+            --tab-button-active-text: #3E91FF; 
+            --card-depth-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.4); /* Softer drop shadow */
         }
 
         /* Anti-Selection & Anti-Cursor Directives */
@@ -63,7 +71,6 @@
             cursor: text !important;
         }
 
-        /* Specific fix for time input icons in dark mode */
         input[type="time"]::-webkit-calendar-picker-indicator {
             filter: invert(1);
             cursor: pointer !important;
@@ -71,7 +78,7 @@
 
         body {
             background-color: var(--bg-color);
-            background-image: radial-gradient(circle at 50% 0%, #161b22 0%, #000000 70%);
+            /* Removed radial gradient for pure AMOLED black */
             color: var(--text-color);
             font-family: var(--body-font);
             display: flex;
@@ -98,10 +105,10 @@
 
         .glass-panel {
             background: var(--glass-bg);
-            backdrop-filter: blur(16px) saturate(180%);
-            -webkit-backdrop-filter: blur(16px) saturate(180%);
+            backdrop-filter: blur(25px) saturate(200%); /* Enhanced blur for One UI */
+            -webkit-backdrop-filter: blur(25px) saturate(200%);
             border: 1px solid var(--border-color);
-            border-radius: 24px;
+            border-radius: 32px; /* Smoother, heavier rounding */
             box-shadow: var(--card-depth-shadow);
             padding: 25px;
             width: 90vw;
@@ -130,15 +137,15 @@
         .schedule-arc { fill: none; stroke-linecap: round; transition: stroke 0.3s ease-in-out; }
         .active-routine-arc {
             fill: none; stroke: var(--active-routine-color); stroke-linecap: round;
-            filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.8));
+            filter: drop-shadow(0 0 8px rgba(62, 145, 255, 0.6));
         }
 
         .center-activity-label {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
             font-size: 1.15rem; font-weight: 700; color: var(--active-routine-color);
             text-align: center; max-width: 75%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-            padding: 8px 12px; border-radius: 12px; background: rgba(0, 0, 0, 0.7);
-            border: 1px solid rgba(255, 215, 0, 0.2); backdrop-filter: blur(4px);
+            padding: 8px 12px; border-radius: 16px; background: rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(62, 145, 255, 0.15); backdrop-filter: blur(8px);
         }
 
         /* --- Advanced Routine Timeline View Styling --- */
@@ -146,43 +153,50 @@
             width: 100%;
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 5px; /* SPECIFIC REQUEST: 5px padding between routines */
             margin-bottom: 1.5rem;
         }
         
         .timeline-header {
-            display: grid;
-            grid-template-columns: 2fr 1.5fr 1fr 1fr;
-            padding: 10px 16px;
-            color: var(--text-muted);
-            font-weight: 600;
-            text-transform: uppercase;
-            font-size: 0.75rem;
-            letter-spacing: 0.08em;
-            border-bottom: 1px solid var(--border-color);
+            display: none;
         }
 
         .timeline-row {
-            display: grid;
-            grid-template-columns: 2fr 1.5fr 1fr 1fr;
-            align-items: center;
-            padding: 14px 16px;
-            background: rgba(255, 255, 255, 0.01);
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding: 15px 18px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid transparent; /* Removed high contrast borders */
+            border-radius: 24px; /* Soft One UI styling */
             transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            margin-top: 10px;
         }
 
         .timeline-row:hover {
             background: var(--glass-bg-hover);
-            border-color: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.08);
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
 
         .timeline-row.active-current {
-            border-color: rgba(255, 215, 0, 0.3);
-            background: rgba(255, 215, 0, 0.03);
+            border-color: rgba(62, 145, 255, 0.2);
+            background: rgba(62, 145, 255, 0.05);
+        }
+
+        .timeline-row-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .timeline-row-bottom {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
         }
 
         .activity-meta {
@@ -190,7 +204,7 @@
             align-items: center;
             gap: 12px;
             font-weight: 600;
-            font-size: 0.95rem;
+            font-size: 1.05rem; 
             min-width: 0;
         }
 
@@ -201,8 +215,8 @@
         }
 
         .activity-indicator-dot {
-            width: 8px;
-            height: 8px;
+            width: 10px;
+            height: 10px;
             border-radius: 50%;
             flex-shrink: 0;
             box-shadow: 0 0 8px cubic-bezier(0.4, 0, 0.2, 1);
@@ -221,198 +235,188 @@
             font-size: 0.8rem;
         }
 
+        /* 3-Dot Menu Styling */
+        .action-menu-wrapper { position: relative; }
+
+        .action-menu-btn {
+            background: transparent; border: none; color: var(--text-muted); padding: 4px 8px;
+            font-size: 1rem; border-radius: 6px; width: auto; height: auto; cursor: pointer !important;
+            transition: color 0.2s, background 0.2s;
+        }
+
+        .action-menu-btn:hover { color: var(--text-color); background: rgba(255, 255, 255, 0.08); }
+
+        .action-menu-dropdown {
+            position: absolute; top: 100%; right: 0; background: #151515; backdrop-filter: blur(25px);
+            border: 1px solid var(--border-color); border-radius: 16px; padding: 6px; display: none;
+            flex-direction: column; gap: 4px; min-width: 130px; z-index: 100; box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+        }
+
+        .action-menu-dropdown.show { display: flex; }
+
+        .action-menu-dropdown button {
+            background: transparent; border: none; padding: 10px 14px; text-align: left; width: 100%;
+            border-radius: 12px; font-size: 0.85rem; color: var(--text-color); justify-content: flex-start;
+            transition: background 0.2s;
+        }
+
+        .action-menu-dropdown button:hover { background: rgba(255, 255, 255, 0.1); }
+        .action-menu-dropdown button.delete-btn { color: var(--danger-text); }
+        .action-menu-dropdown button.delete-btn:hover { background: var(--danger-hover-bg); color: #ffffff; }
+
         /* Modern Dynamic Status Tags */
         .status-pill {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 700;
-            letter-spacing: 0.03em;
-            width: max-content;
+            display: inline-flex; align-items: center; justify-content: center; padding: 4px 12px;
+            border-radius: 20px; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.03em; width: max-content;
         }
 
         .status-pill.now {
-            background: rgba(255, 215, 0, 0.15);
-            color: var(--active-routine-color);
-            border: 1px solid rgba(255, 215, 0, 0.25);
-            animation: pulse-glow 2s infinite alternate;
+            background: rgba(62, 145, 255, 0.15); color: var(--active-routine-color);
+            border: 1px solid rgba(62, 145, 255, 0.3); animation: pulse-glow 2s infinite alternate;
         }
 
         .status-pill.upcoming {
-            background: rgba(88, 166, 255, 0.1);
-            color: var(--accent-color);
-            border: 1px solid rgba(88, 166, 255, 0.2);
+            background: rgba(255, 255, 255, 0.05); color: var(--text-muted); border: 1px solid transparent;
         }
 
         .status-pill.done {
-            background: rgba(16, 185, 129, 0.1);
-            color: var(--accent-success);
-            border: 1px solid rgba(16, 185, 129, 0.2);
+            background: rgba(50, 215, 75, 0.1); color: var(--accent-success); border: 1px solid rgba(50, 215, 75, 0.2);
         }
 
         @keyframes pulse-glow {
-            from { box-shadow: 0 0 2px rgba(255, 215, 0, 0.2); }
-            to { box-shadow: 0 0 10px rgba(255, 215, 0, 0.4); }
-        }
-
-        .timeline-actions {
-            display: flex;
-            gap: 8px;
-            justify-content: flex-end;
-        }
-
-        .timeline-actions button {
-            padding: 8px;
-            font-size: 0.85rem;
-            border-radius: 10px;
-            width: 34px;
-            height: 34px;
-            cursor: pointer !important;
-        }
-
-        .timeline-actions button.edit-btn {
-            color: var(--accent-color);
-        }
-        .timeline-actions button.delete-btn {
-            color: var(--danger-text);
-        }
-        .timeline-actions button.delete-btn:hover {
-            background-color: var(--danger-hover-bg);
-            color: #ffffff;
+            from { box-shadow: 0 0 2px rgba(62, 145, 255, 0.2); }
+            to { box-shadow: 0 0 10px rgba(62, 145, 255, 0.4); }
         }
 
         .form-group { margin-bottom: 1.25rem; }
         .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 600; font-size: 0.9rem; color: var(--text-color); }
         .form-group input, .form-group select {
-            width: 100%; padding: 12px 16px; border: 1px solid var(--border-color); border-radius: 14px;
+            width: 100%; padding: 14px 18px; border: 1px solid var(--border-color); border-radius: 18px;
             background-color: var(--input-bg); color: var(--text-color); font-family: var(--body-font); font-size: 1rem;
             box-sizing: border-box; transition: border-color 0.2s, box-shadow 0.2s;
         }
         .form-group input:focus, .form-group select:focus {
-            outline: none; border-color: var(--accent-color); box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.25);
+            outline: none; border-color: var(--accent-color); box-shadow: 0 0 0 3px rgba(62, 145, 255, 0.2);
         }
         
         .button-group { display: flex; gap: 10px; margin-top: 1.5rem; }
         button {
-            padding: 12px 20px; border: none; border-radius: 14px; font-family: var(--body-font); font-size: 0.95rem;
+            padding: 14px 22px; border: none; border-radius: 24px; font-family: var(--body-font); font-size: 0.95rem;
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); font-weight: 600; display: inline-flex;
             align-items: center; justify-content: center; gap: 8px; box-sizing: border-box;
         }
         button.primary { background-color: var(--button-bg-primary); color: var(--button-text-primary); }
         button.primary:hover { background-color: var(--button-hover-bg-primary); transform: translateY(-1px); }
-        button.secondary { background-color: var(--button-bg-secondary); color: var(--button-text-secondary); border: 1px solid var(--border-color); }
+        button.secondary { background-color: var(--button-bg-secondary); color: var(--button-text-secondary); }
         button.secondary:hover { background-color: var(--button-hover-bg-secondary); transform: translateY(-1px); }
-        button.danger { background-color: var(--danger-bg); color: #FFFFFF; }
-        button.danger:hover { background-color: var(--danger-hover-bg); transform: translateY(-1px); }
+        button.danger { background-color: var(--danger-bg); color: var(--danger-text); }
+        button.danger:hover { background-color: var(--danger-hover-bg); color: #FFF; transform: translateY(-1px); }
         button:disabled { opacity: 0.4; transform: none !important; }
 
         .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.75);
-            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); display: flex; justify-content: center;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); display: flex; justify-content: center;
             align-items: center; z-index: 2000; visibility: hidden; opacity: 0; transition: opacity 0.3s ease, visibility 0.3s ease;
         }
         .modal-overlay.show { visibility: visible; opacity: 1; }
         .modal-content {
-            background: rgba(22, 27, 34, 0.7); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 28px;
-            padding: 30px; width: 85vw; max-width: 500px; box-shadow: 0 20px 50px rgba(0,0,0,0.9); position: relative;
+            background: rgba(25, 25, 25, 0.7); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 36px;
+            padding: 35px; width: 85vw; max-width: 500px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); position: relative;
             transform: translateY(-30px); transition: transform 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28); text-align: left;
         }
         .modal-overlay.show .modal-content { transform: translateY(0); }
         .modal-close-button {
-            position: absolute; top: 15px; right: 20px; font-size: 1.8rem; color: var(--text-muted);
+            position: absolute; top: 20px; right: 25px; font-size: 1.8rem; color: var(--text-muted);
             background: none; border: none; padding: 0; transition: color 0.2s;
         }
         .modal-close-button:hover { color: var(--text-color); }
 
         .arc-info-tooltip {
-            position: fixed; background-color: rgba(255, 255, 255, 0.1); color: #ffffff; backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.2); padding: 10px 14px;
-            border-radius: 16px; font-size: 0.85rem; pointer-events: none; opacity: 0; visibility: hidden;
+            position: fixed; background-color: rgba(30, 30, 30, 0.8); color: #ffffff; backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px); border: 1px solid rgba(255,255,255,0.05); padding: 12px 18px;
+            border-radius: 20px; font-size: 0.85rem; pointer-events: none; opacity: 0; visibility: hidden;
             transition: opacity 0.2s, visibility 0.2s; z-index: 3000; white-space: nowrap; transform: translate(-50%, -120%);
-            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.4);
         }
         .arc-info-tooltip.show { opacity: 1; visibility: visible; transform: translate(-50%, -120%); }
         .arc-info-tooltip .info-label { font-weight: 700; margin-bottom: 2px; color: var(--accent-color); }
 
         .tab-bar-container {
             position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex;
-            background-color: var(--tab-bar-bg); backdrop-filter: blur(24px) saturate(180%);
-            -webkit-backdrop-filter: blur(24px) saturate(180%); border: 1px solid var(--border-color);
-            border-radius: 30px; padding: 6px; box-shadow: 0 10px 35px rgba(0, 0, 0, 0.7); z-index: 1000;
+            background-color: var(--tab-bar-bg); backdrop-filter: blur(35px) saturate(200%);
+            -webkit-backdrop-filter: blur(35px) saturate(200%); border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 40px; padding: 6px; box-shadow: 0 10px 35px rgba(0, 0, 0, 0.5); z-index: 1000;
             gap: 6px; width: 85vw; max-width: 360px; justify-content: space-around;
         }
         .tab-button {
-            flex: 1; padding: 12px 16px; border: none; border-radius: 25px; font-size: 0.95rem; font-weight: 600;
+            flex: 1; padding: 12px 16px; border: none; border-radius: 35px; font-size: 0.95rem; font-weight: 600;
             transition: all 0.25s ease; background-color: transparent; color: var(--text-muted);
             display: flex; align-items: center; justify-content: center; gap: 8px;
         }
-        .tab-button.active { background-color: var(--tab-button-active-bg); color: var(--tab-button-active-text); box-shadow: 0 4px 12px rgba(255,255,255,0.15); }
-        .tab-button:hover:not(.active) { background-color: rgba(255, 255, 255, 0.08); color: var(--text-color); }
+        .tab-button.active { background-color: var(--tab-button-active-bg); color: var(--tab-button-active-text); }
+        .tab-button:hover:not(.active) { background-color: rgba(255, 255, 255, 0.05); color: var(--text-color); }
 
         .content-section { width: 100%; display: none; flex-direction: column; align-items: center; gap: 1.5rem; }
         .content-section.active { display: flex; }
 
-        .quiz-welcome-panel h2 { font-size: 1.6rem; font-weight: 700; margin-top: 0; background: linear-gradient(90deg, #ffffff, var(--accent-color)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .quiz-welcome-panel h2 { font-size: 1.6rem; font-weight: 700; margin-top: 0; color: var(--text-color); }
         .quiz-welcome-panel p { color: var(--text-muted); line-height: 1.5; font-size: 0.95rem; }
 
         .question-card {
             background: rgba(255, 255, 255, 0.02);
             border: 1px solid transparent; 
-            border-radius: 18px;
-            padding: 20px;
+            border-radius: 24px;
+            padding: 24px;
             margin-bottom: 1.25rem;
             transition: all 0.3s ease;
         }
 
-        .question-text { font-size: 1.1rem; font-weight: 600; margin-bottom: 15px; line-height: 1.4; }
+        .question-text { font-size: 1.1rem; font-weight: 600; margin-bottom: 18px; line-height: 1.4; }
         
-        .option-wrapper { margin-bottom: 8px; }
+        .option-wrapper { margin-bottom: 10px; }
         .option-wrapper label {
-            display: flex; align-items: center; padding: 10px 14px;
-            background: rgba(255, 255, 255, 0.03); 
-            border-radius: 12px;
+            display: flex; align-items: center; padding: 14px 16px;
+            background: rgba(255, 255, 255, 0.04); 
+            border-radius: 16px;
             transition: all 0.2s ease;
         }
-        .option-wrapper label:hover { background: rgba(255, 255, 255, 0.06); }
+        .option-wrapper label:hover { background: rgba(255, 255, 255, 0.08); }
         .option-wrapper input[type="radio"] { margin-right: 14px; accent-color: var(--accent-color); transform: scale(1.2); }
 
-        .eval-correct { border: 1px solid var(--accent-success) !important; background: rgba(16, 185, 129, 0.08) !important; }
-        .eval-incorrect { border: 1px solid var(--danger-hover-bg) !important; background: rgba(248, 81, 73, 0.08) !important; }
-        .eval-unanswered { border: 1px solid var(--accent-warning) !important; background: rgba(245, 158, 11, 0.08) !important; }
+        .eval-correct { border: 1px solid rgba(50, 215, 75, 0.3) !important; background: rgba(50, 215, 75, 0.05) !important; }
+        .eval-incorrect { border: 1px solid rgba(255, 69, 58, 0.3) !important; background: rgba(255, 69, 58, 0.05) !important; }
+        .eval-unanswered { border: 1px solid rgba(255, 214, 10, 0.3) !important; background: rgba(255, 214, 10, 0.05) !important; }
 
         .explanation-box {
-            background-color: rgba(88, 166, 255, 0.07); border-left: 4px solid var(--accent-color);
-            padding: 12px 16px; border-radius: 0 12px 12px 0; margin-top: 15px; font-size: 0.9rem; color: #c9d1d9; display: none;
+            background-color: rgba(62, 145, 255, 0.05); border-left: 4px solid var(--accent-color);
+            padding: 14px 18px; border-radius: 0 16px 16px 0; margin-top: 15px; font-size: 0.9rem; color: #c9d1d9; display: none;
         }
-        .feedback-banner { font-weight: 600; margin-top: 10px; font-size: 0.95rem; }
+        .feedback-banner { font-weight: 600; margin-top: 12px; font-size: 0.95rem; }
 
         .quiz-overlay {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background-color: rgba(0, 0, 0, 0.85); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+            background-color: rgba(0, 0, 0, 0.85); backdrop-filter: blur(35px); -webkit-backdrop-filter: blur(35px);
             z-index: 9999; display: none; justify-content: center; align-items: center; flex-direction: column; gap: 20px;
         }
         .quiz-overlay span { font-size: 2.2rem; font-weight: 800; letter-spacing: -0.03em; }
 
         .timer-badge {
-            position: fixed; top: 20px; right: 20px; background: rgba(22, 27, 34, 0.8); backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px); border: 1px solid var(--border-color); padding: 8px 14px; border-radius: 14px;
-            display: none; align-items: center; gap: 12px; font-weight: 600; font-size: 0.9rem; z-index: 1500; box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+            position: fixed; top: 20px; right: 20px; background: rgba(28, 28, 30, 0.8); backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px); border: 1px solid var(--border-color); padding: 10px 16px; border-radius: 20px;
+            display: none; align-items: center; gap: 12px; font-weight: 600; font-size: 0.9rem; z-index: 1500; box-shadow: 0 4px 20px rgba(0,0,0,0.3);
         }
-        .timer-badge button { padding: 4px 8px; font-size: 0.75rem; border-radius: 6px; }
+        .timer-badge button { padding: 6px 12px; font-size: 0.75rem; border-radius: 12px; }
 
         .hud-progress-container { position: fixed; bottom: 0; left: 0; width: 100%; height: 6px; background: rgba(255, 255, 255, 0.05); z-index: 99999; display: none; }
         .hud-progress-bar { height: 100%; width: 0%; background: var(--accent-success); transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
 
-        .results-panel { background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 20px; padding: 20px; text-align: center; display: none; width: 100%; box-sizing: border-box; }
+        .results-panel { background: rgba(50, 215, 75, 0.05); border: 1px solid rgba(50, 215, 75, 0.2); border-radius: 28px; padding: 25px; text-align: center; display: none; width: 100%; box-sizing: border-box; }
         .results-panel h3 { margin: 0 0 8px 0; color: var(--accent-success); font-size: 1.4rem; }
 
         #hud-toast {
-            position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%) translateY(20px); background: rgba(255, 255, 255, 0.95);
-            color: #000000; padding: 12px 24px; border-radius: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); font-weight: 600;
-            font-size: 0.9rem; z-index: 5000; opacity: 0; visibility: hidden; transition: opacity 0.3s, transform 0.3s, visibility 0.3s;
+            position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%) translateY(20px); background: rgba(240, 240, 240, 0.95);
+            color: #000000; padding: 14px 28px; border-radius: 40px; box-shadow: 0 10px 30px rgba(0,0,0,0.4); font-weight: 600;
+            font-size: 0.95rem; z-index: 5000; opacity: 0; visibility: hidden; transition: opacity 0.3s, transform 0.3s, visibility 0.3s;
         }
         #hud-toast.show { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
 
@@ -426,32 +430,43 @@
         }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* Modern Structural Layout Adaptability */
         @media (max-width: 600px) {
             body { padding: 12px; padding-bottom: 100px; }
-            .glass-panel { padding: 16px; }
-            .timeline-header { display: none; }
-            .timeline-row {
-                grid-template-columns: 1fr;
-                gap: 12px;
-                padding: 16px;
-            }
-            .timeline-actions {
-                justify-content: flex-start;
-                border-top: 1px solid var(--border-color);
-                padding-top: 12px;
-                margin-top: 4px;
-            }
+            .glass-panel { padding: 20px; }
             .button-group { flex-direction: column; }
             button { width: 100%; }
             .tab-bar-container { width: calc(100% - 24px); }
+        }
+         
+        .oneui-header-container {
+            width: 100%;
+            max-width: 650px;
+            text-align: left;
+            padding: 40px 12px 16px 12px;
+        }
+
+        .oneui-main-title {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin: 0 0 6px 0;
+            letter-spacing: -0.02em;
+            color: #FFFFFF;
+        }
+
+        .date-day-header {
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            margin: 0;
         }
     </style>
 </head>
 <body>
 
-    <div id="date-day-header" class="date-day-header"></div>
-
+    <div class="oneui-header-container">
+        <h1 id="oneui-app-title" class="oneui-main-title">Routine</h1>
+        <div id="date-day-header" class="date-day-header"></div>
+    </div>
     <div id="activity-section" class="content-section active">
         <div class="chart-container">
             <svg id="schedule-chart" class="chart" viewBox="0 0 100 100"></svg>
@@ -460,12 +475,7 @@
 
         <div class="glass-panel">
             <div class="timeline-wrapper">
-                <div class="timeline-header">
-                    <div>Activity</div>
-                    <div>Timeline</div>
-                    <div>Status</div>
-                    <div style="text-align: right;">Actions</div>
-                </div>
+                <div class="timeline-header"></div>
                 <div id="timeline-container"></div>
             </div>
             <button type="button" class="primary" id="add-activity-button" style="margin: 0 auto; display: inline-flex;">
@@ -496,7 +506,7 @@
             <p id="timeText" style="font-size: 0.95rem; color: var(--text-muted); margin: 0;"></p>
         </div>
 
-        <div id="controls" class="glass-panel" style="display: none; padding: 15px;">
+        <div id="controls" class="glass-panel" style="display: none; padding: 20px;">
             <div class="button-group" style="margin: 0;">
                 <button id="submitBtn" class="primary flex-1">Submit Test</button>
                 <button id="downloadPdfBtn" class="secondary flex-1"><i class="fas fa-file-pdf"></i> Save PDF</button>
@@ -570,7 +580,7 @@
 
     <div id="floatingTimerControls" class="timer-badge">
         <span id="timer"><i class="far fa-clock"></i> 00:00</span>
-        <button id="pauseBtn" class="secondary"><i class="fas fa-pause"></i> Focus Mode</button>
+        <button id="pauseBtn" class="secondary"><i class="fas fa-pause"></i> Focus</button>
     </div>
 
     <div id="quizOverlay" class="quiz-overlay">
@@ -589,10 +599,7 @@
         <button id="quiz-tab-btn" class="tab-button"><i class="fas fa-graduation-cap"></i> Quiz</button>
     </div>
 
-    <footer class="app-footer">
-        <a href="#">Privacy Policy</a> &bull; <a href="#">Terms of Service</a>
-        <p style="margin-top: 8px; opacity:0.6;">&copy; 2026 Daily Rhythm. Fully Localized.</p>
-    </footer>
+    
 
     <script type="module">
         const LOCAL_STORAGE_KEY_SCHEDULE = 'dailyRhythmSchedule';
@@ -604,7 +611,8 @@
         const svgNS = "http://www.w3.org/2000/svg";
         const cx = 50; const cy = 50; const radius = 45;
         const strokeWidth = 9; const activeBarStrokeWidth = 7;
-
+        
+        const appTitle = document.getElementById('oneui-app-title');
         const dateDayHeader = document.getElementById('date-day-header');
         const svgChart = document.getElementById('schedule-chart');
         const centerActivityLabel = document.getElementById('center-activity-label');
@@ -761,7 +769,6 @@
                 activeBar.style.display = 'block'; centerActivityLabel.textContent = activeRoutine.label;
             } else { activeBar.style.display = 'none'; centerActivityLabel.textContent = "No Active Routine"; }
 
-            // Dynamic background evaluation loop mapping to UI cards seamlessly
             document.querySelectorAll('.timeline-row').forEach(row => {
                 const item = currentScheduleData.find(i => i.id === row.dataset.id);
                 if(item) {
@@ -770,7 +777,7 @@
                     row.className = `timeline-row ${status === 'now' ? 'active-current' : ''}`;
                     if(pill) {
                         pill.className = `status-pill ${status}`;
-                        pill.innerHTML = status === 'now' ? '<i class="fas fa-spinner fa-spin style="margin-right:4px;"></i> Active Now' : (status === 'done' ? 'Completed' : 'Upcoming');
+                        pill.innerHTML = status === 'now' ? '<i class="fas fa-spinner fa-spin" style="margin-right:4px;"></i> Active Now' : (status === 'done' ? 'Completed' : 'Upcoming');
                     }
                 }
             });
@@ -799,22 +806,39 @@
                 if(status === 'done') pillText = 'Completed';
 
                 row.innerHTML = `
-                    <div class="activity-meta">
-                        <div class="activity-indicator-dot" style="background:${item.color}; box-shadow: 0 0 8px ${item.color};"></div>
-                        <span>${item.label}</span>
+                    <div class="timeline-row-top">
+                        <div class="activity-meta">
+                            <div class="activity-indicator-dot" style="background:${item.color}; box-shadow: 0 0 8px ${item.color};"></div>
+                            <span>${item.label}</span>
+                        </div>
+                        <div class="action-menu-wrapper">
+                            <button class="action-menu-btn" title="Options"><i class="fas fa-ellipsis-v"></i></button>
+                            <div class="action-menu-dropdown">
+                                <button class="edit-btn"><i class="fas fa-edit"></i> Edit Activity</button>
+                                <button class="delete-btn"><i class="fas fa-trash-alt"></i> Delete</button>
+                            </div>
+                        </div>
                     </div>
-                    <div class="time-duration-box">
-                        <i class="far fa-clock"></i>
-                        <span>${formatTime(item.startH, item.startM)} - ${formatTime(item.endH, item.endM)}</span>
-                    </div>
-                    <div>
+                    <div class="timeline-row-bottom">
+                        <div class="time-duration-box">
+                            <i class="far fa-clock"></i>
+                            <span>${formatTime(item.startH, item.startM)} - ${formatTime(item.endH, item.endM)}</span>
+                        </div>
                         <span class="status-pill ${status}">${pillText}</span>
                     </div>
-                    <div class="timeline-actions">
-                        <button class="secondary edit-btn"><i class="fas fa-edit"></i></button>
-                        <button class="secondary delete-btn"><i class="fas fa-trash-alt"></i></button>
-                    </div>
                 `;
+
+                const menuBtn = row.querySelector('.action-menu-btn');
+                const dropdown = row.querySelector('.action-menu-dropdown');
+                
+                menuBtn.onclick = (e) => {
+                    e.stopPropagation(); 
+                    document.querySelectorAll('.action-menu-dropdown.show').forEach(d => {
+                        if (d !== dropdown) d.classList.remove('show');
+                    });
+                    dropdown.classList.toggle('show');
+                };
+
                 row.querySelector('.edit-btn').onclick = () => editActivity(item);
                 row.querySelector('.delete-btn').onclick = () => deleteActivity(item.id);
                 timelineContainer.appendChild(row);
@@ -885,8 +909,15 @@
         function switchTab(target) {
             activityTabBtn.classList.remove('active'); quizTabBtn.classList.remove('active');
             activitySection.classList.remove('active'); quizSection.classList.remove('active');
-            if(target === 'activity') { activityTabBtn.classList.add('active'); activitySection.classList.add('active'); } 
-            else { quizTabBtn.classList.add('active'); quizSection.classList.add('active'); }
+            if(target === 'activity') { 
+                activityTabBtn.classList.add('active'); 
+                activitySection.classList.add('active'); 
+                appTitle.textContent = "Routine";
+            } else { 
+                quizTabBtn.classList.add('active'); 
+                quizSection.classList.add('active'); 
+                appTitle.textContent = "Quiz practice";
+            }
         }
 
         function cleanTextForComparison(text) { return text ? text.toString().replace(/^[a-zA-Z][.)]\s*/, '').trim() : ''; }
@@ -1201,9 +1232,14 @@
             updateDateHeader();
             const storedSchedule = localStorage.getItem(LOCAL_STORAGE_KEY_SCHEDULE);
             currentScheduleData = storedSchedule ? JSON.parse(storedSchedule) : [];
-            drawChart(); createScheduleTable(); loadQuizFromLocalStorage();
+            drawChart(); 
+            createScheduleTable(); 
+            loadQuizFromLocalStorage();
+
+            document.addEventListener('click', () => {
+                document.querySelectorAll('.action-menu-dropdown.show').forEach(d => d.classList.remove('show'));
+            });
         });
     </script>
 </body>
 </html>
-
