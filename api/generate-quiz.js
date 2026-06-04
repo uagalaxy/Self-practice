@@ -66,7 +66,7 @@ Ensure the options are clearly distinct and the question is clear. For example:
         };
 
         // Construct the full URL for the Gemini API endpoint
-        const geminiApiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+        const geminiApiUrl = ` https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent?key=${GEMINI_API_KEY}`;
 
         // Make the actual HTTP POST request to the Gemini API
         const geminiResponse = await fetch(geminiApiUrl, {
