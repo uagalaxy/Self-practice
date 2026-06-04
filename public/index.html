@@ -1203,8 +1203,7 @@
                 
                 q.options.forEach((opt, oIdx) => {
                     parsePdfText(`${String.fromCharCode(65+oIdx)}. ${cleanTextForComparison(opt)}`, 11, false, null, 15);
-                    parsePdfText(`Correct Answer: ${cleanedCorrect}`, 11, true, [16, 185, 129], 15);
-                    parsePdfText(`Explanation: ${q.explanation}`, 11, false, [100,100,100], 15);
+                    
                 });
 
                 if(quizState.submitted) {
