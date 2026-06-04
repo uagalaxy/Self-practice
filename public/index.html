@@ -62,6 +62,12 @@
             cursor: text !important;
         }
 
+        /* Specific fix for time input icons in dark mode */
+        input[type="time"]::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+            cursor: pointer !important;
+        }
+
         body {
             background-color: var(--bg-color);
             background-image: radial-gradient(circle at 50% 0%, #161b22 0%, #000000 70%);
@@ -81,19 +87,12 @@
             box-sizing: border-box;
         }
 
-        h1 {
-            font-weight: 700;
-            font-size: 2.2rem;
-            color: var(--text-color);
-            margin: 0.5rem 0 0 0;
-            letter-spacing: -0.05em;
-        }
-
         .date-day-header {
             font-size: 1.1rem;
             font-weight: 500;
             color: var(--text-muted);
             margin-bottom: 0.5rem;
+            margin-top: 1rem;
         }
 
         .glass-panel {
@@ -156,17 +155,15 @@
 
         .form-group { margin-bottom: 1.25rem; }
         .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 600; font-size: 0.9rem; color: var(--text-color); }
-        .form-group input[type="text"], .form-group select {
+        .form-group input, .form-group select {
             width: 100%; padding: 12px 16px; border: 1px solid var(--border-color); border-radius: 14px;
             background-color: var(--input-bg); color: var(--text-color); font-family: var(--body-font); font-size: 1rem;
             box-sizing: border-box; transition: border-color 0.2s, box-shadow 0.2s;
         }
-        .form-group input[type="text"]:focus, .form-group select:focus {
+        .form-group input:focus, .form-group select:focus {
             outline: none; border-color: var(--accent-color); box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.25);
         }
-        .time-inputs { display: flex; gap: 10px; }
-        .time-inputs select { flex: 1; }
-
+        
         .button-group { display: flex; gap: 10px; margin-top: 1.5rem; }
         button {
             padding: 12px 20px; border: none; border-radius: 14px; font-family: var(--body-font); font-size: 0.95rem;
@@ -230,10 +227,9 @@
         .quiz-welcome-panel h2 { font-size: 1.6rem; font-weight: 700; margin-top: 0; background: linear-gradient(90deg, #ffffff, var(--accent-color)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .quiz-welcome-panel p { color: var(--text-muted); line-height: 1.5; font-size: 0.95rem; }
 
-        /* Cleaned Up Question Domain Styling Module */
         .question-card {
             background: rgba(255, 255, 255, 0.02);
-            border: 1px solid transparent; /* Removed heavy borders */
+            border: 1px solid transparent; 
             border-radius: 18px;
             padding: 20px;
             margin-bottom: 1.25rem;
@@ -252,7 +248,6 @@
         .option-wrapper label:hover { background: rgba(255, 255, 255, 0.06); }
         .option-wrapper input[type="radio"] { margin-right: 14px; accent-color: var(--accent-color); transform: scale(1.2); }
 
-        /* Dynamic Evaluation Classes */
         .eval-correct { border: 1px solid var(--accent-success) !important; background: rgba(16, 185, 129, 0.08) !important; }
         .eval-incorrect { border: 1px solid var(--danger-hover-bg) !important; background: rgba(248, 81, 73, 0.08) !important; }
         .eval-unanswered { border: 1px solid var(--accent-warning) !important; background: rgba(245, 158, 11, 0.08) !important; }
@@ -302,10 +297,8 @@
 
         @media (max-width: 600px) {
             body { padding: 12px; padding-bottom: 100px; }
-            h1 { font-size: 1.75rem; }
             .glass-panel { padding: 16px; }
             th, td { padding: 10px 8px; font-size: 0.85rem; }
-            .time-inputs { flex-direction: column; }
             .button-group { flex-direction: column; }
             button { width: 100%; }
             .tab-bar-container { width: calc(100% - 24px); }
@@ -314,7 +307,6 @@
 </head>
 <body>
 
-    <h1>My Daily Rhythm App</h1>
     <div id="date-day-header" class="date-day-header"></div>
 
     <div id="activity-section" class="content-section active">
@@ -345,22 +337,22 @@
 
     <div id="quiz-section" class="content-section">
         <div id="landingPage" class="glass-panel quiz-welcome-panel">
-            <h2>Master Any Subject dynamically! 🚀</h2>
-            <p>Generate high-end personalized quiz structures dynamically. Test tracking metrics instantly with offline support parameters.</p>
+            <h2>Master Any Subject! 🚀</h2>
+            <p>Create personalized quizzes effortlessly. Test your knowledge and track your results offline.</p>
             <button id="startQuizBtn" class="primary w-full" style="margin-top: 15px;">
-                <i class="fas fa-magic"></i> Configure Quiz Engine
+                <i class="fas fa-magic"></i> Create Quiz
             </button>
         </div>
 
         <div id="loadingIndicator" style="display:none; text-align:center; width:100%;">
             <div class="loader-ring"></div>
-            <p>Contacting Engine Protocol...</p>
+            <p>Generating your quiz...</p>
         </div>
 
         <div id="quizContainer" class="glass-panel" style="display: none; background: rgba(255,255,255,0.02);"></div>
 
         <div id="resultsContainer" class="results-panel glass-panel">
-            <h3>Quiz Analysis Finalized</h3>
+            <h3>Quiz Results</h3>
             <p id="scoreText" style="font-size: 1.1rem; margin: 5px 0;"></p>
             <p id="timeText" style="font-size: 0.95rem; color: var(--text-muted); margin: 0;"></p>
         </div>
@@ -381,21 +373,17 @@
             <form id="activity-form">
                 <input type="hidden" id="activity-id">
                 <div class="form-group">
-                    <label for="activity-label">Activity Label:</label>
+                    <label for="activity-label">Activity Name:</label>
                     <input type="text" id="activity-label" placeholder="e.g., Work, Sleep, Gym" required>
                 </div>
-                <div class="form-group">
-                    <label>Start Time:</label>
-                    <div class="time-inputs">
-                        <select id="start-hour" required></select>
-                        <select id="start-minute" required></select>
+                <div style="display: flex; gap: 10px;">
+                    <div class="form-group" style="flex: 1;">
+                        <label for="start-time">Start Time:</label>
+                        <input type="time" id="start-time" required>
                     </div>
-                </div>
-                <div class="form-group">
-                    <label>End Time:</label>
-                    <div class="time-inputs">
-                        <select id="end-hour" required></select>
-                        <select id="end-minute" required></select>
+                    <div class="form-group" style="flex: 1;">
+                        <label for="end-time">End Time:</label>
+                        <input type="time" id="end-time" required>
                     </div>
                 </div>
                 <div class="button-group">
@@ -409,12 +397,12 @@
     <div id="inputModal" class="modal-overlay">
         <div class="modal-content">
             <button class="modal-close-button" id="closeQuizConfigBtn">&times;</button>
-            <h2 style="margin-top: 0; margin-bottom: 1.5rem; font-size: 1.4rem;">Setup Self Quiz Engine</h2>
+            <h2 style="margin-top: 0; margin-bottom: 1.5rem; font-size: 1.4rem;">Setup Quiz</h2>
             <div class="form-group">
-                <label for="modalTopicInput">Subject Matter Topic:</label>
+                <label for="modalTopicInput">Quiz Topic:</label>
                 <input type="text" id="modalTopicInput" placeholder="e.g., Quantum Mechanics, European History" required>
             </div>
-            <div class="time-inputs" style="margin-bottom: 1.25rem;">
+            <div style="display: flex; gap: 10px; margin-bottom: 1.25rem;">
                 <div class="form-group" style="flex: 1; margin: 0;">
                     <label for="modalDifficultySelect">Difficulty Level:</label>
                     <select id="modalDifficultySelect">
@@ -424,15 +412,15 @@
                     </select>
                 </div>
                 <div class="form-group" style="flex: 1; margin: 0;">
-                    <label for="modalNumQuestionsSelect">Total Items:</label>
+                    <label for="modalNumQuestionsSelect">Total Questions:</label>
                     <select id="modalNumQuestionsSelect">
-                        <option value="5" selected>5 Items</option>
-                        <option value="10">10 Items</option>
-                        <option value="20">20 Items</option>
+                        <option value="5" selected>5 Questions</option>
+                        <option value="10">10 Questions</option>
+                        <option value="20">20 Questions</option>
                     </select>
                 </div>
             </div>
-            <button id="generateBtn" class="primary w-full"><i class="fas fa-cog"></i> Construct Engine Questions</button>
+            <button id="generateBtn" class="primary w-full"><i class="fas fa-cog"></i> Generate Questions</button>
         </div>
     </div>
 
@@ -443,12 +431,12 @@
 
     <div id="floatingTimerControls" class="timer-badge">
         <span id="timer"><i class="far fa-clock"></i> 00:00</span>
-        <button id="pauseBtn" class="secondary"><i class="fas fa-pause"></i> Focus Lock</button>
+        <button id="pauseBtn" class="secondary"><i class="fas fa-pause"></i> Focus Mode</button>
     </div>
 
     <div id="quizOverlay" class="quiz-overlay">
-        <span>Focus Shield Engaged</span>
-        <button id="overlayResumeBtn" class="primary"><i class="fas fa-play"></i> Unlock Content</button>
+        <span>Focus Mode Engaged</span>
+        <button id="overlayResumeBtn" class="primary"><i class="fas fa-play"></i> Resume Quiz</button>
     </div>
 
     <div id="progressWrapper" class="hud-progress-container">
@@ -459,12 +447,12 @@
 
     <div class="tab-bar-container">
         <button id="activity-tab-btn" class="tab-button active"><i class="fas fa-chart-pie"></i> Routine</button>
-        <button id="quiz-tab-btn" class="tab-button"><i class="fas fa-graduation-cap"></i> Self Quiz</button>
+        <button id="quiz-tab-btn" class="tab-button"><i class="fas fa-graduation-cap"></i> Quiz</button>
     </div>
 
     <footer class="app-footer">
-        <a href="#">Security Parameters</a> &bull; <a href="#">Local State Terms</a>
-        <p style="margin-top: 8px; opacity:0.6;">&copy; 2026 Daily Rhythm Frameworks. Fully Localized Array.</p>
+        <a href="#">Privacy Policy</a> &bull; <a href="#">Terms of Service</a>
+        <p style="margin-top: 8px; opacity:0.6;">&copy; 2026 Daily Rhythm. Fully Localized.</p>
     </footer>
 
     <script type="module">
@@ -489,10 +477,8 @@
         const activityForm = document.getElementById('activity-form');
         const activityIdInput = document.getElementById('activity-id');
         const activityLabelInput = document.getElementById('activity-label');
-        const startHourSelect = document.getElementById('start-hour');
-        const startMinuteSelect = document.getElementById('start-minute');
-        const endHourSelect = document.getElementById('end-hour');
-        const endMinuteSelect = document.getElementById('end-minute');
+        const startTimeInput = document.getElementById('start-time');
+        const endTimeInput = document.getElementById('end-time');
         const saveButton = document.getElementById('save-button');
         const cancelEditButton = document.getElementById('cancel-edit-button');
         const formTitle = document.getElementById('form-title');
@@ -507,6 +493,7 @@
         const quizSection = document.getElementById('quiz-section');
 
         let quizState = {
+            topic: '',
             activeQuestions: [],
             selections: {},
             submitted: false,
@@ -544,19 +531,6 @@
             const el = document.getElementById('hud-toast');
             el.textContent = msg; el.classList.add('show');
             setTimeout(() => el.classList.remove('show'), 3500);
-        }
-
-        function populateTimeSelects() {
-            startHourSelect.innerHTML = ''; endHourSelect.innerHTML = '';
-            startMinuteSelect.innerHTML = ''; endMinuteSelect.innerHTML = '';
-            for (let i = 0; i < 24; i++) {
-                const opt = i < 10 ? `0${i}` : i;
-                startHourSelect.add(new Option(opt, i)); endHourSelect.add(new Option(opt, i));
-            }
-            for (let i = 0; i < 60; i += 5) {
-                const opt = i < 10 ? `0${i}` : i;
-                startMinuteSelect.add(new Option(opt, i)); endMinuteSelect.add(new Option(opt, i));
-            }
         }
 
         function polarToCartesian(centerX, centerY, r, angleInDegrees) {
@@ -640,7 +614,7 @@
         function createScheduleTable() {
             scheduleTableBody.innerHTML = '';
             if (currentScheduleData.length === 0) {
-                scheduleTableBody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--text-muted);">No assigned blocks found. Setup a routine to monitor progress.</td></tr>`;
+                scheduleTableBody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--text-muted);">No assigned activities found. Setup a routine to monitor progress.</td></tr>`;
                 return;
             }
             currentScheduleData.forEach(item => {
@@ -672,17 +646,19 @@
 
         function editActivity(item) {
             activityIdInput.value = item.id; activityLabelInput.value = item.label;
-            startHourSelect.value = item.startH; startMinuteSelect.value = item.startM;
-            endHourSelect.value = item.endH; endMinuteSelect.value = item.endM;
-            saveButton.textContent = 'Update Activity'; formTitle.textContent = 'Edit Activity Area';
+            
+            startTimeInput.value = `${String(item.startH).padStart(2, '0')}:${String(item.startM).padStart(2, '0')}`;
+            endTimeInput.value = `${String(item.endH).padStart(2, '0')}:${String(item.endM).padStart(2, '0')}`;
+            
+            saveButton.textContent = 'Update Activity'; formTitle.textContent = 'Edit Activity';
             activityModal.classList.add('show');
         }
 
         function deleteActivity(id) {
-            if(confirm("Purge selected routine timeframe block completely?")) {
+            if(confirm("Delete this activity?")) {
                 currentScheduleData = currentScheduleData.filter(i => i.id !== id);
                 localStorage.setItem(LOCAL_STORAGE_KEY_SCHEDULE, JSON.stringify(currentScheduleData));
-                drawChart(); createScheduleTable(); triggerHUDToast("Routine item purged successfully.");
+                drawChart(); createScheduleTable(); triggerHUDToast("Activity deleted.");
             }
         }
 
@@ -697,8 +673,11 @@
             e.preventDefault();
             const id = activityIdInput.value || generateUniqueId();
             const label = activityLabelInput.value.trim();
-            const startH = parseInt(startHourSelect.value); const startM = parseInt(startMinuteSelect.value);
-            const endH = parseInt(endHourSelect.value); const endM = parseInt(endMinuteSelect.value);
+            
+            const startH = parseInt(startTimeInput.value.split(':')[0]);
+            const startM = parseInt(startTimeInput.value.split(':')[1]);
+            const endH = parseInt(endTimeInput.value.split(':')[0]);
+            const endM = parseInt(endTimeInput.value.split(':')[1]);
             
             const existing = currentScheduleData.find(i => i.id === id);
             const color = existing ? existing.color : getRandomLightColor();
@@ -710,7 +689,7 @@
             currentScheduleData.sort((a,b) => (a.startH * 60 + a.startM) - (b.startH * 60 + b.startM));
             localStorage.setItem(LOCAL_STORAGE_KEY_SCHEDULE, JSON.stringify(currentScheduleData));
             
-            drawChart(); createScheduleTable(); activityModal.classList.remove('show'); triggerHUDToast("State synchronization verified.");
+            drawChart(); createScheduleTable(); activityModal.classList.remove('show'); triggerHUDToast("Activity saved.");
         };
 
         activityTabBtn.onclick = () => switchTab('activity');
@@ -728,12 +707,11 @@
         startQuizBtn.onclick = () => inputModal.classList.add('show');
         closeQuizConfigBtn.onclick = () => inputModal.classList.remove('show');
 
-        // Dynamic API Call Integration
         generateBtn.onclick = async () => {
             const topic = document.getElementById('modalTopicInput').value.trim();
             const difficulty = document.getElementById('modalDifficultySelect').value;
             const numQuestions = parseInt(document.getElementById('modalNumQuestionsSelect').value);
-            if(!topic) { alert("Please provide a target topic area configuration parameter."); return; }
+            if(!topic) { alert("Please provide a quiz topic."); return; }
 
             inputModal.classList.remove('show');
             landingPage.style.display = 'none';
@@ -755,6 +733,7 @@
                     controls.style.display = 'block';
                     progressWrapper.style.display = 'block';
 
+                    quizState.topic = topic;
                     quizState.activeQuestions = result;
                     quizState.selections = {};
                     quizState.submitted = false;
@@ -765,7 +744,7 @@
                     renderQuizStructure();
                     beginQuizTimer();
                     saveQuizToLocalStorage();
-                    triggerHUDToast("Quiz environment generated cleanly.");
+                    triggerHUDToast("Quiz ready!");
                 } else {
                     throw new Error(result.error || "Failed to fetch structured content.");
                 }
@@ -778,7 +757,7 @@
         };
 
         function renderQuizStructure() {
-            quizContainer.innerHTML = `<h2>Self Quiz Workspace Panel</h2>`;
+            quizContainer.innerHTML = `<h2>Quiz Workspace</h2>`;
             quizState.activeQuestions.forEach((q, idx) => {
                 const card = document.createElement('div');
                 card.className = 'question-card';
@@ -804,7 +783,7 @@
                     <div class="question-text">${idx + 1}. ${q.questionText}</div>
                     <div class="options-block">${optionsHtml}</div>
                     <div class="feedback-banner" id="fb-${idx}"></div>
-                    <div class="explanation-box" id="exp-${idx}"><strong>Exploratory Data:</strong> ${q.explanation}</div>
+                    <div class="explanation-box" id="exp-${idx}"><strong>Explanation:</strong> ${q.explanation}</div>
                 `;
 
                 card.querySelectorAll('input[type="radio"]').forEach(radio => {
@@ -842,10 +821,9 @@
 
         function updateTimerDisplayHUD() {
             const m = Math.floor(quizState.elapsedSeconds / 60); const s = quizState.elapsedSeconds % 60;
-            timerDisplay.innerHTML = `<i class="far fa-clock"></i> Session Pace: ${m < 10 ? '0'+m : m}:${s < 10 ? '0'+s : s}`;
+            timerDisplay.innerHTML = `<i class="far fa-clock"></i> Time: ${m < 10 ? '0'+m : m}:${s < 10 ? '0'+s : s}`;
         }
 
-        // Timer Pause + Document Lock logic
         pauseBtn.onclick = () => {
             quizState.isLocked = true; quizOverlay.style.display = 'flex';
             document.body.style.overflow = 'hidden';
@@ -865,7 +843,7 @@
             
             clearInterval(quizTimerInterval);
             quizState.submitted = true;
-            document.body.style.overflow = ''; // Release scroll lock safely
+            document.body.style.overflow = ''; 
             
             let finalScore = 0;
             quizState.activeQuestions.forEach((q, idx) => {
@@ -879,7 +857,6 @@
             saveQuizToLocalStorage();
         }
 
-        // Advanced Evaluation Feedback System 
         function applyQuizEvaluationFeedback() {
             floatingTimerControls.style.display = 'none';
             progressWrapper.style.display = 'none';
@@ -893,25 +870,24 @@
                 const selected = quizState.selections[idx];
                 const cleanedCorrect = cleanTextForComparison(q.correctAnswer);
 
-                // Disable inputs
                 card.querySelectorAll('input[type="radio"]').forEach(r => r.disabled = true);
                 exp.style.display = 'block';
 
                 if(selected === cleanedCorrect) {
                     card.classList.add('eval-correct');
-                    fb.innerHTML = `<span style="color:var(--accent-success);"><i class="fas fa-check-circle"></i> Correct verification match.</span>`;
+                    fb.innerHTML = `<span style="color:var(--accent-success);"><i class="fas fa-check-circle"></i> Correct!</span>`;
                 } else if(!selected) {
                     card.classList.add('eval-unanswered');
-                    fb.innerHTML = `<span style="color:var(--accent-warning);"><i class="fas fa-exclamation-triangle"></i> Unanswered item. Target: ${cleanedCorrect}</span>`;
+                    fb.innerHTML = `<span style="color:var(--accent-warning);"><i class="fas fa-exclamation-triangle"></i> Unanswered. Correct answer: ${cleanedCorrect}</span>`;
                 } else {
                     card.classList.add('eval-incorrect');
-                    fb.innerHTML = `<span style="color:var(--danger-hover-bg);"><i class="fas fa-times-circle"></i> Incorrect. Target parameter: ${cleanedCorrect}</span>`;
+                    fb.innerHTML = `<span style="color:var(--danger-hover-bg);"><i class="fas fa-times-circle"></i> Incorrect. Correct answer: ${cleanedCorrect}</span>`;
                 }
             });
 
-            scoreText.textContent = `Scored Accuracy Level: ${quizState.score} / ${quizState.activeQuestions.length} Units`;
+            scoreText.textContent = `Score: ${quizState.score} / ${quizState.activeQuestions.length}`;
             const m = Math.floor(quizState.elapsedSeconds / 60); const s = quizState.elapsedSeconds % 60;
-            timeText.textContent = `Chronograph Metric: ${m} Minutes ${s} Seconds elapsed.`;
+            timeText.textContent = `Time elapsed: ${m} Minutes ${s} Seconds`;
             resultsContainer.style.display = 'block';
             submitBtn.disabled = true;
             window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
@@ -921,7 +897,7 @@
             clearInterval(quizTimerInterval);
             localStorage.removeItem(LOCAL_STORAGE_KEY_QUIZ);
             document.body.style.overflow = '';
-            quizState = { activeQuestions: [], selections: {}, submitted: false, score: 0, elapsedSeconds: 0, isLocked: false };
+            quizState = { topic: '', activeQuestions: [], selections: {}, submitted: false, score: 0, elapsedSeconds: 0, isLocked: false };
             
             quizContainer.style.display = 'none'; controls.style.display = 'none';
             resultsContainer.style.display = 'none'; progressWrapper.style.display = 'none';
@@ -930,12 +906,13 @@
         }
 
         resetQuizBtn.onclick = () => {
-            if(confirm("Flush running self quiz parameters and return to welcome module?")) {
-                resetQuizEnv(); triggerHUDToast("Workspace configuration flushed cleanly.");
+            if(confirm("Reset quiz and return to the main menu?")) {
+                resetQuizEnv(); triggerHUDToast("Quiz reset successfully.");
             }
         };
 
         function saveQuizToLocalStorage() { localStorage.setItem(LOCAL_STORAGE_KEY_QUIZ, JSON.stringify(quizState)); }
+        
         function loadQuizFromLocalStorage() {
             const raw = localStorage.getItem(LOCAL_STORAGE_KEY_QUIZ);
             if(!raw) return;
@@ -952,13 +929,13 @@
                         if(quizState.isLocked) { quizOverlay.style.display = 'flex'; document.body.style.overflow = 'hidden'; }
                     } else { applyQuizEvaluationFeedback(); }
                 }
-            } catch(e) { console.error("Storage payload array corruption exception.", e); }
+            } catch(e) { console.error("Error loading saved quiz.", e); }
         }
 
-        // Fixed Diagnostic PDF Assembler System Engine
+        // Updated PDF Generator
         downloadPdfBtn.onclick = () => {
             if(quizState.activeQuestions.length === 0) return;
-            triggerHUDToast("Assembling mapped diagnostic PDF summary...");
+            triggerHUDToast("Generating PDF summary...");
             
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF({ orientation: 'p', unit: 'pt', format: 'a4' });
@@ -968,37 +945,47 @@
             const margin = 40;
             let currentY = 50;
 
-            // Safe Multi-line layout builder
-            function parsePdfText(text, size, isBold, colorRGB) {
-                doc.setFont("Helvetica", isBold ? "bold" : "normal");
-                doc.setFontSize(size);
-                if(colorRGB) doc.setTextColor(colorRGB[0], colorRGB[1], colorRGB[2]);
-                else doc.setTextColor(20, 20, 20);
-
-                const lines = doc.splitTextToSize(text, pageWidth - (margin * 2));
-                lines.forEach(line => {
-                    if (currentY + size > pageHeight - margin) { doc.addPage(); currentY = margin; }
-                    doc.text(line, margin, currentY + size);
-                    currentY += size + 5;
-                });
-                currentY += 5; 
+            function checkPageBreak(neededHeight) {
+                if (currentY + neededHeight > pageHeight - margin) {
+                    doc.addPage();
+                    currentY = margin;
+                }
             }
 
-            parsePdfText("Self Quiz Diagnostic Summary Report", 20, true);
+            function parsePdfText(text, size, isBold, colorRGB, indent = 0) {
+                doc.setFont("Helvetica", isBold ? "bold" : "normal");
+                doc.setFontSize(size);
+                if (colorRGB) doc.setTextColor(colorRGB[0], colorRGB[1], colorRGB[2]);
+                else doc.setTextColor(20, 20, 20);
+
+                const lines = doc.splitTextToSize(text, pageWidth - (margin * 2) - indent);
+                
+                checkPageBreak(lines.length * (size * 1.2));
+
+                lines.forEach(line => {
+                    doc.text(line, margin + indent, currentY + size);
+                    currentY += size * 1.2;
+                });
+                currentY += 5; // Paragraph spacing
+            }
+
+            const reportTitle = quizState.topic ? `${quizState.topic} Quiz Summary` : "Quiz Summary Report";
+            parsePdfText(reportTitle, 18, true);
             currentY += 10;
 
             if (quizState.submitted) {
-                parsePdfText(`Evaluation Score Target: ${quizState.score} / ${quizState.activeQuestions.length}`, 13, true, [16, 185, 129]);
+                parsePdfText(`Score: ${quizState.score} / ${quizState.activeQuestions.length}`, 13, true, [16, 185, 129]);
                 const m = Math.floor(quizState.elapsedSeconds / 60); const s = quizState.elapsedSeconds % 60;
-                parsePdfText(`Execution Timeline: ${m} Minutes ${s} Seconds`, 11, false, [100, 100, 100]);
+                parsePdfText(`Time Taken: ${m} Minutes ${s} Seconds`, 11, false, [100, 100, 100]);
                 currentY += 15;
             }
 
             quizState.activeQuestions.forEach((q, idx) => {
-                parsePdfText(`${idx + 1}. ${q.questionText}`, 12, true);
+                checkPageBreak(40);
+                parsePdfText(`Q${idx + 1}: ${q.questionText}`, 12, true);
                 
                 q.options.forEach((opt, oIdx) => {
-                    parsePdfText(`   [${String.fromCharCode(65+oIdx)}] ${cleanTextForComparison(opt)}`, 11, false);
+                    parsePdfText(`${String.fromCharCode(65+oIdx)}. ${cleanTextForComparison(opt)}`, 11, false, null, 15);
                 });
 
                 if(quizState.submitted) {
@@ -1006,23 +993,26 @@
                     const cleanedCorrect = cleanTextForComparison(q.correctAnswer);
 
                     if (selected === cleanedCorrect) {
-                        parsePdfText(`   Target Selected: Correct (${selected})`, 11, true, [16, 185, 129]);
+                        parsePdfText(`Your Answer: ${selected} (Correct)`, 11, true, [16, 185, 129], 15);
                     } else if (selected) {
-                        parsePdfText(`   Target Selected: Incorrect (${selected} | Need: ${cleanedCorrect})`, 11, true, [248, 81, 73]);
+                        parsePdfText(`Your Answer: ${selected} (Incorrect)`, 11, true, [248, 81, 73], 15);
+                        parsePdfText(`Correct Answer: ${cleanedCorrect}`, 11, true, [16, 185, 129], 15);
                     } else {
-                        parsePdfText(`   Target Selected: Unanswered (Need: ${cleanedCorrect})`, 11, true, [245, 158, 11]);
+                        parsePdfText(`Your Answer: [Not Answered]`, 11, true, [245, 158, 11], 15);
+                        parsePdfText(`Correct Answer: ${cleanedCorrect}`, 11, true, [16, 185, 129], 15);
                     }
-                    parsePdfText(`   Exploratory Data: ${q.explanation}`, 10, false, [100,100,100]);
+                    parsePdfText(`Explanation: ${q.explanation}`, 11, false, [100,100,100], 15);
                 }
-                currentY += 10;
+                currentY += 15;
             });
 
-            doc.save('Self_Quiz_Performance_Array.pdf');
-            triggerHUDToast("PDF document download pipeline dispatched successfully.");
+            const fileName = quizState.topic ? `${quizState.topic.replace(/[^a-zA-Z0-9]/g, '_')}_Quiz.pdf` : 'Quiz_Summary.pdf';
+            doc.save(fileName);
+            triggerHUDToast("PDF downloaded successfully.");
         };
 
         document.addEventListener('DOMContentLoaded', () => {
-            populateTimeSelects(); updateDateHeader();
+            updateDateHeader();
             const storedSchedule = localStorage.getItem(LOCAL_STORAGE_KEY_SCHEDULE);
             currentScheduleData = storedSchedule ? JSON.parse(storedSchedule) : [];
             drawChart(); createScheduleTable(); loadQuizFromLocalStorage();
@@ -1030,4 +1020,3 @@
     </script>
 </body>
 </html>
-
