@@ -363,7 +363,7 @@
         .quiz-welcome-panel p { color: var(--text-muted); line-height: 1.5; font-size: 0.95rem; }
 
         .question-card {
-            background: rgba(255, 255, 255, 0.02);
+            background:#ffffff22;
             border: 1px solid transparent; 
             border-radius: 24px;
             padding: 24px;
@@ -395,17 +395,17 @@
 
         .quiz-overlay {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background-color: rgba(0, 0, 0, 0.85); backdrop-filter: blur(35px); -webkit-backdrop-filter: blur(35px);
+            background-color: rgba(0, 0, 0, 0.85); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(35px);
             z-index: 9999; display: none; justify-content: center; align-items: center; flex-direction: column; gap: 20px;
         }
-        .quiz-overlay span { font-size: 2.2rem; font-weight: 800; letter-spacing: -0.03em; }
-
+        .quiz-overlay span { width:100%; font-size: 2.2rem; font-weight: 800; letter-spacing: -0.03em; }
+        .quiz-overlay button { width: 50%; }
         .timer-badge {
             position: fixed; top: 20px; right: 20px; background: rgba(28, 28, 30, 0.8); backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px); border: 1px solid var(--border-color); padding: 10px 16px; border-radius: 20px;
+            -webkit-backdrop-filter: blur(15px); border: 1px solid var(--border-color); padding: 10px 10px; border-radius: 20px;
             display: none; align-items: center; gap: 12px; font-weight: 600; font-size: 0.9rem; z-index: 1500; box-shadow: 0 4px 20px rgba(0,0,0,0.3);
         }
-        .timer-badge button { padding: 6px 12px; font-size: 0.75rem; border-radius: 12px; }
+        .timer-badge button { margin-top:5px; padding: 6px 12px; font-size: 0.75rem; border-radius: 12px; }
 
         .hud-progress-container { position: fixed; bottom: 0; left: 0; width: 100%; height: 6px; background: rgba(255, 255, 255, 0.05); z-index: 99999; display: none; }
         .hud-progress-bar { height: 100%; width: 0%; background: var(--accent-success); transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
@@ -580,11 +580,11 @@
 
     <div id="floatingTimerControls" class="timer-badge">
         <span id="timer"><i class="far fa-clock"></i> 00:00</span>
-        <button id="pauseBtn" class="secondary"><i class="fas fa-pause"></i> Focus</button>
+        <button id="pauseBtn" class="secondary"><i class="fas fa-pause"></i> pause</button>
     </div>
 
     <div id="quizOverlay" class="quiz-overlay">
-        <span>Focus Mode Engaged</span>
+        <span>Test paused</span>
         <button id="overlayResumeBtn" class="primary"><i class="fas fa-play"></i> Resume Quiz</button>
     </div>
 
@@ -1027,7 +1027,7 @@
 
         function beginQuizTimer() {
             if(quizTimerInterval) clearInterval(quizTimerInterval);
-            floatingTimerControls.style.display = 'flex';
+            floatingTimerControls.style.display = 'block';
             updateTimerDisplayHUD();
             quizTimerInterval = setInterval(() => {
                 if(!quizState.isLocked && !quizState.submitted) {
@@ -1203,6 +1203,8 @@
                 
                 q.options.forEach((opt, oIdx) => {
                     parsePdfText(`${String.fromCharCode(65+oIdx)}. ${cleanTextForComparison(opt)}`, 11, false, null, 15);
+                    parsePdfText(`Correct Answer: ${cleanedCorrect}`, 11, true, [16, 185, 129], 15);
+                    parsePdfText(`Explanation: ${q.explanation}`, 11, false, [100,100,100], 15);
                 });
 
                 if(quizState.submitted) {
