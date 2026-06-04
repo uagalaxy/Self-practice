@@ -30,11 +30,12 @@
             --button-bg-primary: #FFFFFF; 
             --button-text-primary: #000000; 
             --button-hover-bg-primary: #E0E0E0; 
-            --button-bg-secondary: rgba(255, 255, 255, 0.1); 
+            --button-bg-secondary: rgba(255, 255, 255, 0.08); 
             --button-text-secondary: #FFFFFF; 
-            --button-hover-bg-secondary: rgba(255, 255, 255, 0.2);
-            --danger-bg: #da3633; 
-            --danger-hover-bg: #f85149;
+            --button-hover-bg-secondary: rgba(255, 255, 255, 0.18);
+            --danger-bg: rgba(218, 54, 51, 0.2); 
+            --danger-text: #ff6b6b;
+            --danger-hover-bg: #da3633;
             --input-bg: rgba(0, 0, 0, 0.6); 
             --accent-color: #58a6ff; 
             --accent-success: #10b981;
@@ -140,18 +141,148 @@
             border: 1px solid rgba(255, 215, 0, 0.2); backdrop-filter: blur(4px);
         }
 
-        .schedule-table-container {
-            width: 100%; overflow: hidden; border-radius: 16px; border: 1px solid var(--border-color);
-            background: rgba(0, 0, 0, 0.2); margin-bottom: 1rem;
+        /* --- Advanced Routine Timeline View Styling --- */
+        .timeline-wrapper {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 1.5rem;
         }
-        table { width: 100%; border-collapse: collapse; text-align: left; }
-        th, td { padding: 14px 16px; border-bottom: 1px solid var(--border-color); font-size: 0.95rem; }
-        th { background-color: rgba(22, 27, 34, 0.8); color: var(--text-muted); font-weight: 600; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 0.05em; }
-        tr:last-child td { border-bottom: none; }
-        tbody tr { transition: background-color 0.2s ease; }
-        tbody tr:hover { background-color: var(--glass-bg-hover); }
-        .table-actions { display: flex; gap: 8px; }
-        .table-actions button { padding: 6px 10px; font-size: 0.85rem; border-radius: 8px; flex: none; width: auto; }
+        
+        .timeline-header {
+            display: grid;
+            grid-template-columns: 2fr 1.5fr 1fr 1fr;
+            padding: 10px 16px;
+            color: var(--text-muted);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.08em;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .timeline-row {
+            display: grid;
+            grid-template-columns: 2fr 1.5fr 1fr 1fr;
+            align-items: center;
+            padding: 14px 16px;
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .timeline-row:hover {
+            background: var(--glass-bg-hover);
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+        }
+
+        .timeline-row.active-current {
+            border-color: rgba(255, 215, 0, 0.3);
+            background: rgba(255, 215, 0, 0.03);
+        }
+
+        .activity-meta {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            min-width: 0;
+        }
+
+        .activity-meta span {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .activity-indicator-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            box-shadow: 0 0 8px cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .time-duration-box {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: #e2e8f0;
+            font-size: 0.9rem;
+        }
+
+        .time-duration-box i {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
+        /* Modern Dynamic Status Tags */
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.03em;
+            width: max-content;
+        }
+
+        .status-pill.now {
+            background: rgba(255, 215, 0, 0.15);
+            color: var(--active-routine-color);
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            animation: pulse-glow 2s infinite alternate;
+        }
+
+        .status-pill.upcoming {
+            background: rgba(88, 166, 255, 0.1);
+            color: var(--accent-color);
+            border: 1px solid rgba(88, 166, 255, 0.2);
+        }
+
+        .status-pill.done {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--accent-success);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        @keyframes pulse-glow {
+            from { box-shadow: 0 0 2px rgba(255, 215, 0, 0.2); }
+            to { box-shadow: 0 0 10px rgba(255, 215, 0, 0.4); }
+        }
+
+        .timeline-actions {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+        }
+
+        .timeline-actions button {
+            padding: 8px;
+            font-size: 0.85rem;
+            border-radius: 10px;
+            width: 34px;
+            height: 34px;
+            cursor: pointer !important;
+        }
+
+        .timeline-actions button.edit-btn {
+            color: var(--accent-color);
+        }
+        .timeline-actions button.delete-btn {
+            color: var(--danger-text);
+        }
+        .timeline-actions button.delete-btn:hover {
+            background-color: var(--danger-hover-bg);
+            color: #ffffff;
+        }
 
         .form-group { margin-bottom: 1.25rem; }
         .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 600; font-size: 0.9rem; color: var(--text-color); }
@@ -203,7 +334,7 @@
             transition: opacity 0.2s, visibility 0.2s; z-index: 3000; white-space: nowrap; transform: translate(-50%, -120%);
             box-shadow: 0 8px 24px rgba(0,0,0,0.5);
         }
-        .arc-info-tooltip.show { opacity: 1; visibility: visible; }
+        .arc-info-tooltip.show { opacity: 1; visibility: visible; transform: translate(-50%, -120%); }
         .arc-info-tooltip .info-label { font-weight: 700; margin-bottom: 2px; color: var(--accent-color); }
 
         .tab-bar-container {
@@ -295,10 +426,22 @@
         }
         @keyframes spin { to { transform: rotate(360deg); } }
 
+        /* Modern Structural Layout Adaptability */
         @media (max-width: 600px) {
             body { padding: 12px; padding-bottom: 100px; }
             .glass-panel { padding: 16px; }
-            th, td { padding: 10px 8px; font-size: 0.85rem; }
+            .timeline-header { display: none; }
+            .timeline-row {
+                grid-template-columns: 1fr;
+                gap: 12px;
+                padding: 16px;
+            }
+            .timeline-actions {
+                justify-content: flex-start;
+                border-top: 1px solid var(--border-color);
+                padding-top: 12px;
+                margin-top: 4px;
+            }
             .button-group { flex-direction: column; }
             button { width: 100%; }
             .tab-bar-container { width: calc(100% - 24px); }
@@ -316,20 +459,16 @@
         </div>
 
         <div class="glass-panel">
-            <div class="schedule-table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Activity</th>
-                            <th>Start</th>
-                            <th>End</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="schedule-table-body"></tbody>
-                </table>
+            <div class="timeline-wrapper">
+                <div class="timeline-header">
+                    <div>Activity</div>
+                    <div>Timeline</div>
+                    <div>Status</div>
+                    <div style="text-align: right;">Actions</div>
+                </div>
+                <div id="timeline-container"></div>
             </div>
-            <button type="button" class="primary" id="add-activity-button" style="margin: 0 auto; display: flex;">
+            <button type="button" class="primary" id="add-activity-button" style="margin: 0 auto; display: inline-flex;">
                 <i class="fas fa-plus-circle"></i> Add New Activity
             </button>
         </div>
@@ -470,7 +609,7 @@
         const svgChart = document.getElementById('schedule-chart');
         const centerActivityLabel = document.getElementById('center-activity-label');
         const addActivityButton = document.getElementById('add-activity-button');
-        const scheduleTableBody = document.getElementById('schedule-table-body');
+        const timelineContainer = document.getElementById('timeline-container');
         
         const activityModal = document.getElementById('activity-modal');
         const modalCloseButton = document.getElementById('modal-close-button');
@@ -587,6 +726,22 @@
             updateActiveRoutineBar();
         }
 
+        function getRoutineStatus(item, currentMinutes) {
+            const startMin = item.startH * 60 + item.startM;
+            let endMin = item.endH * 60 + item.endM;
+
+            if (endMin <= startMin) {
+                endMin += 1440;
+                let adjustedCur = currentMinutes;
+                if (currentMinutes < startMin) adjustedCur += 1440;
+                if (adjustedCur >= startMin && adjustedCur < endMin) return 'now';
+            } else {
+                if (currentMinutes >= startMin && currentMinutes < endMin) return 'now';
+            }
+            
+            return (currentMinutes >= endMin) ? 'done' : 'upcoming';
+        }
+
         function updateActiveRoutineBar() {
             const now = new Date(); const curH = now.getHours(); const curM = now.getMinutes();
             const currentMinutes = curH * 60 + curM; const activeBar = document.getElementById('active-routine-bar');
@@ -594,14 +749,10 @@
 
             let activeRoutine = null;
             for (const activity of currentScheduleData) {
-                const startMin = activity.startH * 60 + activity.startM;
-                let endMin = activity.endH * 60 + activity.endM;
-
-                if (endMin <= startMin) {
-                    endMin += 1440; let adjustedCur = currentMinutes;
-                    if (currentMinutes < startMin) adjustedCur += 1440;
-                    if (adjustedCur >= startMin && adjustedCur < endMin) { activeRoutine = activity; break; }
-                } else if (currentMinutes >= startMin && currentMinutes < endMin) { activeRoutine = activity; break; }
+                if (getRoutineStatus(activity, currentMinutes) === 'now') {
+                    activeRoutine = activity;
+                    break;
+                }
             }
 
             if (activeRoutine) {
@@ -609,28 +760,64 @@
                 activeBar.setAttribute('d', describeArc(cx, cy, radius, curAngle - 0.2, curAngle + 0.2));
                 activeBar.style.display = 'block'; centerActivityLabel.textContent = activeRoutine.label;
             } else { activeBar.style.display = 'none'; centerActivityLabel.textContent = "No Active Routine"; }
+
+            // Dynamic background evaluation loop mapping to UI cards seamlessly
+            document.querySelectorAll('.timeline-row').forEach(row => {
+                const item = currentScheduleData.find(i => i.id === row.dataset.id);
+                if(item) {
+                    const status = getRoutineStatus(item, currentMinutes);
+                    const pill = row.querySelector('.status-pill');
+                    row.className = `timeline-row ${status === 'now' ? 'active-current' : ''}`;
+                    if(pill) {
+                        pill.className = `status-pill ${status}`;
+                        pill.innerHTML = status === 'now' ? '<i class="fas fa-spinner fa-spin style="margin-right:4px;"></i> Active Now' : (status === 'done' ? 'Completed' : 'Upcoming');
+                    }
+                }
+            });
         }
 
         function createScheduleTable() {
-            scheduleTableBody.innerHTML = '';
+            timelineContainer.innerHTML = '';
             if (currentScheduleData.length === 0) {
-                scheduleTableBody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--text-muted);">No assigned activities found. Setup a routine to monitor progress.</td></tr>`;
+                timelineContainer.innerHTML = `<div style="text-align: center; padding: 24px; color: var(--text-muted); font-size: 0.95rem;">No assigned activities found. Setup a routine to monitor progress.</div>`;
                 return;
             }
+            
+            const now = new Date();
+            const currentMinutes = now.getHours() * 60 + now.getMinutes();
+
             currentScheduleData.forEach(item => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td style="font-weight:600;"><i class="fas fa-dot-circle" style="color:${item.color}; margin-right:8px;"></i>${item.label}</td>
-                    <td>${formatTime(item.startH, item.startM)}</td>
-                    <td>${formatTime(item.endH, item.endM)}</td>
-                    <td class="table-actions">
+                const status = getRoutineStatus(item, currentMinutes);
+                const isActive = status === 'now';
+                
+                const row = document.createElement('div');
+                row.className = `timeline-row ${isActive ? 'active-current' : ''}`;
+                row.setAttribute('data-id', item.id);
+                
+                let pillText = 'Upcoming';
+                if(status === 'now') pillText = '<i class="fas fa-spinner fa-spin"></i> Active Now';
+                if(status === 'done') pillText = 'Completed';
+
+                row.innerHTML = `
+                    <div class="activity-meta">
+                        <div class="activity-indicator-dot" style="background:${item.color}; box-shadow: 0 0 8px ${item.color};"></div>
+                        <span>${item.label}</span>
+                    </div>
+                    <div class="time-duration-box">
+                        <i class="far fa-clock"></i>
+                        <span>${formatTime(item.startH, item.startM)} - ${formatTime(item.endH, item.endM)}</span>
+                    </div>
+                    <div>
+                        <span class="status-pill ${status}">${pillText}</span>
+                    </div>
+                    <div class="timeline-actions">
                         <button class="secondary edit-btn"><i class="fas fa-edit"></i></button>
-                        <button class="danger delete-btn"><i class="fas fa-trash-alt"></i></button>
-                    </td>
+                        <button class="secondary delete-btn"><i class="fas fa-trash-alt"></i></button>
+                    </div>
                 `;
-                tr.querySelector('.edit-btn').onclick = () => editActivity(item);
-                tr.querySelector('.delete-btn').onclick = () => deleteActivity(item.id);
-                scheduleTableBody.appendChild(tr);
+                row.querySelector('.edit-btn').onclick = () => editActivity(item);
+                row.querySelector('.delete-btn').onclick = () => deleteActivity(item.id);
+                timelineContainer.appendChild(row);
             });
         }
 
@@ -932,7 +1119,6 @@
             } catch(e) { console.error("Error loading saved quiz.", e); }
         }
 
-        // Updated PDF Generator
         downloadPdfBtn.onclick = () => {
             if(quizState.activeQuestions.length === 0) return;
             triggerHUDToast("Generating PDF summary...");
@@ -966,7 +1152,7 @@
                     doc.text(line, margin + indent, currentY + size);
                     currentY += size * 1.2;
                 });
-                currentY += 5; // Paragraph spacing
+                currentY += 5;
             }
 
             const reportTitle = quizState.topic ? `${quizState.topic} Quiz Summary` : "Quiz Summary Report";
@@ -1020,3 +1206,4 @@
     </script>
 </body>
 </html>
+
